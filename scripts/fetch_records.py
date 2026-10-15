@@ -58,7 +58,7 @@ def main():
         OPTIONAL {{ ?p wdt:P734 ?fam }}
         OPTIONAL {{ ?p wdt:P535 ?fag }}
         OPTIONAL {{ ?article schema:about ?p ; schema:isPartOf <https://en.wikipedia.org/> }}
-        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en,mul". }}
       }}''')
     people = {}
     for b in base:
@@ -88,7 +88,7 @@ def main():
         rows = sparql(f'''
           SELECT ?p ?vLabel WHERE {{
             ?p wdt:P119 wd:{qid} ; wdt:{prop} ?v .
-            SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+            SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en,mul". }}
           }}''')
         for b in rows:
             q = b['p']['value'].rsplit('/', 1)[-1]
@@ -139,7 +139,7 @@ def main():
       SELECT DISTINCT ?x ?xLabel ?coord WHERE {{
         {{ ?x wdt:P276 wd:{qid} }} UNION {{ ?x wdt:P361 wd:{qid} }} UNION {{ ?x wdt:P131 wd:{qid} }}
         ?x wdt:P625 ?coord .
-        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en,mul". }}
       }}''')
     landmarks = []
     for b in lm_rows:
