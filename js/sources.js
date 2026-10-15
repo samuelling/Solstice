@@ -61,7 +61,7 @@
     if (!r.ok) throw new Error('no baked records');
     const d = await r.json();
     bakedMeta = { generated: d.generated, landmarks: d.landmarks || [], source: d.source };
-    const people = d.people.map((p) => {
+    const people = d.people.filter((p) => !/^Q\d+$/.test(p.label)).map((p) => {
       const rec = {
         id: p.qid, qid: p.qid, source: 'wikidata', baked: true,
         label: p.label, description: p.description || '',
@@ -75,6 +75,20 @@
       return rec;
     });
     return { at: Date.now(), qid: d.cemetery, people, baked: true, generated: d.generated };
+  }
+
+  /**
+   * The best-documented burials, for the sample stone: both dates, a
+   * Wikipedia introduction, and as many recorded facts as possible.
+   */
+  function richSamples(n = 60) {
+    const fields = ['occupations', 'birthPlace', 'deathPlace', 'spouses', 'father', 'mother', 'education'];
+    return [...baked.values()]
+      .filter((p) => p.birth && p.death && p.summary && !/^Q\d+$/.test(p.label))
+      .map((p) => ({ p, score: 3 + fields.filter((f) => p[f] && p[f].length).length + Math.min(p.summary.length, 900) / 450 }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, n)
+      .map(({ p }) => ({ qid: p.qid, label: p.label, birth: p.birth, death: p.death }));
   }
 
   /** All people Wikidata records as buried at Mount Auburn. Cached a week. */
@@ -270,6 +284,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
+    deepLinks, titleCase, store, richSamples, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
   };
 })(window);

@@ -247,7 +247,12 @@ If there is no legible inscription, reply {"lines":[],"condition":"..."}.`;
   // ---------------------------------------------------------------------------
   // A synthetic weathered stone, for trying the app away from the cemetery.
   // ---------------------------------------------------------------------------
-  async function sampleStone() {
+  /**
+   * Carve a weathered stone for one person: { label, birth, death }.
+   * Without a person, falls back to James Russell Lowell.
+   */
+  async function sampleStone(person) {
+    person = person || { label: 'James Russell Lowell', birth: 1819, death: 1891, qid: 'Q449670' };
     if (document.fonts) { try { await document.fonts.load('600 64px Cinzel'); } catch (e) { /* fall back */ } }
     const W = 900, H = 1150, c = document.createElement('canvas');
     c.width = W; c.height = H;
@@ -267,7 +272,7 @@ If there is no legible inscription, reply {"lines":[],"condition":"..."}.`;
     x.fillStyle = grad; x.fill();
     x.save(); x.clip();
     // grain
-    const rnd = mulberry(7);
+    const rnd = mulberry([...String(person.qid || person.label)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7));
     for (let i = 0; i < 14000; i++) {
       x.fillStyle = `rgba(${rnd() < 0.5 ? '60,62,58' : '235,236,230'},${0.05 + rnd() * 0.12})`;
       x.fillRect(sx + rnd() * sw, top + rnd() * (bottom - top), 1 + rnd() * 2, 1 + rnd() * 2);
@@ -284,10 +289,23 @@ If there is no legible inscription, reply {"lines":[],"condition":"..."}.`;
       x.fillStyle = `rgba(240,240,232,${0.55 * fade})`; x.fillText(text, W / 2 + 2, y + 3);
       x.fillStyle = `rgba(52,54,50,${0.9 * fade})`; x.fillText(text, W / 2, y);
     };
-    carve('JAMES RUSSELL', 430, 70);
-    carve('LOWELL', 530, 92);
-    carve('BORN FEB. 22, 1819', 680, 50);
-    carve('DIED AUG. 12, 1891', 770, 50, 0.8);
+    // Name across two lines (given names, then surname), sized to fit.
+    const words = String(person.label).toUpperCase().replace(/,/g, '').split(/\s+/).filter(Boolean);
+    const suffix = /^(JR\.?|SR\.?|II|III|IV)$/.test(words[words.length - 1]) ? words.pop() : null;
+    const surname = words.pop() + (suffix ? ` ${suffix}` : '');
+    const given = words.join(' ');
+    const fit = (text, size, max) => {
+      let s = size;
+      x.font = `600 ${s}px Cinzel, Georgia, serif`;
+      while (s > 28 && x.measureText(text).width > max) { s -= 2; x.font = `600 ${s}px Cinzel, Georgia, serif`; }
+      return s;
+    };
+    const maxW = sw - 90;
+    if (given) carve(given, 430, fit(given, 70, maxW));
+    carve(surname, 530, fit(surname, 92, maxW));
+    // Dates, the lower one more worn — the kind of ambiguity the matcher exists for.
+    carve(`BORN ${person.birth}`, 680, 54, 0.95);
+    carve(`DIED ${person.death}`, 770, 54, 0.62 + rnd() * 0.2);
     x.restore();
     return c;
   }

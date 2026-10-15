@@ -760,7 +760,17 @@
   });
   $('label[for="photo-input"]').addEventListener('click', startGPS);
   $('#type-btn').addEventListener('click', () => { startGPS(); S.ocr = null; hide('#match', '#record'); renderReading(); });
-  $('#sample-btn').addEventListener('click', async () => readFrom(await OCR.sampleStone()));
+  // Each sample is a different well-documented person, never the same twice running.
+  $('#sample-btn').addEventListener('click', async () => {
+    const pool = Src.richSamples();
+    let pick = null;
+    if (pool.length) {
+      const choices = pool.filter((p) => p.qid !== S.lastSample);
+      pick = choices[Math.floor(Math.random() * choices.length)];
+      S.lastSample = pick.qid;
+    }
+    readFrom(await OCR.sampleStone(pick));
+  });
   $('#reading-form').addEventListener('submit', (e) => { e.preventDefault(); runMatch(); });
   for (const k of ['birth', 'death']) {
     $('#reading-form')[k].addEventListener('input', () => { S.yearSource[k] = 'typed'; noteYearSource(k); });
