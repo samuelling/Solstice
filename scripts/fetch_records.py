@@ -107,6 +107,19 @@ def main():
     multi('P69', 'education')
     multi('P22', 'father')
     multi('P25', 'mother')
+    # The texture of a life: service, honours, work, faith, how it ended.
+    multi('P241', 'militaryBranch')
+    multi('P410', 'militaryRank')
+    multi('P607', 'conflicts')
+    multi('P166', 'awards')
+    multi('P463', 'memberOf')
+    multi('P108', 'employers')
+    multi('P800', 'notableWorks')
+    multi('P140', 'religion')
+    multi('P39', 'positions')
+    multi('P551', 'residences')
+    multi('P509', 'causeOfDeath')
+    multi('P1196', 'mannerOfDeath')
 
     # Family links with Wikidata IDs, so the app can tell which relatives
     # are also buried here. Each: {rel, qid, name}.

@@ -78,6 +78,27 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Portraits and grave photos (Wikimedia Commons thumbnails, baked in chunks)
+  // ---------------------------------------------------------------------------
+
+  const imageChunks = new Map();
+
+  /** { portrait?, grave? } each { data, page, artist, license }, or null. */
+  async function imagesOf(qid) {
+    const b = qid && baked.get(qid);
+    if (!b || b.images == null) return null;
+    if (!imageChunks.has(b.images)) {
+      imageChunks.set(b.images, fetch(`data/portraits/chunk-${b.images}.json`)
+        .then((r) => (r.ok ? r.json() : {}))
+        .catch(() => ({})));
+    }
+    const chunk = await imageChunks.get(b.images);
+    return chunk[qid] || null;
+  }
+
+  const hasImages = (qid) => { const b = baked.get(qid); return !!(b && b.images != null); };
+
+  // ---------------------------------------------------------------------------
   // Family within Mount Auburn
   // ---------------------------------------------------------------------------
 
@@ -153,7 +174,7 @@
     const fields = ['occupations', 'birthPlace', 'deathPlace', 'spouses', 'father', 'mother', 'education', 'relatives'];
     return [...baked.values()]
       .filter((p) => p.birth && p.death && p.summary && !/^Q\d+$/.test(p.label))
-      .map((p) => ({ p, score: 3 + fields.filter((f) => p[f] && p[f].length).length + Math.min(p.summary.length, 900) / 450 }))
+      .map((p) => ({ p, score: 3 + fields.filter((f) => p[f] && p[f].length).length + Math.min(p.summary.length, 900) / 450 + (p.images != null ? 1.5 : 0) }))
       .sort((a, b) => b.score - a.score)
       .slice(0, n)
       .map(({ p }) => ({ qid: p.qid, label: p.label, birth: p.birth, death: p.death }));
@@ -232,6 +253,18 @@
       add('Father', bk.father);
       add('Mother', bk.mother);
       add('Educated at', bk.education);
+      add('Lived in', bk.residences);
+      add('Worked for', bk.employers);
+      add('Offices held', bk.positions);
+      add('Military branch', bk.militaryBranch);
+      add('Military rank', bk.militaryRank);
+      add('Served in', bk.conflicts);
+      add('Member of', bk.memberOf);
+      add('Notable works', bk.notableWorks);
+      add('Honours', bk.awards);
+      add('Religion', bk.religion);
+      add('Cause of death', bk.causeOfDeath);
+      add('Manner of death', bk.mannerOfDeath);
       return { facts, findAGraveId: bk.findAGrave || null, image: null };
     }
     const list = (v) => `(GROUP_CONCAT(DISTINCT ?${v}L; separator="|") AS ?${v}s)`;
@@ -352,6 +385,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
+    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, imagesOf, hasImages, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
   };
 })(window);

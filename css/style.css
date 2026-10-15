@@ -362,3 +362,17 @@ footer { padding-top: 10px; padding-bottom: 40px; color: var(--muted); font-size
 .src-line { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }
 .stone-line { font-size: 0.88rem; color: var(--muted); margin: 6px 0 0; }
 .facts li { grid-template-columns: 7.5em 1fr; }
+
+/* ---- portraits and grave photos ---- */
+.best-portrait { float: right; width: 72px; height: 90px; object-fit: cover; border-radius: var(--radius-sm); margin: 0 0 8px 12px; background: var(--line); }
+.best::after { content: ''; display: block; clear: both; }
+.grave-photo { margin: 14px 0 0; clear: both; }
+.grave-photo img { display: block; max-width: 100%; max-height: 260px; border-radius: var(--radius-sm); background: var(--line); }
+.grave-photo.wide img { max-height: 340px; }
+.grave-photo figcaption, .portrait-fig figcaption { font-size: 0.75rem; color: var(--muted); margin-top: 6px; line-height: 1.35; }
+.grave-photo figcaption a, .portrait-fig figcaption a { color: inherit; }
+.portrait-fig { float: right; width: 108px; margin: 0 0 8px 14px; }
+.portrait-fig .portrait { float: none; display: block; width: 108px; height: 136px; margin: 0; }
+.portrait-fig figcaption { font-size: 0.68rem; overflow-wrap: anywhere; }
+.favatar-slot:empty { display: none; }
+.favatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 8px; background: var(--line); }

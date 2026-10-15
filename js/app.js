@@ -436,6 +436,8 @@
   // Wikidata descriptions often end with the dates already shown beside them.
   const cleanDesc = (d) => String(d || '').replace(/\s*\(\s*\d{3,4}\s*[-–]\s*\d{0,4}\s*\)\s*$/, '').trim();
 
+  const credit = (img) => `Photo: <a href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}${img.license ? `, ${esc(img.license)}` : ''}</a>, Wikimedia Commons`;
+
   const fmtDist = (m) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(1)} km`);
 
   function renderCandidates() {
@@ -484,6 +486,15 @@
     if (rows.length) html += `<p class="others-h">${best ? 'Not them?' : 'Possible matches'}</p><ul class="others">${rows.join('')}</ul>`;
 
     $('#candidates').innerHTML = html;
+    if (best && best.person.qid) {
+      Src.imagesOf(best.person.qid).then((img) => {
+        const card = $('#candidates .best');
+        if (!img || S.result !== r || !card) return;
+        if (img.portrait) card.insertAdjacentHTML('afterbegin', `<img class="best-portrait" src="${img.portrait.data}" alt="Portrait of ${esc(best.person.label)}">`);
+        if (img.grave) card.insertAdjacentHTML('beforeend', `<figure class="grave-photo"><img src="${img.grave.data}" alt="The grave of ${esc(best.person.label)}">
+          <figcaption>Their grave, as photographed for Wikimedia Commons. Does it look like the stone in front of you? ${credit(img.grave)}</figcaption></figure>`);
+      });
+    }
     for (const btn of document.querySelectorAll('#candidates [data-pick]')) {
       btn.addEventListener('click', () => {
         const k = btn.dataset.pick;
@@ -553,6 +564,7 @@
       </div>
 
       <div id="wd-slot"></div>
+      <div id="grave-slot"></div>
       <div id="family-slot"></div>
 
       <h3>In the newspapers</h3>
@@ -568,6 +580,17 @@
       </div>`;
 
     renderFamily(person, storyCtx.family, choice);
+    if (choice.kind === 'match' && person.qid) {
+      Src.imagesOf(person.qid).then((img) => {
+        if (!img || S.recordToken !== token) return;
+        if (img.portrait) {
+          $('#portrait-slot').innerHTML = `<figure class="portrait-fig"><img class="portrait" src="${img.portrait.data}" alt="Portrait of ${esc(person.label)}"><figcaption>${credit(img.portrait)}</figcaption></figure>`;
+        }
+        if (img.grave) {
+          $('#grave-slot').innerHTML = `<h3>Their grave</h3><figure class="grave-photo wide"><img src="${img.grave.data}" alt="The grave of ${esc(person.label)}"><figcaption>${credit(img.grave)}</figcaption></figure>`;
+        }
+      });
+    }
     $('#again-btn').onclick = () => go('capture');
     $('#save-btn').onclick = () => saveNote(person, choice);
     $('#save-hint').textContent = gpsForMatching()
@@ -606,7 +629,7 @@
         const lead = parts.slice(0, 2).join('').trim(), rest = parts.slice(2).join('').trim();
         html += `<h3>In brief</h3><blockquote class="summary"><p>${esc(lead)}</p>${rest ? `<details class="more"><summary>Read more</summary><p>${esc(rest)}</p></details>` : ''}
           <p class="src-line"><span class="tag summary">Encyclopedia</span><a href="${esc(s.url)}" target="_blank" rel="noopener">Wikipedia</a></p></blockquote>`;
-        if (s.thumb) $('#portrait-slot').innerHTML = `<img class="portrait" src="${esc(s.thumb)}" alt="Portrait of ${esc(person.label)}">`;
+        if (s.thumb && !$('#portrait-slot').innerHTML.trim()) $('#portrait-slot').innerHTML = `<img class="portrait" src="${esc(s.thumb)}" alt="Portrait of ${esc(person.label)}">`;
       }
       $('#wd-slot').innerHTML = html;
     }
@@ -677,9 +700,9 @@
         const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
         const where = whereIs(r);
         const links = relLinks(r);
-        return `<li>
+        return `<li data-qid="${esc(r.qid)}">
           <span class="rel">${REL_LABEL[r.rel] || 'Relative'}</span>
-          <span class="fname">${esc(r.name)}</span>
+          <span class="fname"><span class="favatar-slot"></span>${esc(r.name)}</span>
           <span class="fyrs">${esc(yrs)}</span>
           ${cleanDesc(r.description) ? `<span class="fdesc">${esc(cleanDesc(r.description))}</span>` : ''}
           ${where ? `<span class="fwhere">${esc(where)}</span>` : ''}
@@ -708,6 +731,13 @@
       </details>`;
     }
     slot.innerHTML = html;
+    for (const r of here) {
+      if (!Src.hasImages(r.qid)) continue;
+      Src.imagesOf(r.qid).then((img) => {
+        const li = slot.querySelector(`li[data-qid="${r.qid}"] .favatar-slot`);
+        if (img && img.portrait && li) li.innerHTML = `<img class="favatar" src="${img.portrait.data}" alt="">`;
+      });
+    }
   }
 
   /** Saved stones with the same surname, near where you're standing now. */

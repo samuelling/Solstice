@@ -1,0 +1,47 @@
+name: Gather texts for stories
+
+# Wikipedia articles, Wikisource period biographies and Library of Congress
+# newspaper pages. Incremental: each run continues where the last stopped,
+# so it runs often until everyone has been checked, then is a quick no-op.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/fetch_texts.py
+      - .github/workflows/texts.yml
+  schedule:
+    - cron: '41 */3 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: texts
+  cancel-in-progress: false
+
+jobs:
+  gather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Gather texts
+        env:
+          TEXT_BUDGET_SECONDS: '3000'
+        run: python scripts/fetch_texts.py
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add data/texts
+          git diff --cached --quiet || git commit -m "Gather texts for stories"
+          for i in 1 2 3 4 5; do
+            git pull --rebase -X theirs origin main && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
