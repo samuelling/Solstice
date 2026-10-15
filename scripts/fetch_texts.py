@@ -168,19 +168,38 @@ def name_variants(p):
     return list(dict.fromkeys(out))
 
 
-def excerpts(text, phrases, limit=2, width=420):
+def name_pattern(ph):
+    return r'\b' + r'\s*'.join(re.escape(w) for w in ph.split()) + r'\b'
+
+
+def snap(flat, start, end, before=170, after=650):
     """
-    Windows of text around the person's actual name. A page that only
-    mentions the surname (a city called Lawrence, some other Lowell) yields
-    nothing, so it's dropped rather than misattributed.
+    A window that opens at the start of the sentence or headline containing
+    the name (not mid-way through the previous article) and ends at a
+    sentence end.
+    """
+    a = max(0, start - before)
+    head = flat[a:start]
+    cut = max(head.rfind('. '), head.rfind('? '), head.rfind('! '))
+    a = a + cut + 2 if cut >= 0 else a
+    b = min(len(flat), end + after)
+    tail = flat[end:b]
+    stop = max(tail.rfind('. '), tail.rfind('.'), 0)
+    b = end + stop + 1 if stop > 80 else b
+    return flat[a:b].strip()
+
+
+def excerpts(text, phrases, limit=2):
+    """
+    Passages around the person's actual name. A page that only mentions the
+    surname (a city called Lawrence, some other Lowell) yields nothing, so it
+    is dropped rather than misattributed.
     """
     flat = re.sub(r'\[\[/?tag\]\]', '', re.sub(r'\s+', ' ', text or ''))
     out = []
     for ph in phrases:
-        pat = r'\b' + r'\s*'.join(re.escape(w) for w in ph.split()) + r'\b'
-        for m in re.finditer(pat, flat, flags=re.I):
-            a, b = max(0, m.start() - width), min(len(flat), m.end() + width)
-            snip = flat[a:b].strip()
+        for m in re.finditer(name_pattern(ph), flat, flags=re.I):
+            snip = snap(flat, m.start(), m.end())
             if any(snip[:80] in o or o[:80] in snip for o in out):
                 continue
             out.append(snip)
@@ -189,6 +208,21 @@ def excerpts(text, phrases, limit=2, width=420):
         if out:
             break
     return out
+
+
+def retrim(item, phrases):
+    """Re-centre excerpts gathered with the older, wider window."""
+    new = []
+    for x in item.get('excerpts', []):
+        for ph in phrases:
+            m = re.search(name_pattern(ph), x, flags=re.I)
+            if m:
+                new.append(snap(x, m.start(), m.end()))
+                break
+        else:
+            new.append(x)
+    item['excerpts'] = new
+    item['t'] = 1
 
 
 def page_text(result):
@@ -200,14 +234,14 @@ def page_text(result):
     if not wc:
         return ''
     try:
-        d = get(wc + '&full_text=1')
+        d = get(wc + '&full_text=1', tries=2)
         v = next(iter(d.values())) if isinstance(d, dict) and d else {}
         if v.get('full_text'):
             return v['full_text']
     except Exception as e:
         print('full text failed', e, file=sys.stderr)
     try:
-        d = get(wc)
+        d = get(wc, tries=2)
         v = next(iter(d.values())) if isinstance(d, dict) and d else {}
         return re.sub(r'\[\[/?tag\]\]', '', v.get('relevant_snippet', ''))
     except Exception:
@@ -221,7 +255,7 @@ def newspapers(p):
     variants = name_variants(p)
     items, seen = [], set()
     for variant in variants:
-        q = urllib.parse.urlencode({'q': f'"{variant}"', 'dates': f'{death}/{min(death + 1, 1963)}', 'fo': 'json', 'c': 6,
+        q = urllib.parse.urlencode({'q': f'"{variant}"', 'dates': f'{death}/{min(death + 1, 1963)}', 'fo': 'json', 'c': 4,
                                     'fa': 'location_state:massachusetts'})
         try:
             d = get('https://www.loc.gov/collections/chronicling-america/?' + q)
@@ -245,7 +279,7 @@ def newspapers(p):
                 'title': re.sub(r'\s+', ' ', (r.get('partof_title') or [r.get('title', '')])[0]).strip(),
                 'date': r.get('date', ''), 'url': rid, 'excerpts': ex,
             })
-            if len(items) >= 4:
+            if len(items) >= 3:
                 break
         if items:
             break
@@ -296,6 +330,13 @@ def main():
     print('people with period entries:', n, 'of', len(links), 'linked')
     save_chunks(chunks)
 
+    # Re-centre excerpts gathered before the window was tightened.
+    for p in people:
+        e = chunks[chunk_of(p['qid'])].get(p['qid'])
+        for it in (e or {}).get('papers', {}).get('items', []):
+            if not it.get('t'):
+                retrim(it, name_variants(p))
+
     # Newspapers, within the time budget; best-documented first.
     order = sorted(people, key=lambda p: (-(1 if p.get('summary') else 0), p['label']))
     n = skipped = 0
@@ -315,7 +356,10 @@ def main():
             save_chunks(chunks)
             print('newspapers checked:', n, round(time.time() - T0), 's')
     save_chunks(chunks)
-    print('newspapers checked this run:', n, '| left for next run:', skipped)
+    remaining = sum(1 for p in people if chunks[chunk_of(p['qid'])].get(p['qid'], {}).get('papers', {}).get('v') != 2)
+    print('newspapers checked this run:', n, '| still to check:', remaining)
+    with open(os.environ.get('GITHUB_OUTPUT', os.devnull), 'a') as fh:
+        fh.write(f'remaining={remaining}\n')
 
 
 if __name__ == '__main__':

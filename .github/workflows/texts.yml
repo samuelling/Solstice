@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: texts
@@ -31,6 +32,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Gather texts
+        id: gather
         env:
           TEXT_BUDGET_SECONDS: '3000'
         run: python scripts/fetch_texts.py
@@ -41,7 +43,13 @@ jobs:
           git add data/texts
           git diff --cached --quiet || git commit -m "Gather texts for stories"
           for i in 1 2 3 4 5; do
-            git pull --rebase -X theirs origin main && git push && exit 0
+            git pull --rebase -X theirs origin main && git push && break
             sleep $((i * 5))
           done
-          exit 1
+      # GitHub's hourly schedule is unreliable, so while people are left to
+      # check, each run starts the next one.
+      - name: Continue if people remain
+        if: steps.gather.outputs.remaining != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run texts.yml --ref main
