@@ -134,6 +134,24 @@ def main():
                 by_title[t]['summary'] = cut
         time.sleep(0.5)
 
+    # Named places inside the cemetery with coordinates, for "I'm near…".
+    lm_rows = sparql(f'''
+      SELECT DISTINCT ?x ?xLabel ?coord WHERE {{
+        {{ ?x wdt:P276 wd:{qid} }} UNION {{ ?x wdt:P361 wd:{qid} }} UNION {{ ?x wdt:P131 wd:{qid} }}
+        ?x wdt:P625 ?coord .
+        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+      }}''')
+    landmarks = []
+    for b in lm_rows:
+        c = b['coord']['value']
+        name = b.get('xLabel', {}).get('value', '')
+        if not c.startswith('Point(') or not name or (name.startswith('Q') and name[1:].isdigit()):
+            continue
+        lon, lat = c[6:-1].split()
+        landmarks.append({'name': name, 'lat': round(float(lat), 6), 'lon': round(float(lon), 6)})
+    landmarks.sort(key=lambda r: r['name'])
+    print(len(landmarks), 'landmarks')
+
     out = []
     for p in sorted(people.values(), key=lambda r: (r['family'] or r['label'].split()[-1], r['label'])):
         given = p['given'][0] if p['given'] else ''
@@ -151,6 +169,7 @@ def main():
             'generated': datetime.date.today().isoformat(),
             'count': len(out),
             'withCoordinates': sum(1 for r in out if 'lat' in r),
+            'landmarks': landmarks,
             'people': out,
         }, f, ensure_ascii=False, separators=(',', ':'))
     print('wrote', len(out), 'people,', sum(1 for r in out if 'lat' in r), 'with coordinates,',
