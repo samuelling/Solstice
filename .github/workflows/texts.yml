@@ -10,7 +10,7 @@ on:
       - scripts/fetch_texts.py
       - .github/workflows/texts.yml
   schedule:
-    - cron: '41 */3 * * *'
+    - cron: '41 * * * *'
 
 permissions:
   contents: write

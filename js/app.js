@@ -652,7 +652,7 @@
 
     // Newspapers: baked excerpts when gathered; otherwise a live search
     // where the network allows (not inside a Claude artifact).
-    if (texts && texts.papers && texts.papers.checked) {
+    if (texts && texts.papers && texts.papers.v === 2) {
       storyCtx.papers = (texts.papers.items || []).map((it) => ({ ...it, snippet: (it.excerpts || []).join(' … ') }));
       renderBakedPapers(texts.papers.items || [], person);
     } else {
@@ -728,7 +728,7 @@
       <ul class="papers">${withText.map((it) => `<li>
         <a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(tc(it.title))}</a>
         <div class="meta"><span class="tag mention">Possible mention</span>${esc(it.date)}</div>
-        ${it.excerpts.map((x) => `<p class="snip">…${markName(x, fam)}…</p>`).join('')}
+        ${it.excerpts.map((x) => `<p class="snip">…${markName(String(x).replace(/\[\[\/?tag\]\]/g, ''), fam)}…</p>`).join('')}
       </li>`).join('')}</ul>
       <p class="hint"><a href="${esc(searchUrl)}" target="_blank" rel="noopener">Search every paper on loc.gov</a></p>`;
   }

@@ -168,15 +168,25 @@ def name_variants(p):
     return list(dict.fromkeys(out))
 
 
-def excerpts(text, family, limit=2, width=450):
+def excerpts(text, phrases, limit=2, width=420):
+    """
+    Windows of text around the person's actual name. A page that only
+    mentions the surname (a city called Lawrence, some other Lowell) yields
+    nothing, so it's dropped rather than misattributed.
+    """
+    flat = re.sub(r'\[\[/?tag\]\]', '', re.sub(r'\s+', ' ', text or ''))
     out = []
-    for m in re.finditer(re.escape(family), text, flags=re.I):
-        a, b = max(0, m.start() - width), min(len(text), m.end() + width)
-        snip = re.sub(r'\s+', ' ', text[a:b]).strip()
-        if out and snip[:80] in out[-1]:
-            continue
-        out.append(snip)
-        if len(out) >= limit:
+    for ph in phrases:
+        pat = r'\b' + r'\s*'.join(re.escape(w) for w in ph.split()) + r'\b'
+        for m in re.finditer(pat, flat, flags=re.I):
+            a, b = max(0, m.start() - width), min(len(flat), m.end() + width)
+            snip = flat[a:b].strip()
+            if any(snip[:80] in o or o[:80] in snip for o in out):
+                continue
+            out.append(snip)
+            if len(out) >= limit:
+                return out
+        if out:
             break
     return out
 
@@ -207,10 +217,10 @@ def page_text(result):
 def newspapers(p):
     death = p.get('death')
     if not death or death < 1770 or death > 1963:
-        return {'checked': True, 'items': []}
-    family = p.get('family') or p['label'].split()[-1]
+        return {'checked': True, 'v': 2, 'items': []}
+    variants = name_variants(p)
     items, seen = [], set()
-    for variant in name_variants(p):
+    for variant in variants:
         q = urllib.parse.urlencode({'q': f'"{variant}"', 'dates': f'{death}/{min(death + 1, 1963)}', 'fo': 'json', 'c': 6,
                                     'fa': 'location_state:massachusetts'})
         try:
@@ -218,7 +228,7 @@ def newspapers(p):
         except Exception as e:
             print('loc search failed', variant, e, file=sys.stderr)
             return None  # try again next run
-        time.sleep(1.5)
+        time.sleep(1.0)
         for r in d.get('results') or []:
             rid = r.get('id')
             if not rid or rid in seen:
@@ -226,10 +236,11 @@ def newspapers(p):
             seen.add(rid)
             text = page_text(r)
             time.sleep(1.0)
-            ex = excerpts(text, family) if text else []
+            ex = excerpts(text, variants) if text else []
             if not ex:
-                desc = (r.get('description') or [''])[0]
-                ex = excerpts(desc, family) or []
+                ex = excerpts((r.get('description') or [''])[0], variants)
+            if not ex:
+                continue  # the page doesn't actually name them
             items.append({
                 'title': re.sub(r'\s+', ' ', (r.get('partof_title') or [r.get('title', '')])[0]).strip(),
                 'date': r.get('date', ''), 'url': rid, 'excerpts': ex,
@@ -238,7 +249,7 @@ def newspapers(p):
                 break
         if items:
             break
-    return {'checked': True, 'items': [i for i in items if i['excerpts']] or items[:2]}
+    return {'checked': True, 'v': 2, 'items': items}
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +304,7 @@ def main():
             skipped += 1
             continue
         e = entry(chunks, p['qid'])
-        if e.get('papers', {}).get('checked'):
+        if e.get('papers', {}).get('v') == 2:
             continue
         res = newspapers(p)
         if res is None:
