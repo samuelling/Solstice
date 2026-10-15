@@ -108,6 +108,33 @@ def main():
     multi('P22', 'father')
     multi('P25', 'mother')
 
+    # Family links with Wikidata IDs, so the app can tell which relatives
+    # are also buried here. Each: {rel, qid, name}.
+    def family(prop, rel):
+        rows = sparql(f'''
+          SELECT ?p ?v ?vLabel WHERE {{
+            ?p wdt:P119 wd:{qid} ; wdt:{prop} ?v .
+            SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en,mul". }}
+          }}''')
+        for b in rows:
+            q = b['p']['value'].rsplit('/', 1)[-1]
+            vq = b['v']['value'].rsplit('/', 1)[-1]
+            name = b.get('vLabel', {}).get('value', '')
+            if q not in people or not vq.startswith('Q'):
+                continue
+            if name.startswith('Q') and name[1:].isdigit():
+                name = ''
+            fam = people[q].setdefault('relatives', [])
+            if not any(r['qid'] == vq and r['rel'] == rel for r in fam):
+                fam.append({'rel': rel, 'qid': vq, 'name': name})
+        time.sleep(1)
+
+    family('P22', 'father')
+    family('P25', 'mother')
+    family('P26', 'spouse')
+    family('P3373', 'sibling')
+    family('P40', 'child')
+
     # Wikipedia intros, 20 titles per request.
     with_article = [p for p in people.values() if p['article']]
     by_title = {}
