@@ -99,8 +99,27 @@ def wikipedia_full():
     return {'length': len(text), 'headings': [l for l in text.splitlines() if l.startswith('==')][:40], 'start': text[:400]}
 
 
-attempt('loc_search.json', loc_search)
-attempt('loc_item.json', loc_item)
-attempt('wikisource.json', wikisource)
-attempt('wikipedia_full.json', wikipedia_full)
+
+def loc_text():
+    q = urllib.parse.urlencode({'q': '"Henry W. Longfellow"', 'dates': '1882/1882', 'fo': 'json', 'c': 2,
+                                'fa': 'location_state:massachusetts'})
+    d = get('https://www.loc.gov/collections/chronicling-america/?' + q)
+    r = d['results'][0]
+    out = {'id': r.get('id'), 'description_len': len((r.get('description') or [''])[0]),
+           'resources': r.get('resources'), 'word_coordinates_pages': shape(d.get('word_coordinates_pages')),
+           'keys': sorted(r.keys())}
+    tried = {}
+    for res in (r.get('resources') or []):
+        for k, v in res.items():
+            if isinstance(v, str) and v.startswith('http') and any(x in v for x in ('xml', 'txt', 'text', 'word')):
+                try:
+                    body = get(v, raw=True)
+                    tried[k] = {'url': v, 'len': len(body), 'head': body[:600]}
+                except Exception as e:
+                    tried[k] = {'url': v, 'error': repr(e)}
+    out['tried'] = tried
+    return out
+
+
+attempt('loc_text.json', loc_text)
 print('probe done')
