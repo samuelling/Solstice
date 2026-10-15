@@ -103,7 +103,18 @@ def wikipedia_full():
 def loc_text():
     q = urllib.parse.urlencode({'q': '"Henry W. Longfellow"', 'dates': '1882/1882', 'fo': 'json', 'c': 2,
                                 'fa': 'location_state:massachusetts'})
-    d = get('https://www.loc.gov/collections/chronicling-america/?' + q)
+    import time
+    d = None
+    for qq in (q, urllib.parse.urlencode({'q': 'Longfellow', 'dates': '1882/1882', 'fo': 'json', 'c': 2})):
+        for _ in range(3):
+            d = get('https://www.loc.gov/collections/chronicling-america/?' + qq)
+            if d.get('results'):
+                break
+            time.sleep(10)
+        if d.get('results'):
+            break
+    if not d.get('results'):
+        return {'no_results': True, 'total': d.get('total'), 'pagination': shape(d.get('pagination'))}
     r = d['results'][0]
     out = {'id': r.get('id'), 'description_len': len((r.get('description') or [''])[0]),
            'resources': r.get('resources'), 'word_coordinates_pages': shape(d.get('word_coordinates_pages')),
