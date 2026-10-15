@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#1A1F21" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M7 30V13a9 9 0 0 1 18 0v17z' fill='%235E676A'/%3E%3C/svg%3E">
 </head>
@@ -73,10 +73,21 @@
         <button id="export-btn" class="btn small">Export as JSON</button>
       </div>
     </details>
+
+    <details id="settings" class="notes">
+      <summary>Story settings</summary>
+      <p class="hint">Without a key, Solstice writes a plain account from the records on your phone. With an Anthropic API key, Claude writes the story — and every sentence is still checked against the evidence before you see it. Keys come from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>, billed per use, separate from any Claude plan.</p>
+      <form id="key-form" class="fields" autocomplete="off">
+        <label class="span2">Anthropic API key<input name="key" type="password" spellcheck="false" placeholder="sk-ant-…"></label>
+        <button class="btn small" type="submit">Save key</button>
+        <button class="btn small" type="button" id="key-clear">Remove key</button>
+      </form>
+      <p class="hint" id="key-status"></p>
+    </details>
   </main>
 
   <footer>
-    <p>Records from Wikidata, Wikipedia and the Library of Congress’s Chronicling America. Reading runs on your phone with Tesseract. Nothing you photograph leaves your device.</p>
+    <p>Records from Wikidata, Wikipedia and the Library of Congress’s Chronicling America. Reading runs on your phone with Tesseract, and your photos never leave it. Writing a story sends the gathered text — not the photo — to Claude, using your key.</p>
   </footer>
 
   <div id="toast" class="toast" role="status" hidden></div>
@@ -85,6 +96,7 @@
   <script src="js/core.js"></script>
   <script src="js/sources.js"></script>
   <script src="js/ocr.js"></script>
+  <script src="js/story.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

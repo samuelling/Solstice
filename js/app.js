@@ -4,6 +4,7 @@
   const C = window.SolsticeCore;
   const Src = window.SolsticeSources;
   const OCR = window.SolsticeOCR;
+  const St = window.SolsticeStory;
   const NOTES_KEY = 'solstice.notes.v1';
   const NEAR_CEMETERY_M = 1500;
 
@@ -389,6 +390,22 @@
       ['Age', stone.aged ?? ''],
     ].filter(([, v]) => v !== '' && v != null);
 
+    // Everything the story is allowed to know, filled in as lookups return.
+    const token = (S.recordToken = {});
+    const storyCtx = {
+      name: fromStone[0][1],
+      birth: stone.birth ? topYear('birth') : null,
+      death: stone.death ? topYear('death') : null,
+      aged: stone.aged,
+      inscription: S.ocr && S.ocr.lines.length ? S.ocr.lines.map((l) => l.text) : null,
+      match: choice.kind === 'match' && posterior >= 0.01
+        ? { label: person.label, description: person.description || '', qid: person.source === 'notes' ? null : person.qid, posterior }
+        : null,
+      facts: [], summary: null, papers: [],
+      nearby: nearbySameSurname(stone.family, person),
+    };
+    S.story = null;
+
     sec.innerHTML = `
       <div class="record-head">
         <div id="portrait-slot"></div>
@@ -396,6 +413,10 @@
         <p class="sub">${esc(yrs)}${person.description ? ` · ${esc(person.description)}` : ''}</p>
       </div>
       <div class="verdict conf-${conf}"><p>${verdict}</p></div>
+
+      <div id="story" class="story">
+        <button class="btn primary" id="story-btn" disabled>Gathering the records…</button>
+      </div>
 
       <h3>From the stone</h3>
       <ul class="facts">${fromStone.map(([k, v]) => `<li><span class="k">${esc(k)}</span><span>${esc(v)}</span><span class="src"><span class="tag you">You read this</span>photo, checked by you</span></li>`).join('')}</ul>
@@ -432,8 +453,10 @@
     if (choice.kind === 'match' && person.qid) {
       $('#wd-slot').innerHTML = '<h3>What the records say</h3><p class="loading">Looking up Wikidata and Wikipedia…</p>';
       const [det, sum] = await Promise.allSettled([Src.wikidataDetails(person.qid), Src.wikipediaSummary(person.article)]);
+      if (S.recordToken !== token) return;
       let html = '<h3>What the records say</h3>';
       if (det.status === 'fulfilled') {
+        storyCtx.facts = det.value.facts;
         extras = { findAGraveId: det.value.findAGraveId };
         further();
         if (det.value.facts.length) {
@@ -444,6 +467,7 @@
       }
       if (sum.status === 'fulfilled' && sum.value && sum.value.text) {
         const s = sum.value;
+        storyCtx.summary = s;
         html += `<h3>In brief</h3><blockquote class="summary"><p>${esc(s.text)}</p><span class="src"><span class="tag summary">Encyclopedia</span><a href="${esc(s.url)}" target="_blank" rel="noopener">Wikipedia</a></span></blockquote>`;
         if (s.thumb) $('#portrait-slot').innerHTML = `<img class="portrait" src="${esc(s.thumb)}" alt="Portrait of ${esc(person.label)}">`;
       }
@@ -453,6 +477,8 @@
     // Newspapers
     try {
       const n = await Src.newspaperMentions(person);
+      if (S.recordToken !== token) return;
+      storyCtx.papers = n.items || [];
       const slot = $('#papers-slot');
       if (n.error) {
         slot.innerHTML = `<p class="muted">The newspaper search didn’t answer from here. <a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">Run it on loc.gov</a>.</p>`;
@@ -466,8 +492,112 @@
           <p class="hint"><a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">See every result on loc.gov</a></p>`;
       }
     } catch (e) {
+      if (S.recordToken !== token) return;
       $('#papers-slot').innerHTML = `<p class="muted">The newspaper search failed: ${esc(e.message)}</p>`;
     }
+
+    const btn = $('#story-btn');
+    btn.disabled = false;
+    btn.textContent = 'Tell their story';
+    btn.onclick = () => tellStory(storyCtx, token);
+  }
+
+  /** Saved stones with the same surname, near where you're standing now. */
+  function nearbySameSurname(family, person) {
+    const g = gpsForMatching();
+    if (!g || !family) return [];
+    const fam = C.normName(family);
+    return S.notes
+      .filter((n) => n.lat != null && C.normName(n.family) === fam && n.id !== person.noteId && !(person.qid && n.qid === person.qid))
+      .map((n) => ({ label: n.label, birth: n.birth, death: n.death, distance: C.haversineM(g.lat, g.lon, n.lat, n.lon) }))
+      .filter((n) => n.distance < 40)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 4);
+  }
+
+  // ---------------------------------------------------------------------------
+  // The story
+  // ---------------------------------------------------------------------------
+
+  const KEY_STORE = 'solstice.anthropicKey';
+  const getKey = () => { try { return localStorage.getItem(KEY_STORE) || ''; } catch (e) { return ''; } };
+
+  async function tellStory(ctx, token) {
+    const slot = $('#story');
+    const evidence = St.buildEvidence(ctx);
+    const key = getKey();
+    let story, note = '';
+    if (key) {
+      slot.innerHTML = '<p class="loading">Writing from the records, then checking every sentence…</p>';
+      try {
+        const raw = await St.requestStory({ key, evidence });
+        if (S.recordToken !== token) return;
+        story = St.validateStory(raw, evidence);
+        if (!story.report.kept) throw new Error('Every sentence failed the evidence check, so nothing is shown.');
+      } catch (e) {
+        if (S.recordToken !== token) return;
+        story = St.plainAccount(evidence, ctx);
+        note = `${e.message} Showing the plain account instead.`;
+      }
+    } else {
+      story = St.plainAccount(evidence, ctx);
+      note = 'This plain account is written on your phone from the records alone. Add an Anthropic API key in Story settings and Claude will write the full story — still checked against the same evidence.';
+    }
+    S.story = { story, evidence };
+    renderStory(story, evidence, note, ctx, token);
+  }
+
+  function renderStory(story, evidence, note, ctx, token) {
+    const num = (id) => Number(id.slice(1));
+    const kindTag = { stone: ['you', 'From the stone'], derived: ['you', 'Worked out'], record: ['record', 'Database record'], summary: ['summary', 'Encyclopedia'], mention: ['mention', 'Possible mention'], place: ['you', 'Your field notes'] };
+    const used = new Set(story.paragraphs.flat().flatMap((s) => s.cites));
+    const r = story.report;
+    const n = r.checked;
+    const down = r.downgraded ? `${r.downgraded === 1 ? 'One sentence' : `${r.downgraded} sentences`} resting only on a newspaper mention ${r.downgraded === 1 ? 'is' : 'are'} shown as an inference, not a fact.` : '';
+    const check = r.removed.length
+      ? `${n} sentence${n === 1 ? '' : 's'} checked against the evidence. ${r.removed.length} thing${r.removed.length === 1 ? '' : 's'} removed:`
+      : `All ${n} sentences checked against the evidence.`;
+
+    $('#story').innerHTML = `
+      <h3 class="story-title">${esc(story.title)}</h3>
+      <div class="story-body">${story.paragraphs.map((p) => `<p>${p.map((s) =>
+        `<span class="s s-${s.kind}">${esc(s.text)}${s.cites.map((c) => `<sup><a href="#ev-${c}" data-ev="${c}" aria-label="Source ${num(c)}">${num(c)}</a></sup>`).join('')}</span>`).join(' ')}</p>`).join('')}</div>
+      ${story.unknowns.length ? `<div class="unknowns"><p class="u-head">What the records don’t say</p><ul>${story.unknowns.map((u) => `<li>${esc(u)}</li>`).join('')}</ul></div>` : ''}
+      <p class="story-key"><span class="s-fact">Plain</span>: stated by a source. <span class="s-inference">Italic</span>: a reading of the sources. <span class="s-context">Grey</span>: background on the time and place. Numbers link to sources.</p>
+      <details class="checks"${r.removed.length ? ' open' : ''}>
+        <summary>${esc(check)}</summary>
+        ${r.removed.length ? `<ul>${r.removed.map((x) => `<li><s>${esc(x.text)}</s> — ${esc(x.reason)}</li>`).join('')}</ul>` : ''}
+      </details>
+      ${down ? `<p class="hint">${esc(down)}</p>` : ''}
+      <details class="ev-list" id="ev-list">
+        <summary>Sources for this story (${used.size} of ${evidence.length} used)</summary>
+        <ol>${evidence.map((e) => {
+          const [cls, lbl] = kindTag[e.kind] || ['you', e.kind];
+          return `<li id="ev-${e.id}" value="${num(e.id)}" class="${used.has(e.id) ? '' : 'unused'}"><span class="tag ${cls}">${lbl}</span><strong>${esc(e.label)}.</strong> ${esc(e.text.length > 400 ? e.text.slice(0, 400) + '…' : e.text)}
+            <span class="ev-src">${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.source)}</a>` : esc(e.source || '')}</span></li>`;
+        }).join('')}</ol>
+      </details>
+      ${note ? `<p class="hint">${esc(note)}</p>` : ''}
+      <div class="actions">
+        ${getKey() ? '<button class="btn small" id="story-again">Write it again</button>' : ''}
+        <button class="btn small" id="story-copy">Copy story</button>
+      </div>`;
+
+    for (const a of document.querySelectorAll('#story sup a')) {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        $('#ev-list').open = true;
+        const li = document.getElementById('ev-' + a.dataset.ev);
+        li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash');
+      });
+    }
+    const again = $('#story-again');
+    if (again) again.onclick = () => tellStory(ctx, token);
+    $('#story-copy').onclick = async () => {
+      const text = `${story.title}\n\n${story.paragraphs.map((p) => p.map((s) => s.text).join(' ')).join('\n\n')}${story.unknowns.length ? `\n\nWhat the records don’t say: ${story.unknowns.join('; ')}.` : ''}`;
+      try { await navigator.clipboard.writeText(text); toast('Story copied'); } catch (e) { toast('Couldn’t copy on this browser'); }
+    };
   }
 
   // ---------------------------------------------------------------------------
@@ -487,6 +617,15 @@
       lat: g ? g.lat : null, lon: g ? g.lon : null, acc: g ? g.accuracy : null,
       savedAt: new Date().toISOString(),
     };
+    if (S.story) {
+      const st = S.story.story;
+      note.story = {
+        title: st.title,
+        text: st.paragraphs.map((p) => p.map((s) => s.text).join(' ')).join('\n\n'),
+        unknowns: st.unknowns,
+        plain: !!st.plain,
+      };
+    }
     // Re-saving a stone you already saved updates it rather than duplicating.
     if (person.noteId) S.notes = S.notes.filter((n) => n.id !== person.noteId);
     S.notes.unshift(note);
@@ -502,7 +641,7 @@
     $('#notes-count').textContent = S.notes.length ? `(${S.notes.length})` : '';
     $('#notes-list').innerHTML = S.notes.length
       ? S.notes.map((n) => `<li><div><div class="n-name">${esc(n.label)}</div>
-          <div class="n-meta">${[n.birth, n.death].some(Boolean) ? `${n.birth || '?'}–${n.death || '?'} · ` : ''}${new Date(n.savedAt).toLocaleDateString()}${n.lat != null ? ' · located' : ''}</div></div>
+          <div class="n-meta">${[n.birth, n.death].some(Boolean) ? `${n.birth || '?'}–${n.death || '?'} · ` : ''}${new Date(n.savedAt).toLocaleDateString()}${n.lat != null ? ' · located' : ''}${n.story ? ' · story' : ''}</div></div>
           <button class="btn small" data-del="${esc(n.id)}" aria-label="Delete ${esc(n.label)}">Delete</button></li>`).join('')
       : '<li class="muted">No stones saved yet.</li>';
     for (const b of document.querySelectorAll('[data-del]')) {
@@ -549,6 +688,24 @@
     $('#reading-form')[k].addEventListener('input', () => { S.yearSource[k] = 'typed'; noteYearSource(k); });
   }
   $('#export-btn').addEventListener('click', exportNotes);
+
+  const keyStatus = () => {
+    const k = getKey();
+    $('#key-status').textContent = k ? `A key ending in …${k.slice(-4)} is saved on this phone only.` : 'No key saved — stories use the plain account.';
+  };
+  $('#key-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = e.target.key.value.trim();
+    if (!v) return;
+    try { localStorage.setItem(KEY_STORE, v); toast('Key saved'); } catch (err) { toast('This browser won’t store the key'); }
+    e.target.key.value = '';
+    keyStatus();
+  });
+  $('#key-clear').addEventListener('click', () => {
+    try { localStorage.removeItem(KEY_STORE); } catch (err) { /* nothing stored */ }
+    toast('Key removed'); keyStatus();
+  });
+  keyStatus();
 
   renderNotes();
   loadRecords();
