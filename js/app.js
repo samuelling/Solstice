@@ -40,14 +40,14 @@
         S.gps = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy, source: 'device' };
         showWhere();
       },
-      (err) => { if (!S.gps) setChip('#gps-chip', err.code === 1 ? 'Location off — tap “I’m near…”' : 'Location unavailable', 'warn'); },
+      (err) => { if (!S.gps) setChip('#gps-chip', err.code === 1 ? 'Location off — tap to set it' : 'Location unavailable', 'warn'); },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 },
     );
   }
 
   function showWhere() {
     const g = S.gps;
-    if (!g) { setChip('#gps-chip', 'Location off'); return; }
+    if (!g) { setChip('#gps-chip', 'Location off — tap to set it'); return; }
     const d = C.haversineM(g.lat, g.lon, C.CEMETERY.lat, C.CEMETERY.lon);
     if (d >= NEAR_CEMETERY_M) { setChip('#gps-chip', 'Not at Mount Auburn — location unused', 'warn'); return; }
     const acc = `±${Math.round(g.accuracy)} m`;
@@ -98,7 +98,36 @@
   function setChip(sel, text, cls) {
     const el = $(sel);
     el.textContent = text;
-    el.className = 'chip' + (cls ? ' ' + cls : '');
+    el.classList.remove('on', 'warn');
+    if (cls) el.classList.add(cls);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Steps: one at a time, in order
+  // ---------------------------------------------------------------------------
+  const STEPS = ['capture', 'reading', 'match', 'record'];
+  let current = 'capture';
+
+  function reachable(step) {
+    if (step === 'capture') return true;
+    if (step === 'reading') return !$('#reading-form').hidden && (!!S.ocr || !!S.typed);
+    if (step === 'match') return !!S.result;
+    return !!S.recordShown;
+  }
+
+  function go(step) {
+    current = step;
+    for (const id of STEPS) $('#' + id).hidden = id !== step;
+    const at = STEPS.indexOf(step);
+    for (const b of document.querySelectorAll('.steps button')) {
+      const i = STEPS.indexOf(b.dataset.step);
+      b.classList.toggle('current', i === at);
+      b.classList.toggle('done', i < at);
+      b.disabled = i === at || !reachable(b.dataset.step);
+      if (i === at) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    }
+    $('#near-panel').hidden = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function loadRecords(force) {
@@ -152,7 +181,9 @@
 
   async function readFrom(source) {
     startGPS();
-    hide('#match', '#record');
+    S.result = null;
+    S.recordShown = false;
+    S.typed = false;
     setBusy(true);
     try {
       // The photo's own GPS beats everything else for this stone.
@@ -195,7 +226,7 @@
 
   function renderReading() {
     const sec = $('#reading');
-    sec.hidden = false;
+    go('reading');
     const f = $('#reading-form');
     S.yearSource = { birth: 'ocr', death: 'ocr' };
 
@@ -220,7 +251,7 @@
       S.parsed = null;
       for (const k of ['birth', 'death']) { S.yearSource[k] = 'typed'; noteYearSource(k); }
     }
-    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
     if (!S.ocr) f.given.focus();
   }
 
@@ -323,8 +354,8 @@
 
   function renderMatch() {
     const sec = $('#match');
-    sec.hidden = false;
-    hide('#record');
+    go('match');
+    
     $('#dates').innerHTML = ['birth', 'death'].map(renderDates).join('');
     for (const b of document.querySelectorAll('#dates .yr.final')) {
       b.addEventListener('click', () => {
@@ -336,7 +367,10 @@
       });
     }
     renderCandidates();
-    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const b = S.stone.birth ? topYear('birth') : null, d = S.stone.death ? topYear('death') : null;
+    const dates = [b && `born ${b}`, d && `died ${d}`].filter(Boolean).join(', ');
+    $('#read-summary').textContent = dates ? `How the dates were read (${dates})` : 'How the dates were read';
+    $('.dates-details').hidden = !S.stone.birth && !S.stone.death;
   }
 
   function renderDates(key) {
@@ -399,36 +433,60 @@
     return out;
   }
 
+  // Wikidata descriptions often end with the dates already shown beside them.
+  const cleanDesc = (d) => String(d || '').replace(/\s*\(\s*\d{3,4}\s*[-–]\s*\d{0,4}\s*\)\s*$/, '').trim();
+
   const fmtDist = (m) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(1)} km`);
 
   function renderCandidates() {
     const r = S.result;
     const list = r.candidates.filter((c) => c.posterior >= 0.01).slice(0, 5);
-    const items = list.map((c, i) => {
-      const p = c.person, conf = C.confidenceLabel(c.posterior);
-      const yrs = [p.birth || '?', p.death || '?'].join('–');
-      return `<li class="cand">
-        <div class="cand-head"><span class="cand-name">${esc(p.label)}</span><span class="cand-years">${esc(yrs)}</span></div>
-        ${p.description ? `<p class="cand-desc">${esc(p.description)}</p>` : ''}
-        <div class="meter"><span class="track"><span class="fill bg-${conf}" style="width:${Math.max(2, c.posterior * 100)}%"></span></span><span class="conf-${conf}">${pct(c.posterior)} ${conf}</span></div>
-        <ul class="reasons">${reasons(c).map(([t, k]) => `<li class="${k}">${esc(t)}</li>`).join('')}</ul>
-        <button class="btn small" data-pick="${i}">This is them</button>
-      </li>`;
-    });
-    const uConf = C.confidenceLabel(r.unknown);
+    const best = list.length && list[0].posterior >= r.unknown ? list[0] : null;
     const noRecords = !S.known.length && !S.notes.length;
-    items.push(`<li class="cand unknown">
-      <div class="cand-head"><span class="cand-name">Someone not in these records</span></div>
-      <p class="cand-desc">${noRecords
-        ? 'Known burials haven’t loaded, so there’s nothing to match against yet.'
-        : `Solstice knows ${S.known.length.toLocaleString()} of Mount Auburn’s roughly 100,000 burials, so most stones land here. That’s an honest gap, not a failure.`}</p>
-      <div class="meter"><span class="track"><span class="fill bg-${uConf}" style="width:${Math.max(2, r.unknown * 100)}%"></span></span><span class="conf-${uConf}">${pct(r.unknown)}</span></div>
-      <button class="btn small" data-pick="unknown">Search the records for this name</button>
-    </li>`);
-    $('#candidates').innerHTML = items.join('');
-    for (const b of document.querySelectorAll('#candidates [data-pick]')) {
-      b.addEventListener('click', () => {
-        const k = b.dataset.pick;
+    const unknownWhy = noRecords
+      ? 'Known burials haven’t loaded, so there’s nothing to match against yet.'
+      : `Solstice knows ${S.known.length.toLocaleString()} of Mount Auburn’s roughly 100,000 burials, so most ordinary stones end up here. You can still search the records for the name.`;
+    const meter = (p) => {
+      const conf = C.confidenceLabel(p);
+      return `<div class="meter"><span class="track"><span class="fill bg-${conf}" style="width:${Math.max(2, p * 100)}%"></span></span><span class="conf-${conf}">${pct(p)} ${conf}</span></div>`;
+    };
+
+    let html;
+    if (best) {
+      const p = best.person;
+      html = `<div class="best">
+        <p class="best-name">${esc(p.label)}</p>
+        <p class="best-sub">${esc([p.birth || '?', p.death || '?'].join('–'))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</p>
+        ${meter(best.posterior)}
+        <ul class="reasons">${reasons(best).map(([t, k]) => `<li class="${k}">${esc(t)}</li>`).join('')}</ul>
+      </div>
+      <button class="btn primary cta" data-pick="0">Yes, this is ${esc(p.label)}</button>`;
+    } else {
+      html = `<div class="best unknown">
+        <p class="best-name">Probably someone not in these records</p>
+        <p class="best-sub">${esc(unknownWhy)}</p>
+        ${meter(r.unknown)}
+      </div>
+      <button class="btn primary cta" data-pick="unknown">Search the records for this name</button>`;
+    }
+
+    const others = list.map((c, i) => ({ c, i })).filter(({ c }) => c !== best);
+    const rows = others.map(({ c, i }) => `<li><button class="other" data-pick="${i}">
+        <span class="o-name">${esc(c.person.label)}</span>
+        <span class="o-meta">${esc([c.person.birth || '?', c.person.death || '?'].join('–'))} · ${pct(c.posterior)}</span>
+      </button></li>`);
+    if (best) {
+      rows.push(`<li><button class="other" data-pick="unknown">
+        <span class="o-name">Someone not in these records</span>
+        <span class="o-meta">${pct(r.unknown)}</span>
+      </button></li>`);
+    }
+    if (rows.length) html += `<p class="others-h">${best ? 'Not them?' : 'Possible matches'}</p><ul class="others">${rows.join('')}</ul>`;
+
+    $('#candidates').innerHTML = html;
+    for (const btn of document.querySelectorAll('#candidates [data-pick]')) {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.pick;
         renderRecord(k === 'unknown' ? { kind: 'unknown', posterior: r.unknown } : { kind: 'match', cand: list[Number(k)] });
       });
     }
@@ -440,7 +498,7 @@
 
   async function renderRecord(choice) {
     const sec = $('#record');
-    sec.hidden = false;
+    go('record');
     const stone = S.stone;
     const person = choice.kind === 'match'
       ? choice.cand.person
@@ -449,9 +507,12 @@
     const conf = C.confidenceLabel(posterior);
     const yrs = [person.birth, person.death].some(Boolean) ? `${person.birth || '?'} – ${person.death || '?'}` : '';
 
+    const basis = choice.kind === 'match'
+      ? ['the name', 'the dates', choice.cand.distance != null ? `${fmtDist(choice.cand.distance)} between you and the recorded grave` : null].filter(Boolean)
+      : [];
     const verdict = choice.kind === 'match'
-      ? `<strong class="conf-${conf}">${tc(conf)} match, ${pct(posterior)}.</strong> Weighed from the name, the dates and ${choice.cand.distance != null ? `the ${fmtDist(choice.cand.distance)} between you and the recorded grave` : 'no location (none on record or none from your phone)'}. ${person.source === 'notes' ? 'This is a stone you saved earlier.' : `Identity from <a href="https://www.wikidata.org/wiki/${esc(person.qid)}" target="_blank" rel="noopener">Wikidata</a>.`}`
-      : `<strong>Not a confirmed identity.</strong> Everything below is a search on the name and dates read from the stone. Hits may be someone else who shared the name.`;
+      ? `<span class="conf-${conf}">${tc(conf)} match · ${pct(posterior)}</span> from ${basis.join(', ').replace(/, ([^,]*)$/, ' and $1')}. ${person.source === 'notes' ? 'A stone you saved earlier.' : `<a href="https://www.wikidata.org/wiki/${esc(person.qid)}" target="_blank" rel="noopener">Wikidata record</a>`}`
+      : '<span class="conf-weak">Not a confirmed identity.</span> What follows is a search on the name and dates from the stone; hits may be someone else with the same name.';
 
     const fromStone = [
       ['Name', [stone.given, stone.family].filter(Boolean).map(tc).join(' ')],
@@ -473,25 +534,26 @@
         : null,
       facts: [], summary: null, papers: [],
       nearby: nearbySameSurname(stone.family, person),
+      family: choice.kind === 'match' && person.qid ? Src.familyOf(person.qid) : [],
     };
     S.story = null;
 
+    S.recordShown = true;
     sec.innerHTML = `
       <div class="record-head">
         <div id="portrait-slot"></div>
         <h2>${esc(person.label)}</h2>
-        <p class="sub">${esc(yrs)}${person.description ? ` · ${esc(person.description)}` : ''}</p>
+        <p class="sub">${esc(yrs)}${cleanDesc(person.description) ? ` · ${esc(cleanDesc(person.description))}` : ''}</p>
+        <p class="stone-line"><span class="tag you">On the stone</span>${esc(fromStone.map(([k, v]) => (k === 'Name' ? v : k === 'Age' ? `aged ${v}` : `${k.toLowerCase()} ${v}`)).join(', '))}</p>
+        <p class="verdict-line">${verdict}</p>
       </div>
-      <div class="verdict conf-${conf}"><p>${verdict}</p></div>
 
       <div id="story" class="story">
-        <button class="btn primary" id="story-btn" disabled>Gathering the records…</button>
+        <button class="btn primary cta" id="story-btn" disabled>Gathering the records…</button>
       </div>
 
-      <h3>From the stone</h3>
-      <ul class="facts">${fromStone.map(([k, v]) => `<li><span class="k">${esc(k)}</span><span>${esc(v)}</span><span class="src"><span class="tag you">You read this</span>photo, checked by you</span></li>`).join('')}</ul>
-
       <div id="wd-slot"></div>
+      <div id="family-slot"></div>
 
       <h3>In the newspapers</h3>
       <div id="papers-slot"><p class="loading">Searching the Library of Congress…</p></div>
@@ -499,23 +561,24 @@
       <h3>Look further</h3>
       <ul class="further" id="further-slot"></ul>
 
-      <div class="actions" style="margin-top:20px">
-        <button class="btn primary" id="save-btn">Save to field notes</button>
-        <button class="btn" id="again-btn">Read another stone</button>
-      </div>
-      <p class="hint" id="save-hint"></p>`;
+      <div class="finish">
+        <button class="btn cta" id="save-btn">Save and read another stone</button>
+        <p class="hint" id="save-hint"></p>
+        <div class="quiet-actions"><button class="link-btn" id="again-btn" type="button">Read another without saving</button></div>
+      </div>`;
 
-    $('#again-btn').onclick = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    renderFamily(person, storyCtx.family, choice);
+    $('#again-btn').onclick = () => go('capture');
     $('#save-btn').onclick = () => saveNote(person, choice);
     $('#save-hint').textContent = gpsForMatching()
-      ? `Saves this stone with your location (±${Math.round(S.gps.accuracy)} m) so it’s recognised next time.`
-      : 'You’re not at Mount Auburn or location is off, so this saves without a position.';
-    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      ? `Saves this stone with your location (±${Math.round(S.gps.accuracy)} m), so it’s recognised next time you’re here.`
+      : 'Location is off, so this saves without a position.';
+    
 
     let extras = {};
     const further = () => {
       $('#further-slot').innerHTML = Src.deepLinks(person, extras).map((l) =>
-        `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}<span>${esc(l.note)}</span></a></li>`).join('');
+        `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a> <span class="muted">${esc(l.note)}</span></li>`).join('');
     };
     further();
 
@@ -530,7 +593,8 @@
         extras = { findAGraveId: det.value.findAGraveId };
         further();
         if (det.value.facts.length) {
-          html += `<ul class="facts">${det.value.facts.map((f) => `<li><span class="k">${esc(f.label)}</span><span>${esc(f.value)}</span><span class="src"><span class="tag record">Database record</span><a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.source)}</a></span></li>`).join('')}</ul>`;
+          html += `<ul class="facts">${det.value.facts.map((f) => `<li><span class="k">${esc(f.label)}</span><span>${esc(f.value)}</span></li>`).join('')}</ul>
+            <p class="src-line"><span class="tag record">Database record</span><a href="${esc(det.value.facts[0].url)}" target="_blank" rel="noopener">Wikidata</a></p>`;
         }
       } else {
         html += `<p class="muted">Wikidata didn’t answer (${esc(det.reason.message)}).</p>`;
@@ -538,7 +602,10 @@
       if (sum.status === 'fulfilled' && sum.value && sum.value.text) {
         const s = sum.value;
         storyCtx.summary = s;
-        html += `<h3>In brief</h3><blockquote class="summary"><p>${esc(s.text)}</p><span class="src"><span class="tag summary">Encyclopedia</span><a href="${esc(s.url)}" target="_blank" rel="noopener">Wikipedia</a></span></blockquote>`;
+        const parts = s.text.match(/[^.!?]+[.!?]+(\s|$)/g) || [s.text];
+        const lead = parts.slice(0, 2).join('').trim(), rest = parts.slice(2).join('').trim();
+        html += `<h3>In brief</h3><blockquote class="summary"><p>${esc(lead)}</p>${rest ? `<details class="more"><summary>Read more</summary><p>${esc(rest)}</p></details>` : ''}
+          <p class="src-line"><span class="tag summary">Encyclopedia</span><a href="${esc(s.url)}" target="_blank" rel="noopener">Wikipedia</a></p></blockquote>`;
         if (s.thumb) $('#portrait-slot').innerHTML = `<img class="portrait" src="${esc(s.thumb)}" alt="Portrait of ${esc(person.label)}">`;
       }
       $('#wd-slot').innerHTML = html;
@@ -570,6 +637,77 @@
     btn.disabled = false;
     btn.textContent = 'Tell their story';
     btn.onclick = () => tellStory(storyCtx, token);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Family at Mount Auburn
+  // ---------------------------------------------------------------------------
+
+  const REL_LABEL = { father: 'Father', mother: 'Mother', parent: 'Parent', spouse: 'Spouse', sibling: 'Sibling', child: 'Child' };
+
+  function whereIs(r) {
+    const g = gpsForMatching();
+    if (r.lat != null && g) return `${fmtDist(C.haversineM(g.lat, g.lon, r.lat, r.lon))} from you`;
+    if (r.lat != null) return 'Grave position on record';
+    const note = S.notes.find((n) => n.qid === r.qid && n.lat != null);
+    if (note && g) return `${fmtDist(C.haversineM(g.lat, g.lon, note.lat, note.lon))} from you (your field notes)`;
+    return '';
+  }
+
+  function relLinks(r) {
+    const links = [];
+    if (r.findAGrave) links.push(`<a href="https://www.findagrave.com/memorial/${esc(r.findAGrave)}" target="_blank" rel="noopener">Find a Grave — lot and photos</a>`);
+    if (r.article) links.push(`<a href="${esc(r.article)}" target="_blank" rel="noopener">Wikipedia</a>`);
+    return links.join(' · ');
+  }
+
+  function renderFamily(person, family, choice) {
+    const slot = $('#family-slot');
+    const surname = person.family || (S.stone && S.stone.family) || '';
+    const here = family.filter((r) => r.here);
+    const away = family.filter((r) => !r.here);
+    const exclude = [person.qid, ...family.map((r) => r.qid)].filter(Boolean);
+    const year = person.birth || (S.stone && topYear('birth')) || null;
+    const same = Src.sameSurname(surname, { exclude, year });
+    if (!here.length && !away.length && !same.length) { slot.innerHTML = ''; return; }
+
+    let html = '<h3>Family at Mount Auburn</h3>';
+    if (here.length) {
+      html += `<ul class="family">${here.map((r) => {
+        const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
+        const where = whereIs(r);
+        const links = relLinks(r);
+        return `<li>
+          <span class="rel">${REL_LABEL[r.rel] || 'Relative'}</span>
+          <span class="fname">${esc(r.name)}</span>
+          <span class="fyrs">${esc(yrs)}</span>
+          ${cleanDesc(r.description) ? `<span class="fdesc">${esc(cleanDesc(r.description))}</span>` : ''}
+          ${where ? `<span class="fwhere">${esc(where)}</span>` : ''}
+          ${links ? `<span class="flinks">${links}</span>` : ''}
+        </li>`;
+      }).join('')}</ul>
+      <p class="hint">Families here usually bought a single lot, so ${here.length === 1 ? 'this relative may lie' : 'these relatives may lie'} close to this stone — look at the ones around it. Find a Grave usually gives the lot number and path.</p>`;
+    } else if (choice.kind === 'match' && family.length) {
+      html += '<p class="muted">None of the relatives Wikidata lists are recorded as buried here.</p>';
+    } else if (choice.kind === 'match') {
+      html += '<p class="muted">Wikidata lists no relatives for this person.</p>';
+    }
+    if (away.length) {
+      html += `<p class="muted away">Not recorded as buried here: ${away.map((r) => `${(REL_LABEL[r.rel] || 'relative').toLowerCase()} ${esc(r.name)}`).join('; ')}. That only means the records don’t say; they may be here unrecorded, or elsewhere.</p>`;
+    }
+    if (same.length) {
+      const shown = same.slice(0, 15);
+      html += `<details class="same-surname"${choice.kind === 'match' ? '' : ' open'}>
+        <summary>${same.length} other${same.length === 1 ? '' : 's'} named ${esc(tc(surname))} buried here — same surname, not necessarily family</summary>
+        <ul>${shown.map((r) => {
+          const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
+          const where = whereIs(r);
+          return `<li><span class="fname">${esc(r.name)}</span> <span class="fyrs">${esc(yrs)}</span>${where ? ` · <span class="fwhere">${esc(where)}</span>` : ''}${r.findAGrave ? ` · <a href="https://www.findagrave.com/memorial/${esc(r.findAGrave)}" target="_blank" rel="noopener">Find a Grave</a>` : ''}</li>`;
+        }).join('')}</ul>
+        ${same.length > shown.length ? `<p class="hint">Showing the ${shown.length} closest in time.</p>` : ''}
+      </details>`;
+    }
+    slot.innerHTML = html;
   }
 
   /** Saved stones with the same surname, near where you're standing now. */
@@ -650,9 +788,9 @@
         }).join('')}</ol>
       </details>
       ${note ? `<p class="hint">${esc(note)}</p>` : ''}
-      <div class="actions">
-        ${S.sample || getKey() ? '<button class="btn small" id="story-again">Write it again</button>' : ''}
-        <button class="btn small" id="story-copy">Copy story</button>
+      <div class="quiet-actions">
+        ${S.sample || getKey() ? '<button class="link-btn" id="story-again" type="button">Write it again</button>' : ''}
+        <button class="link-btn" id="story-copy" type="button">Copy story</button>
       </div>`;
 
     for (const a of document.querySelectorAll('#story sup a')) {
@@ -704,9 +842,8 @@
     Src.store.set(NOTES_KEY, S.notes);
     renderNotes();
     updateRecordsChip();
-    toast('Saved to field notes');
-    $('#save-btn').disabled = true;
-    $('#save-btn').textContent = 'Saved';
+    toast(`Saved ${note.label} to field notes`);
+    go('capture');
   }
 
   function renderNotes() {
@@ -759,7 +896,7 @@
     e.target.value = '';
   });
   $('label[for="photo-input"]').addEventListener('click', startGPS);
-  $('#type-btn').addEventListener('click', () => { startGPS(); S.ocr = null; hide('#match', '#record'); renderReading(); });
+  $('#type-btn').addEventListener('click', () => { startGPS(); S.ocr = null; S.typed = true; S.result = null; S.recordShown = false; renderReading(); });
   // Each sample is a different well-documented person, never the same twice running.
   $('#sample-btn').addEventListener('click', async () => {
     const pool = Src.richSamples();
@@ -795,7 +932,11 @@
   });
   keyStatus();
 
-  $('#near-btn').addEventListener('click', openNearPicker);
+  $('#gps-chip').addEventListener('click', openNearPicker);
+  for (const b of document.querySelectorAll('.steps button, [data-go]')) {
+    b.addEventListener('click', () => go(b.dataset.step || b.dataset.go));
+  }
+  go('capture');
 
   // Inside a claude.ai artifact: Claude reads stones and writes stories
   // through the viewer's own account. Elsewhere: Tesseract and an API key.

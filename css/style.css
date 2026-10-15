@@ -51,7 +51,7 @@ a { color: var(--focus); text-underline-offset: 2px; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 
 /* ---- header ---- */
-.masthead { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-top: 22px; padding-bottom: 14px; flex-wrap: wrap; }
+.masthead { padding-top: 20px; padding-bottom: 6px; }
 .brand p { margin: 2px 0 0; color: var(--muted); font-size: 0.95rem; }
 .status { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip {
@@ -255,3 +255,110 @@ footer { padding-top: 10px; padding-bottom: 40px; color: var(--muted); font-size
 .near-row { display: flex; gap: 8px; }
 .near-row input { flex: 1; min-width: 0; font: 600 1rem/1.2 var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; min-height: 44px; }
 .reader-note { font-family: var(--body); font-weight: 400; letter-spacing: 0; font-size: 0.82rem; color: var(--muted); margin: 14px 0 0; }
+
+/* ---- family ---- */
+.family { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 8px; }
+.family li { display: grid; grid-template-columns: 5.5em 1fr auto; gap: 2px 10px; align-items: baseline; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.family .rel { color: var(--muted); font-size: 0.82rem; }
+.family .fname { font-family: var(--display); font-weight: 600; letter-spacing: 0.03em; min-width: 0; }
+.family .fyrs { color: var(--muted); font-size: 0.85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.family .fdesc, .family .fwhere, .family .flinks { grid-column: 2 / -1; font-size: 0.85rem; color: var(--muted); }
+.family .fwhere { color: var(--strong); }
+.away { margin-top: 6px; }
+.same-surname { margin: 10px 0; font-size: 0.9rem; }
+.same-surname summary { cursor: pointer; color: var(--muted); min-height: 40px; padding: 8px 0; }
+.same-surname ul { list-style: none; padding: 0; margin: 4px 0; }
+.same-surname li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+.same-surname .fname { font-weight: 600; }
+.same-surname .fyrs { color: var(--muted); font-variant-numeric: tabular-nums; }
+.same-surname .fwhere { color: var(--strong); }
+
+
+/* ==== Linear flow ==================================================== */
+.status-line { margin: 4px 0 0; font-size: 0.85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.status-line .on { color: var(--strong); }
+.status-line .warn { color: var(--possible); }
+.inline-link { appearance: none; background: none; border: 0; padding: 4px 0; font: inherit; color: inherit; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; cursor: pointer; }
+.inline-link.on, .inline-link.warn { text-decoration-style: solid; }
+
+/* Progress: four steps, a bar under each */
+.steps { max-width: 640px; margin: 10px auto 0; padding: 0 16px; }
+.steps ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.steps button {
+  appearance: none; width: 100%; background: none; border: 0; border-top: 3px solid var(--line);
+  padding: 6px 0 4px; text-align: left; font: 600 0.78rem/1.2 var(--body); color: var(--muted); cursor: pointer;
+}
+.steps button.done { border-top-color: var(--strong); color: var(--ink); }
+.steps button.current { border-top-color: var(--carve); color: var(--ink); }
+.steps button:disabled { cursor: default; }
+.steps button.done:not(:disabled):hover { color: var(--strong); }
+
+.stage { border-top: 0; padding-top: 18px; }
+.stage h2 { font-size: 1.35rem; margin-bottom: 6px; }
+.step-hint { margin: 0 0 14px; color: var(--muted); font-size: 0.95rem; }
+
+/* The one thing to press */
+.btn.cta { width: 100%; min-height: 54px; font-size: 1.05rem; }
+.btn.cta:not(.primary) { background: transparent; border: 2px solid var(--carve); color: var(--ink); }
+.quiet-actions { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 10px; }
+.quiet-actions .btn { min-height: 40px; padding: 8px 14px; font-size: 0.92rem; }
+.link-btn { margin-top: 0; color: var(--muted); }
+
+/* Capture */
+.lede { font-size: 1.05rem; }
+.tucked { margin-top: 40px; border-top: 1px solid var(--line); }
+.tucked details { border-bottom: 1px solid var(--line); }
+.tucked summary { cursor: pointer; min-height: 46px; display: flex; align-items: center; color: var(--muted); font-size: 0.95rem; }
+.tucked details[open] { padding-bottom: 14px; }
+.key-form { display: grid; gap: 6px; }
+.key-form label { font-size: 0.85rem; color: var(--muted); }
+.key-form input { font: 600 1rem/1.2 var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px; min-height: 46px; }
+.near-panel { max-width: 640px; margin: 8px auto 0; box-sizing: border-box; width: calc(100% - 32px); }
+
+/* Reading */
+.photo-wrap { max-height: 46vh; display: flex; justify-content: center; }
+.photo-wrap canvas { width: auto; max-width: 100%; max-height: 46vh; object-fit: contain; }
+.key { margin: 8px 0 16px; }
+.fields .btn.cta { margin-top: 6px; }
+
+/* Who is this? */
+.best { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+.best.unknown { background: transparent; border-style: dashed; }
+.best-name { font-family: var(--display); font-weight: 600; font-size: 1.35rem; letter-spacing: 0.03em; margin: 0; text-wrap: balance; }
+.best-sub { margin: 4px 0 10px; color: var(--muted); font-size: 0.95rem; }
+.best .reasons { margin-bottom: 0; }
+.others-h { margin: 22px 0 6px; color: var(--muted); font-size: 0.9rem; }
+.others { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.others li { border-bottom: 1px solid var(--line); }
+.other { appearance: none; width: 100%; background: none; border: 0; padding: 12px 2px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; text-align: left; cursor: pointer; color: var(--ink); font: inherit; }
+.other .o-name { font-weight: 600; min-width: 0; }
+.other .o-meta { color: var(--muted); font-size: 0.88rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dates-details { margin-top: 22px; border-top: 1px solid var(--line); }
+.dates-details summary { cursor: pointer; color: var(--muted); font-size: 0.92rem; min-height: 46px; display: flex; align-items: center; }
+.dates-details[open] summary { margin-bottom: 8px; }
+
+/* Their story */
+.verdict-line { margin: 6px 0 0; font-size: 0.9rem; color: var(--muted); clear: both; }
+.verdict-line span { font-weight: 600; }
+.story { margin: 18px 0 6px; }
+.record-head .sub { margin-bottom: 0; }
+#record h3 { margin-top: 28px; }
+.further { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.further li { font-size: 0.95rem; }
+.further a { display: inline; padding: 0; border: 0; background: none; color: var(--focus); text-decoration: underline; }
+.further .muted { display: block; font-size: 0.85rem; }
+.finish { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); }
+.finish .hint { margin: 8px 0 0; }
+
+/* ---- final polish ---- */
+.btn.cta { line-height: 1.25; padding: 14px 18px; text-align: center; }
+.dates-details summary::before, .tucked summary::before, .more summary::before {
+  content: ''; width: 0.45em; height: 0.45em; margin-right: 0.6em; flex: none;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s;
+}
+.dates-details[open] summary::before, .tucked details[open] summary::before, .more[open] summary::before { transform: rotate(45deg); }
+.more summary { cursor: pointer; color: var(--focus); font-size: 0.9rem; display: flex; align-items: center; min-height: 40px; list-style: none; }
+.more summary::-webkit-details-marker, .dates-details summary::-webkit-details-marker, .tucked summary::-webkit-details-marker { display: none; }
+.src-line { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }
+.stone-line { font-size: 0.88rem; color: var(--muted); margin: 6px 0 0; }
+.facts li { grid-template-columns: 7.5em 1fr; }

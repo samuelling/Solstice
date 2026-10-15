@@ -15,93 +15,107 @@
 </head>
 <body>
   <header class="masthead">
-    <div class="brand">
-      <h1>Solstice</h1>
-      <p>Mount Auburn, one stone at a time</p>
-    </div>
-    <div class="status" aria-live="polite">
-      <span id="gps-chip" class="chip">Location off</span>
-      <span id="records-chip" class="chip">Loading records…</span>
-    </div>
+    <h1>Solstice</h1>
+    <p class="status-line" aria-live="polite">
+      <span id="records-chip">Loading records…</span>
+      <span aria-hidden="true">·</span>
+      <button id="gps-chip" class="inline-link" type="button">Location off — tap to set it</button>
+    </p>
   </header>
+
+  <div id="near-panel" class="near-panel" hidden>
+    <form id="near-form" autocomplete="off">
+      <label for="near-input">What are you standing near?</label>
+      <div class="near-row">
+        <input id="near-input" list="near-list" placeholder="A landmark or a grave you know">
+        <button class="btn" type="submit">Use this</button>
+      </div>
+      <datalist id="near-list"></datalist>
+    </form>
+    <p class="hint" id="near-hint"></p>
+  </div>
+
+  <nav class="steps" aria-label="Progress">
+    <ol>
+      <li><button type="button" data-step="capture">Photograph</button></li>
+      <li><button type="button" data-step="reading">Check</button></li>
+      <li><button type="button" data-step="match">Identify</button></li>
+      <li><button type="button" data-step="record">Their story</button></li>
+    </ol>
+  </nav>
 
   <main>
     <section id="capture" class="stage">
-      <p class="lede">Photograph a headstone. Solstice reads the inscription, checks it against known burials near where you’re standing, and shows what the records say — with how sure it is about each part.</p>
-      <div class="actions">
-        <label class="btn primary" for="photo-input">Photograph a stone</label>
-        <input id="photo-input" type="file" accept="image/*" capture="environment" hidden>
-        <button id="type-btn" class="btn">Type a name instead</button>
-      </div>
-      <div class="minor-actions">
-        <button id="sample-btn" class="link-btn">No stone nearby? Try a sample</button>
-        <button id="near-btn" class="link-btn">I’m near…</button>
-      </div>
-      <div id="near-panel" class="near-panel" hidden>
-        <form id="near-form" autocomplete="off">
-          <label for="near-input">Closest landmark or known grave</label>
-          <div class="near-row">
-            <input id="near-input" list="near-list" placeholder="Washington Tower, Bigelow Chapel…">
-            <button class="btn small" type="submit">Use this</button>
-          </div>
-          <datalist id="near-list"></datalist>
-        </form>
-        <p class="hint" id="near-hint"></p>
+      <p class="lede">Photograph a headstone. Solstice reads it, works out who is buried there, and tells you what the records say — and how sure it is.</p>
+      <label class="btn primary cta" for="photo-input">Photograph a stone</label>
+      <input id="photo-input" type="file" accept="image/*" capture="environment" hidden>
+      <div class="quiet-actions">
+        <button id="type-btn" class="link-btn" type="button">Type a name instead</button>
+        <button id="sample-btn" class="link-btn" type="button">Try a sample stone</button>
       </div>
       <div id="progress" class="progress" hidden>
         <div class="bar"><span></span></div>
         <p class="progress-label"></p>
       </div>
+
+      <div class="tucked">
+        <details id="notes">
+          <summary>Field notes <span id="notes-count"></span></summary>
+          <p class="hint">Stones you save keep their location. Each becomes a known grave next time you’re nearby, so matching gets sharper the more you walk.</p>
+          <ul id="notes-list"></ul>
+          <button id="export-btn" class="link-btn" type="button">Export as JSON</button>
+        </details>
+        <details id="settings">
+          <summary>Story settings</summary>
+          <p class="hint" id="settings-hint">Without a key, Solstice writes a plain account from the records on your phone. With an Anthropic API key, Claude writes the story — and every sentence is still checked against the evidence before you see it. Keys come from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>, billed per use, separate from any Claude plan.</p>
+          <form id="key-form" class="key-form" autocomplete="off">
+            <label for="key-input">Anthropic API key</label>
+            <input id="key-input" name="key" type="password" spellcheck="false" placeholder="sk-ant-…">
+            <div class="quiet-actions">
+              <button class="btn" type="submit">Save key</button>
+              <button class="link-btn" type="button" id="key-clear">Remove key</button>
+            </div>
+          </form>
+          <p class="hint" id="key-status"></p>
+        </details>
+      </div>
     </section>
 
     <section id="reading" class="stage" hidden>
-      <h2>What the stone says</h2>
+      <h2>Check the reading</h2>
+      <p class="step-hint">Fix anything that looks wrong. Faded letters are the ones Solstice is least sure of.</p>
       <div id="photo-wrap" class="photo-wrap" hidden></div>
       <div id="rubbing" class="rubbing" hidden></div>
       <p id="rubbing-key" class="key" hidden>
-        <span class="c-hi">Clear</span> <span class="c-mid">Probably right</span> <span class="c-lo">Unsure</span> — fix anything below before searching.
+        <span class="c-hi">Clear</span> · <span class="c-mid">Probably right</span> · <span class="c-lo">Unsure</span>
       </p>
       <form id="reading-form" class="fields" autocomplete="off">
-        <label>Given name<input name="given" autocapitalize="characters" spellcheck="false"></label>
-        <label>Surname<input name="family" autocapitalize="characters" spellcheck="false" required></label>
-        <label>Born<input name="birth" inputmode="numeric" pattern="\d{4}" maxlength="4"><small data-for="birth"></small></label>
-        <label>Died<input name="death" inputmode="numeric" pattern="\d{4}" maxlength="4"><small data-for="death"></small></label>
-        <label>Age on stone<input name="aged" inputmode="numeric" maxlength="3"></label>
-        <button class="btn primary wide" type="submit">Find who this is</button>
+        <label>Given name<input name="given" id="f-given" autocapitalize="characters" spellcheck="false"></label>
+        <label>Surname<input name="family" id="f-family" autocapitalize="characters" spellcheck="false" required></label>
+        <label>Born<input name="birth" id="f-birth" inputmode="numeric" pattern="\d{4}" maxlength="4"><small data-for="birth"></small></label>
+        <label>Died<input name="death" id="f-death" inputmode="numeric" pattern="\d{4}" maxlength="4"><small data-for="death"></small></label>
+        <label>Age, if carved<input name="aged" id="f-aged" inputmode="numeric" maxlength="3"></label>
+        <button class="btn primary cta wide" type="submit">Find who this is</button>
       </form>
+      <div class="quiet-actions">
+        <button class="link-btn" type="button" data-go="capture">Take a different photo</button>
+      </div>
     </section>
 
     <section id="match" class="stage" hidden>
-      <h2>Who this might be</h2>
-      <div id="dates"></div>
-      <ol id="candidates" class="candidates"></ol>
+      <h2>Who is this?</h2>
+      <div id="candidates"></div>
+      <details class="dates-details">
+        <summary id="read-summary">How the dates were read</summary>
+        <div id="dates"></div>
+      </details>
     </section>
 
     <section id="record" class="stage" hidden></section>
-
-    <details id="notes" class="notes">
-      <summary>Field notes <span id="notes-count"></span></summary>
-      <p class="hint">Stones you save keep their location. Each one becomes a known grave the next time you’re nearby, so matching gets sharper the more you walk.</p>
-      <ul id="notes-list"></ul>
-      <div class="actions">
-        <button id="export-btn" class="btn small">Export as JSON</button>
-      </div>
-    </details>
-
-    <details id="settings" class="notes">
-      <summary>Story settings</summary>
-      <p class="hint" id="settings-hint">Without a key, Solstice writes a plain account from the records on your phone. With an Anthropic API key, Claude writes the story — and every sentence is still checked against the evidence before you see it. Keys come from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>, billed per use, separate from any Claude plan.</p>
-      <form id="key-form" class="fields" autocomplete="off">
-        <label class="span2">Anthropic API key<input name="key" type="password" spellcheck="false" placeholder="sk-ant-…"></label>
-        <button class="btn small" type="submit">Save key</button>
-        <button class="btn small" type="button" id="key-clear">Remove key</button>
-      </form>
-      <p class="hint" id="key-status"></p>
-    </details>
   </main>
 
   <footer>
-    <p id="footer-text">Records from Wikidata, Wikipedia and the Library of Congress’s Chronicling America. Reading runs on your phone with Tesseract, and your photos never leave it. Writing a story sends the gathered text — not the photo — to Claude, using your key.</p>
+    <p id="footer-text">Records from Wikidata and Wikipedia, baked in and refreshed monthly. Reading runs on your phone with Tesseract, and your photos never leave it. Writing a story sends the gathered text — not the photo — to Claude, using your key.</p>
   </footer>
 
   <div id="toast" class="toast" role="status" hidden></div>

@@ -69,6 +69,13 @@
     }
 
     for (const f of ctx.facts || []) add('record', f.label, `${f.label}: ${f.value}`, { source: f.source || 'Wikidata', url: f.url });
+    const REL = { father: 'Father', mother: 'Mother', parent: 'Parent', spouse: 'Spouse', sibling: 'Sibling', child: 'Child' };
+    for (const r of [...(ctx.family || [])].sort((a, b) => (b.here ? 1 : 0) - (a.here ? 1 : 0)).slice(0, 12)) {
+      const yrs = r.birth || r.death ? ` (${r.birth || '?'}–${r.death || '?'})` : '';
+      add('record', `Family: ${REL[r.rel] || 'Relative'}`, `${REL[r.rel] || 'Relative'}: ${r.name}${yrs}, ${r.here ? 'also buried at Mount Auburn Cemetery' : 'not recorded as buried at Mount Auburn'}`, {
+        source: 'Wikidata', url: `https://www.wikidata.org/wiki/${r.qid}`,
+      });
+    }
     if (ctx.summary && ctx.summary.text) add('summary', 'Encyclopedia summary', ctx.summary.text, { source: 'Wikipedia', url: ctx.summary.url });
     for (const n of (ctx.papers || []).slice(0, 6)) {
       add('mention', 'Newspaper page', `${n.title} (${n.date})${n.snippet ? `: ${n.snippet}` : ''}`, {
@@ -99,6 +106,7 @@ Rules:
 - Do not use any number that does not appear in the evidence you cite. Write decades or centuries only if a cited year falls in them.
 - Newspaper pages are name matches only and may be about someone else. Use one only if its text clearly fits this person (same name plus consistent place, role or date), and treat it as an inference.
 - If the identity confidence is below 60 percent, or there is no match, write only about what the stone itself shows, and say plainly where the trail ends.
+- Family evidence says only who is related and whether they are also buried at Mount Auburn. "Not recorded" does not mean buried elsewhere. Never place relatives in the same lot or next to each other unless the evidence says so.
 - When the evidence is thin, write less. Two honest sentences beat a paragraph of filler. What the dates alone imply — an age, an era, a child's grave — can be enough.
 
 Style: plain, specific, unsentimental, warm. No clichés ("a life well lived", "left an indelible mark"), no exclamation marks, no second person, no rhetorical questions. Present the person; let the reader feel what they feel. 60 to 220 words over one to three short paragraphs. A title of a few words — not the person's name alone.
@@ -343,6 +351,11 @@ Reply with only JSON in this shape:
       for (const e of evidence.filter((x) => x.kind === 'record').slice(0, 4)) p2.push(s(`${e.text}.`, 'fact', e));
     } else {
       p2.push(s(`No known record has been matched to this stone yet; what it says is what we have.`, 'fact', idE));
+    }
+    const famHere = evidence.filter((x) => x.label.startsWith('Family:') && /also buried at Mount Auburn/.test(x.text));
+    if (famHere.length) {
+      const names = famHere.slice(0, 4).map((e) => e.text.split(':')[0].toLowerCase() + ' ' + e.text.split(': ')[1].split(' (')[0].split(',')[0]);
+      p2.push(s(`Also buried at Mount Auburn: ${names.join(', ')}${famHere.length > 4 ? `, and ${famHere.length - 4} more` : ''}.`, 'fact', ...famHere.slice(0, 6)));
     }
     const near = evidence.filter((x) => x.kind === 'place');
     if (near.length) p2.push(s(`Others with the same surname lie nearby, which may mean a family lot.`, 'inference', ...near));

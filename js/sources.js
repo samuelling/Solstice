@@ -77,12 +77,80 @@
     return { at: Date.now(), qid: d.cemetery, people, baked: true, generated: d.generated };
   }
 
+  // ---------------------------------------------------------------------------
+  // Family within Mount Auburn
+  // ---------------------------------------------------------------------------
+
+  const REL_INVERSE = { father: 'child', mother: 'child', parent: 'child', child: 'parent', spouse: 'spouse', sibling: 'sibling' };
+  const REL_ORDER = { father: 0, mother: 1, parent: 2, spouse: 3, sibling: 4, child: 5 };
+  let reverseLinks = null;
+
+  // Links stated on other people's records, pointing at this one.
+  function reverseIndex() {
+    if (reverseLinks) return reverseLinks;
+    reverseLinks = new Map();
+    for (const p of baked.values()) {
+      for (const r of p.relatives || []) {
+        if (!reverseLinks.has(r.qid)) reverseLinks.set(r.qid, []);
+        reverseLinks.get(r.qid).push({ rel: REL_INVERSE[r.rel] || 'relative', qid: p.qid, name: p.label });
+      }
+    }
+    return reverseLinks;
+  }
+
+  /**
+   * Relatives recorded on Wikidata, from either side of each link, marked
+   * with whether they too are buried at Mount Auburn.
+   */
+  function familyOf(qid) {
+    const self = baked.get(qid);
+    if (!self) return [];
+    const merged = new Map();
+    const add = (r) => {
+      if (r.qid === qid) return;
+      const prev = merged.get(r.qid);
+      // "father" or "mother" beats the vaguer "parent" from a reverse link.
+      if (!prev || (prev.rel === 'parent' && r.rel !== 'parent')) merged.set(r.qid, { ...r });
+    };
+    (self.relatives || []).forEach(add);
+    (reverseIndex().get(qid) || []).forEach(add);
+    return [...merged.values()]
+      .map((r) => {
+        const b = baked.get(r.qid);
+        return {
+          rel: r.rel, qid: r.qid, here: !!b,
+          name: (b && b.label) || r.name || '',
+          birth: b ? b.birth ?? null : null, death: b ? b.death ?? null : null,
+          lat: b ? b.lat ?? null : null, lon: b ? b.lon ?? null : null,
+          findAGrave: b ? b.findAGrave || null : null,
+          article: b ? b.article || null : null,
+          description: b ? b.description || '' : '',
+        };
+      })
+      .filter((r) => r.name && !/^Q\d+$/.test(r.name))
+      .sort((a, b) => (REL_ORDER[a.rel] ?? 9) - (REL_ORDER[b.rel] ?? 9) || (a.birth || 0) - (b.birth || 0));
+  }
+
+  /**
+   * Other burials sharing a surname — possibly family, possibly not —
+   * nearest in time first.
+   */
+  function sameSurname(family, { exclude = [], year = null } = {}) {
+    const fam = C.normName(family);
+    if (!fam) return [];
+    const skip = new Set(exclude);
+    return [...baked.values()]
+      .filter((p) => !skip.has(p.qid) && !/^Q\d+$/.test(p.label) && C.normName(p.family || C.splitName(p.label).family) === fam)
+      .map((p) => ({ qid: p.qid, name: p.label, birth: p.birth ?? null, death: p.death ?? null, findAGrave: p.findAGrave || null, lat: p.lat ?? null, lon: p.lon ?? null }))
+      .sort((a, b) => (year == null ? 0 : Math.abs((a.birth || a.death || year) - year) - Math.abs((b.birth || b.death || year) - year)) || a.name.localeCompare(b.name));
+  }
+
   /**
    * The best-documented burials, for the sample stone: both dates, a
    * Wikipedia introduction, and as many recorded facts as possible.
    */
   function richSamples(n = 60) {
-    const fields = ['occupations', 'birthPlace', 'deathPlace', 'spouses', 'father', 'mother', 'education'];
+    const fields = ['occupations', 'birthPlace', 'deathPlace', 'spouses', 'father', 'mother', 'education', 'relatives'];
     return [...baked.values()]
       .filter((p) => p.birth && p.death && p.summary && !/^Q\d+$/.test(p.label))
       .map((p) => ({ p, score: 3 + fields.filter((f) => p[f] && p[f].length).length + Math.min(p.summary.length, 900) / 450 }))
@@ -284,6 +352,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, richSamples, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
+    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
   };
 })(window);
