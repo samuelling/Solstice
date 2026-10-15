@@ -125,6 +125,126 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Reading with Claude's vision (inside a claude.ai artifact)
+  // ---------------------------------------------------------------------------
+
+  const CLAUDE_READ_PROMPT = `This photo shows a headstone at Mount Auburn Cemetery in Cambridge, Massachusetts. Transcribe the inscription exactly as carved, one entry per carved line, top to bottom, in the letter case it is carved in.
+
+Mark every character you are not sure of in square brackets: your best reading first, then the other plausible readings, separated by a bar. For example 18[3|8]2, SM[I|L]TH, [O|Q]UINCY. Write [?] for a character you cannot read at all. Don't expand abbreviations, don't correct spelling, don't fill in words you can't see. Ignore carved decoration, and any other stones in the background.
+
+For each line give a legibility from 0 to 1 (1 = crisp, 0.5 = worn but readable, 0.2 = mostly guessed).
+
+Reply with only JSON in this shape:
+{"lines":[{"text":"IN MEMORY OF","legibility":0.9},{"text":"18[3|8]2","legibility":0.5}],"condition":"one short sentence on the stone's condition"}
+If there is no legible inscription, reply {"lines":[],"condition":"..."}.`;
+
+  /** "18[3|8]2" → symbols [{text:'1'},{text:'8'},{text:'3',alts:['8'],unsure:true},{text:'2'}] */
+  function parseMarked(text, legibility) {
+    // Claude brackets the letters it doubts, so unbracketed ones stay fairly
+    // sure even on a worn line; legibility only shades them.
+    const leg = Math.max(0, Math.min(1, Number.isFinite(legibility) ? legibility : 0.85));
+    const base = Math.round((0.75 + 0.22 * leg) * 100);
+    const words = [];
+    let cur = [];
+    const push = () => { if (cur.length) { words.push(cur); cur = []; } };
+    const re = /\[([^\]]*)\]|(\s+)|([^\s[\]])/g;
+    let m;
+    while ((m = re.exec(String(text)))) {
+      if (m[2]) { push(); continue; }
+      if (m[3]) { cur.push({ text: m[3], conf: base }); continue; }
+      const opts = m[1].split('|').map((s) => s.trim()).filter(Boolean);
+      if (!opts.length || opts[0] === '?') { cur.push({ text: '?', conf: 10, alts: [], unsure: true }); continue; }
+      // A multi-character option ("[TH|H]") becomes its first option, unsure.
+      const first = opts[0];
+      const alts = opts.slice(1).filter((o) => o.length === 1);
+      const conf = Math.min(base, opts.length >= 3 ? 40 : 52);
+      for (let i = 0; i < first.length; i++) cur.push({ text: first[i], conf, alts: i === 0 ? alts : [], unsure: true });
+    }
+    push();
+    return words.map((syms) => ({
+      text: syms.map((s) => s.text).join(''),
+      conf: Math.round(syms.reduce((a, s) => a + s.conf, 0) / syms.length),
+      bbox: null,
+      symbols: syms,
+    }));
+  }
+
+  async function toJpegBlob(canvas) {
+    return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('Could not prepare the photo.'))), 'image/jpeg', 0.9));
+  }
+
+  async function readStoneWithClaude(source, sample, { onProgress, signal } = {}) {
+    const say = (stage, progress) => onProgress && onProgress({ stage, progress });
+    say('Preparing the photo', 0.05);
+    const photo = await toCanvas(source, 2000);
+    const blob = await toJpegBlob(photo);
+    say('Claude is reading the stone…', 0.25);
+    let tick = 0.25;
+    const timer = setInterval(() => { tick = Math.min(0.9, tick + 0.03); say('Claude is reading the stone…', tick); }, 900);
+    let data;
+    try {
+      data = await sample.json(CLAUDE_READ_PROMPT, { images: [blob], signal });
+    } finally { clearInterval(timer); }
+    const lines = (Array.isArray(data && data.lines) ? data.lines : [])
+      .map((l) => {
+        const words = parseMarked(l.text || '', Number(l.legibility));
+        return words.length ? { text: words.map((w) => w.text).join(' '), conf: Math.round(words.reduce((a, w) => a + w.conf, 0) / words.length), words, bbox: null, raw: l.text } : null;
+      })
+      .filter(Boolean);
+    say('Done', 1);
+    return { lines, quality: lines.length ? 80 : 0, photo, width: photo.width, height: photo.height, reader: 'claude', condition: data && data.condition ? String(data.condition) : '' };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Location from the photo itself (EXIF GPS), when the phone recorded it.
+  // ---------------------------------------------------------------------------
+  async function photoLocation(file) {
+    try {
+      if (!file || !/jpe?g/i.test(file.type || file.name || '')) return null;
+      const buf = await file.slice(0, 256 * 1024).arrayBuffer();
+      const v = new DataView(buf);
+      if (v.getUint16(0) !== 0xffd8) return null;
+      let off = 2;
+      while (off + 4 < v.byteLength) {
+        const marker = v.getUint16(off), len = v.getUint16(off + 2);
+        if (marker === 0xffe1 && v.getUint32(off + 4) === 0x45786966) return parseExifGps(v, off + 10);
+        if ((marker & 0xff00) !== 0xff00) return null;
+        off += 2 + len;
+      }
+    } catch (e) { /* unreadable: no location */ }
+    return null;
+  }
+
+  function parseExifGps(v, tiff) {
+    const le = v.getUint16(tiff) === 0x4949;
+    const u16 = (o) => v.getUint16(tiff + o, le), u32 = (o) => v.getUint32(tiff + o, le);
+    const ifd0 = u32(4);
+    let gpsOff = null;
+    for (let i = 0, n = u16(ifd0); i < n; i++) {
+      const e = ifd0 + 2 + i * 12;
+      if (u16(e) === 0x8825) gpsOff = u32(e + 8);
+    }
+    if (gpsOff == null) return null;
+    const tags = {};
+    for (let i = 0, n = u16(gpsOff); i < n; i++) {
+      const e = gpsOff + 2 + i * 12, tag = u16(e), type = u16(e + 2), count = u32(e + 4);
+      if (type === 2) tags[tag] = String.fromCharCode(v.getUint8(tiff + e + 8));
+      else if (type === 5) {
+        const p = u32(e + 8), vals = [];
+        for (let k = 0; k < count; k++) vals.push(u32(p + k * 8) / (u32(p + k * 8 + 4) || 1));
+        tags[tag] = vals;
+      }
+    }
+    if (!tags[2] || !tags[4]) return null;
+    const dms = (a) => a[0] + (a[1] || 0) / 60 + (a[2] || 0) / 3600;
+    let lat = dms(tags[2]), lon = dms(tags[4]);
+    if (tags[1] === 'S') lat = -lat;
+    if (tags[3] === 'W') lon = -lon;
+    const acc = tags[31] ? tags[31][0] : 15; // HPositioningError, metres
+    return { lat, lon, accuracy: Math.max(5, acc) };
+  }
+
+  // ---------------------------------------------------------------------------
   // A synthetic weathered stone, for trying the app away from the cemetery.
   // ---------------------------------------------------------------------------
   async function sampleStone() {
@@ -164,11 +284,10 @@
       x.fillStyle = `rgba(240,240,232,${0.55 * fade})`; x.fillText(text, W / 2 + 2, y + 3);
       x.fillStyle = `rgba(52,54,50,${0.9 * fade})`; x.fillText(text, W / 2, y);
     };
-    carve('IN MEMORY OF', 330, 44);
-    carve('HENRY W.', 450, 76);
-    carve('LONGFELLOW', 550, 80);
-    carve('BORN FEB. 27, 1807', 680, 50);
-    carve('DIED MAR. 24, 1882', 770, 50, 0.85);
+    carve('JAMES RUSSELL', 430, 70);
+    carve('LOWELL', 530, 92);
+    carve('BORN FEB. 22, 1819', 680, 50);
+    carve('DIED AUG. 12, 1891', 770, 50, 0.8);
     x.restore();
     return c;
   }
@@ -182,5 +301,5 @@
     };
   }
 
-  root.SolsticeOCR = { readStone, sampleStone, toCanvas };
+  root.SolsticeOCR = { readStone, readStoneWithClaude, parseMarked, photoLocation, sampleStone, toCanvas };
 })(window);

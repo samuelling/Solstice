@@ -33,7 +33,21 @@
         <input id="photo-input" type="file" accept="image/*" capture="environment" hidden>
         <button id="type-btn" class="btn">Type a name instead</button>
       </div>
-      <button id="sample-btn" class="link-btn">No stone nearby? Try a sample</button>
+      <div class="minor-actions">
+        <button id="sample-btn" class="link-btn">No stone nearby? Try a sample</button>
+        <button id="near-btn" class="link-btn">I’m near…</button>
+      </div>
+      <div id="near-panel" class="near-panel" hidden>
+        <form id="near-form" autocomplete="off">
+          <label for="near-input">Closest landmark or known grave</label>
+          <div class="near-row">
+            <input id="near-input" list="near-list" placeholder="Washington Tower, Bigelow Chapel…">
+            <button class="btn small" type="submit">Use this</button>
+          </div>
+          <datalist id="near-list"></datalist>
+        </form>
+        <p class="hint" id="near-hint"></p>
+      </div>
       <div id="progress" class="progress" hidden>
         <div class="bar"><span></span></div>
         <p class="progress-label"></p>
@@ -76,7 +90,7 @@
 
     <details id="settings" class="notes">
       <summary>Story settings</summary>
-      <p class="hint">Without a key, Solstice writes a plain account from the records on your phone. With an Anthropic API key, Claude writes the story — and every sentence is still checked against the evidence before you see it. Keys come from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>, billed per use, separate from any Claude plan.</p>
+      <p class="hint" id="settings-hint">Without a key, Solstice writes a plain account from the records on your phone. With an Anthropic API key, Claude writes the story — and every sentence is still checked against the evidence before you see it. Keys come from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>, billed per use, separate from any Claude plan.</p>
       <form id="key-form" class="fields" autocomplete="off">
         <label class="span2">Anthropic API key<input name="key" type="password" spellcheck="false" placeholder="sk-ant-…"></label>
         <button class="btn small" type="submit">Save key</button>
@@ -87,7 +101,7 @@
   </main>
 
   <footer>
-    <p>Records from Wikidata, Wikipedia and the Library of Congress’s Chronicling America. Reading runs on your phone with Tesseract, and your photos never leave it. Writing a story sends the gathered text — not the photo — to Claude, using your key.</p>
+    <p id="footer-text">Records from Wikidata, Wikipedia and the Library of Congress’s Chronicling America. Reading runs on your phone with Tesseract, and your photos never leave it. Writing a story sends the gathered text — not the photo — to Claude, using your key.</p>
   </footer>
 
   <div id="toast" class="toast" role="status" hidden></div>

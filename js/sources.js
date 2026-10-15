@@ -52,8 +52,34 @@
     return page.pageprops.wikibase_item;
   }
 
+  // Records baked into the repo by .github/workflows/records.yml.
+  const baked = new Map();
+  let bakedMeta = null;
+
+  async function loadBaked() {
+    const r = await fetch('data/burials.json', { cache: 'no-cache' });
+    if (!r.ok) throw new Error('no baked records');
+    const d = await r.json();
+    bakedMeta = { generated: d.generated, landmarks: d.landmarks || [], source: d.source };
+    const people = d.people.map((p) => {
+      const rec = {
+        id: p.qid, qid: p.qid, source: 'wikidata', baked: true,
+        label: p.label, description: p.description || '',
+        birth: p.birth ?? null, death: p.death ?? null,
+        lat: p.lat ?? null, lon: p.lon ?? null, coordError: p.lat != null ? 15 : undefined,
+        article: p.article || null,
+        given: C.normName(p.given || C.splitName(p.label).given),
+        family: C.normName(p.family || C.splitName(p.label).family),
+      };
+      baked.set(p.qid, p);
+      return rec;
+    });
+    return { at: Date.now(), qid: d.cemetery, people, baked: true, generated: d.generated };
+  }
+
   /** All people Wikidata records as buried at Mount Auburn. Cached a week. */
   async function loadKnownBurials({ force = false } = {}) {
+    try { return await loadBaked(); } catch (e) { /* fall back to live Wikidata */ }
     const cached = store.get(CACHE_KEY);
     if (!force && cached && Date.now() - cached.at < CACHE_DAYS * 864e5) return cached;
 
@@ -112,6 +138,20 @@
   // ---------------------------------------------------------------------------
 
   async function wikidataDetails(qid) {
+    const bk = baked.get(qid);
+    if (bk) {
+      const url = `https://www.wikidata.org/wiki/${qid}`;
+      const facts = [];
+      const add = (label, values) => values && values.length && facts.push({ label, value: values.join(', '), source: 'Wikidata', url, confidence: 'record' });
+      add('Occupation', bk.occupations);
+      add('Born in', bk.birthPlace);
+      add('Died in', bk.deathPlace);
+      add('Spouse', bk.spouses);
+      add('Father', bk.father);
+      add('Mother', bk.mother);
+      add('Educated at', bk.education);
+      return { facts, findAGraveId: bk.findAGrave || null, image: null };
+    }
     const list = (v) => `(GROUP_CONCAT(DISTINCT ?${v}L; separator="|") AS ?${v}s)`;
     const lab = (prop, v) => `OPTIONAL { wd:${qid} wdt:${prop} ?${v} . ?${v} rdfs:label ?${v}L FILTER(LANG(?${v}L) = "en") }`;
     const q = `
@@ -143,7 +183,10 @@
     };
   }
 
-  async function wikipediaSummary(articleUrl) {
+  async function wikipediaSummary(articleUrl, qid) {
+    const b = qid && baked.get(qid);
+    if (b && b.summary) return { text: b.summary, url: articleUrl, thumb: null, source: 'Wikipedia', confidence: 'summary' };
+    if (b) return null; // baked record has no article intro; don't go to the network
     if (!articleUrl) return null;
     const title = decodeURIComponent(articleUrl.split('/wiki/')[1] || '');
     if (!title) return null;
@@ -227,6 +270,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store,
+    deepLinks, titleCase, store, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
   };
 })(window);

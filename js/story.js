@@ -173,6 +173,38 @@ Finish with up to three things the records do not tell us, phrased as short noun
     return block.input;
   }
 
+  /**
+   * The same request through a claude.ai artifact's `sample` capability: no
+   * API key, runs on the viewer's own Claude account. Same rules, same
+   * checks afterwards.
+   */
+  async function requestStoryViaSample(sample, evidence, { signal } = {}) {
+    const prompt = `${SYSTEM}
+
+${'Evidence:\n\n' + evidence.map((e) => `${e.id} [${e.kind}; ${e.source || ''}] ${e.label}: ${e.text}`).join('\n')}
+
+Reply with only JSON in this shape:
+{"title":"A few words","paragraphs":[[{"text":"One sentence.","kind":"fact","cites":["E2","E3"]}]],"unknowns":["what he did for work"]}
+"paragraphs" is a list of paragraphs; each paragraph is a list of sentences. "kind" is "fact", "inference" or "context".`;
+    try {
+      const out = await sample.json(prompt, { cache: false, signal });
+      if (!out || !Array.isArray(out.paragraphs)) throw { code: 'invalid_json' };
+      return out;
+    } catch (e) {
+      const msg = {
+        not_granted: 'Claude isn’t allowed for this page. You can allow it from the artifact’s permissions.',
+        sampling_disabled: 'Claude isn’t available on this account.',
+        rate_limited: 'Claude is busy or you’ve hit a usage limit. Try again in a little while.',
+        invalid_json: 'Claude’s reply couldn’t be read as a story.',
+        refused: 'Claude declined to write this one.',
+        cancelled: 'Stopped.',
+      }[e && e.code] || `Claude couldn’t write the story (${(e && (e.code || e.message)) || 'unknown error'}).`;
+      const err = new Error(msg);
+      err.code = e && e.code;
+      throw err;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Checking every sentence
   // ---------------------------------------------------------------------------
@@ -324,7 +356,7 @@ Finish with up to three things the records do not tell us, phrased as short noun
     return { title: 'What the stone and records say', paragraphs: [p1, p2].filter((p) => p.length), unknowns: unknowns.slice(0, 3), report: { kept, removed: [], downgraded: 0, checked: kept }, plain: true };
   }
 
-  const api = { MODEL, SYSTEM, STORY_TOOL, buildEvidence, evidencePrompt, requestStory, validateStory, plainAccount, unsupportedNumbers, unsupportedNames };
+  const api = { MODEL, SYSTEM, STORY_TOOL, buildEvidence, evidencePrompt, requestStory, requestStoryViaSample, validateStory, plainAccount, unsupportedNumbers, unsupportedNames };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SolsticeStory = api;
 })(typeof window !== 'undefined' ? window : globalThis);

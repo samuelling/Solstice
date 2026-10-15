@@ -247,3 +247,11 @@ footer { padding-top: 10px; padding-bottom: 40px; color: var(--muted); font-size
 .ev-list li.flash { animation: flash 1.4s ease-out; }
 @keyframes flash { from { background: color-mix(in srgb, var(--focus) 22%, transparent); } to { background: transparent; } }
 .fields .span2 { grid-column: 1 / -1; }
+
+/* ---- location and Claude-reader extras ---- */
+.minor-actions { display: flex; gap: 18px; flex-wrap: wrap; }
+.near-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px; margin-top: 8px; }
+.near-panel label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+.near-row { display: flex; gap: 8px; }
+.near-row input { flex: 1; min-width: 0; font: 600 1rem/1.2 var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; min-height: 44px; }
+.reader-note { font-family: var(--body); font-weight: 400; letter-spacing: 0; font-size: 0.82rem; color: var(--muted); margin: 14px 0 0; }

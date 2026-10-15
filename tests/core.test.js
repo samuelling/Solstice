@@ -115,3 +115,11 @@ test('parser: stitches a name split across two lines', () => {
   assert.strictEqual(w.given, 'MARY');
   assert.strictEqual(w.family, 'DOW');
 });
+
+test('reader-named alternatives take most of the doubt', () => {
+  const generic = C.digitBelief('8', 0.5);
+  const named = C.digitBelief('8', 0.5, ['6']);
+  assert.ok(named['6'] > generic['6'] * 2, 'named 6 rises');
+  assert.ok(named['3'] < generic['3'], 'unnamed 3 falls');
+  assert.ok(Math.abs(Object.values(named).reduce((a, v) => a + v, 0) - 1) < 1e-9);
+});

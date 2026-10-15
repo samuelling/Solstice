@@ -15,6 +15,7 @@
 
   const S = {
     gps: null, gpsWatch: null,
+    sample: null, canSeeImages: false,   // set inside a claude.ai artifact
     known: [],             // Wikidata burials
     notes: Src.store.get(NOTES_KEY) || [],
     ocr: null, parsed: null,
@@ -34,14 +35,58 @@
     setChip('#gps-chip', 'Finding you…');
     S.gpsWatch = navigator.geolocation.watchPosition(
       (pos) => {
-        S.gps = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy };
-        const d = C.haversineM(S.gps.lat, S.gps.lon, C.CEMETERY.lat, C.CEMETERY.lon);
-        if (d < NEAR_CEMETERY_M) setChip('#gps-chip', `At Mount Auburn · ±${Math.round(S.gps.accuracy)} m`, 'on');
-        else setChip('#gps-chip', 'Not at Mount Auburn — location unused', 'warn');
+        // A location from the photo or chosen by hand stays until replaced.
+        if (S.gps && S.gps.source !== 'device') return;
+        S.gps = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy, source: 'device' };
+        showWhere();
       },
-      (err) => setChip('#gps-chip', err.code === 1 ? 'Location blocked' : 'Location unavailable', 'warn'),
+      (err) => { if (!S.gps) setChip('#gps-chip', err.code === 1 ? 'Location off — tap “I’m near…”' : 'Location unavailable', 'warn'); },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 },
     );
+  }
+
+  function showWhere() {
+    const g = S.gps;
+    if (!g) { setChip('#gps-chip', 'Location off'); return; }
+    const d = C.haversineM(g.lat, g.lon, C.CEMETERY.lat, C.CEMETERY.lon);
+    if (d >= NEAR_CEMETERY_M) { setChip('#gps-chip', 'Not at Mount Auburn — location unused', 'warn'); return; }
+    const acc = `±${Math.round(g.accuracy)} m`;
+    const text = g.source === 'photo' ? `Location from photo · ${acc}`
+      : g.source === 'near' ? `Near ${g.label} · ${acc}`
+      : `At Mount Auburn · ${acc}`;
+    setChip('#gps-chip', text, 'on');
+  }
+
+  // "I'm near…": landmarks, graves with known positions, and saved stones.
+  function placesToPick() {
+    const out = [];
+    for (const l of Src.landmarks()) out.push({ label: l.name, lat: l.lat, lon: l.lon, kind: 'Landmark' });
+    for (const p of S.known) if (p.lat != null) out.push({ label: p.label, lat: p.lat, lon: p.lon, kind: 'Grave' });
+    for (const n of S.notes) if (n.lat != null) out.push({ label: n.label, lat: n.lat, lon: n.lon, kind: 'Your stone' });
+    const seen = new Set();
+    return out.filter((p) => !seen.has(p.label) && seen.add(p.label)).sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  function openNearPicker() {
+    const panel = $('#near-panel');
+    const places = placesToPick();
+    $('#near-list').innerHTML = places.map((p, i) => `<option value="${esc(p.label)}" data-i="${i}">${esc(p.kind)}</option>`).join('');
+    panel.hidden = !panel.hidden;
+    $('#near-hint').textContent = places.length
+      ? `${places.length} places with known positions. Pick the closest one you can see; Solstice treats you as within about 40 m of it.`
+      : 'No places with known positions have loaded yet.';
+    if (!panel.hidden) $('#near-input').focus();
+    $('#near-form').onsubmit = (e) => {
+      e.preventDefault();
+      const v = $('#near-input').value.trim().toLowerCase();
+      const hit = places.find((p) => p.label.toLowerCase() === v) || places.find((p) => p.label.toLowerCase().includes(v));
+      if (!v || !hit) { $('#near-hint').textContent = 'Pick a name from the list as you type.'; return; }
+      S.gps = { lat: hit.lat, lon: hit.lon, accuracy: 40, source: 'near', label: hit.label };
+      showWhere();
+      panel.hidden = true;
+      $('#near-input').value = '';
+      if (S.stone) runMatch();
+    };
   }
 
   function gpsForMatching() {
@@ -110,12 +155,29 @@
     hide('#match', '#record');
     setBusy(true);
     try {
-      const res = await OCR.readStone(source, { onProgress: ({ stage, progress }) => showProgress(stage, progress) });
+      // The photo's own GPS beats everything else for this stone.
+      if (source instanceof Blob) {
+        const loc = await OCR.photoLocation(source);
+        if (loc && C.haversineM(loc.lat, loc.lon, C.CEMETERY.lat, C.CEMETERY.lon) < NEAR_CEMETERY_M) {
+          S.gps = { ...loc, source: 'photo' };
+          showWhere();
+        }
+      }
+      const onProgress = ({ stage, progress }) => showProgress(stage, progress);
+      const res = S.canSeeImages
+        ? await OCR.readStoneWithClaude(source, S.sample, { onProgress })
+        : await OCR.readStone(source, { onProgress });
       S.ocr = res;
       S.parsed = C.parseInscription(res.lines);
       renderReading();
     } catch (e) {
-      showProgress(`The reader stopped: ${e.message || e}. Try another photo, or type the name instead.`, 0);
+      const why = {
+        not_granted: 'Claude isn’t allowed to read photos on this page — allow it from the artifact’s permissions, or type the name instead.',
+        rate_limited: 'Claude is busy or you’ve reached a usage limit. Try again shortly, or type the name instead.',
+        image_rejected: 'Claude couldn’t open that image. Try another photo.',
+        invalid_json: 'Claude’s reading came back garbled. Try again.',
+      }[e && e.code];
+      showProgress(why || `The reader stopped: ${(e && e.message) || e}. Try another photo, or type the name instead.`, 0);
     } finally {
       setBusy(false);
       setTimeout(() => { $('#progress').hidden = true; }, 600);
@@ -194,11 +256,15 @@
       const words = line.words.map((w) => {
         const idx = wi++;
         const syms = (w.symbols && w.symbols.length ? w.symbols : [{ text: w.text, conf: w.conf }])
-          .map((s) => `<span class="sym ${confClass(s.conf)}" title="${esc(s.text)} — ${Math.round(s.conf)}% sure">${esc(s.text)}</span>`).join('');
+          .map((s) => `<span class="sym ${confClass(s.conf)}" title="${esc(s.text)} — ${Math.round(s.conf)}% sure${s.alts && s.alts.length ? `; could be ${esc(s.alts.join(' or '))}` : ''}">${esc(s.text)}</span>`).join('');
         return `<span class="${yearWords.has(idx) ? 'year' : ''}">${syms}</span>`;
       }).join(' ');
       return `<div class="line${isName ? ' is-name' : ''}">${words}</div>`;
     }).join('');
+    if (S.ocr.reader === 'claude') {
+      const unsure = S.ocr.lines.flatMap((l) => l.words).flatMap((w) => w.symbols).filter((s) => s.unsure).length;
+      el.insertAdjacentHTML('beforeend', `<p class="reader-note">Read by Claude${unsure ? ` · ${unsure} letter${unsure === 1 ? '' : 's'} it wasn’t sure of, faded` : ' · every letter read clearly'}${S.ocr.condition ? ` · ${esc(S.ocr.condition)}` : ''}</p>`);
+    }
     el.hidden = false;
     $('#rubbing-key').hidden = false;
   }
@@ -296,14 +362,18 @@
     if (ocrTop.year === finalTop.year && rulesTop.year === finalTop.year) {
       why = `Photo, rules and records all point to ${finalTop.year}.`;
     } else {
-      const bits = [];
+      const steps = [`The photo leans to ${ocrTop.year}.`];
       if (rulesTop.year !== ocrTop.year) {
-        bits.push(key === 'death' && ocrTop.year < C.CEMETERY.founded
-          ? `Mount Auburn opened in ${C.CEMETERY.founded}, so a ${ocrTop.year} death is unlikely`
-          : 'the dates fit together better that way — the ages they imply are more plausible');
+        steps.push(key === 'death' && ocrTop.year < C.CEMETERY.founded
+          ? `Mount Auburn opened in ${C.CEMETERY.founded}, so the rules prefer ${rulesTop.year}.`
+          : `Read together with the other date, the age ${rulesTop.year} implies is more common, so the rules prefer it.`);
       }
-      if (finalTop.year !== rulesTop.year) bits.push('a known burial nearby matches it');
-      why = `The photo leans to ${ocrTop.year}, but ${bits.join(', and ')}. Using ${finalTop.year}.`;
+      if (finalTop.year !== rulesTop.year) {
+        const top = S.result.candidates[0];
+        const near = top && top.distance != null && top.distance < 100;
+        steps.push(`A known burial ${near ? 'close to you ' : ''}with this name has ${finalTop.year}, which settles it.`);
+      }
+      why = `${steps.join(' ')} Using ${finalTop.year}.`;
     }
     return `<div class="dateblock">
       <p>${label} <strong>${finalTop.year}</strong></p>
@@ -452,7 +522,7 @@
     // Database facts and encyclopedia summary for a Wikidata match.
     if (choice.kind === 'match' && person.qid) {
       $('#wd-slot').innerHTML = '<h3>What the records say</h3><p class="loading">Looking up Wikidata and Wikipedia…</p>';
-      const [det, sum] = await Promise.allSettled([Src.wikidataDetails(person.qid), Src.wikipediaSummary(person.article)]);
+      const [det, sum] = await Promise.allSettled([Src.wikidataDetails(person.qid), Src.wikipediaSummary(person.article, person.qid)]);
       if (S.recordToken !== token) return;
       let html = '<h3>What the records say</h3>';
       if (det.status === 'fulfilled') {
@@ -527,10 +597,12 @@
     const evidence = St.buildEvidence(ctx);
     const key = getKey();
     let story, note = '';
-    if (key) {
-      slot.innerHTML = '<p class="loading">Writing from the records, then checking every sentence…</p>';
+    if (S.sample || key) {
+      slot.innerHTML = '<p class="loading">Claude is writing from the records. Every sentence gets checked before you see it…</p>';
       try {
-        const raw = await St.requestStory({ key, evidence });
+        const raw = S.sample
+          ? await St.requestStoryViaSample(S.sample, evidence)
+          : await St.requestStory({ key, evidence });
         if (S.recordToken !== token) return;
         story = St.validateStory(raw, evidence);
         if (!story.report.kept) throw new Error('Every sentence failed the evidence check, so nothing is shown.');
@@ -579,7 +651,7 @@
       </details>
       ${note ? `<p class="hint">${esc(note)}</p>` : ''}
       <div class="actions">
-        ${getKey() ? '<button class="btn small" id="story-again">Write it again</button>' : ''}
+        ${S.sample || getKey() ? '<button class="btn small" id="story-again">Write it again</button>' : ''}
         <button class="btn small" id="story-copy">Copy story</button>
       </div>`;
 
@@ -653,8 +725,14 @@
     }
   }
 
-  function exportNotes() {
-    const blob = new Blob([JSON.stringify(S.notes, null, 2)], { type: 'application/json' });
+  async function exportNotes() {
+    const json = JSON.stringify(S.notes, null, 2);
+    if (window.claude) {
+      // Inside Claude, downloads from the page are blocked: copy instead.
+      try { await navigator.clipboard.writeText(json); toast('Field notes copied as JSON'); } catch (e) { toast('Couldn’t copy on this browser'); }
+      return;
+    }
+    const blob = new Blob([json], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `solstice-field-notes-${new Date().toISOString().slice(0, 10)}.json`;
@@ -707,6 +785,26 @@
   });
   keyStatus();
 
+  $('#near-btn').addEventListener('click', openNearPicker);
+
+  // Inside a claude.ai artifact: Claude reads stones and writes stories
+  // through the viewer's own account. Elsewhere: Tesseract and an API key.
+  async function detectClaude() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    const sample = await window.claude.use('sample').catch(() => null);
+    if (!sample) return;
+    S.sample = sample;
+    try { S.canSeeImages = !!(await sample.limits()).images; } catch (e) { S.canSeeImages = false; }
+    $('#key-form').hidden = true;
+    $('#key-status').hidden = true;
+    $('#settings-hint').textContent = 'Inside Claude, stories are written through your own Claude account — no key needed. Every sentence is still checked against the evidence before you see it.';
+    $('#export-btn').textContent = 'Copy as JSON';
+    $('#footer-text').textContent = S.canSeeImages
+      ? 'Records from Wikidata and Wikipedia, baked in and refreshed monthly. Claude reads the stone and writes the story through your Claude account. The photo’s location is read on this page and never sent.'
+      : 'Records from Wikidata and Wikipedia, baked in and refreshed monthly. Claude writes the story through your Claude account.';
+  }
+
   renderNotes();
   loadRecords();
+  detectClaude();
 })();

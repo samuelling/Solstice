@@ -81,17 +81,23 @@
    * Belief over the true digit at one position, given what OCR saw and how
    * sure it was. Returns {digit: probability} summing to 1.
    */
-  function digitBelief(observed, confidence) {
+  function digitBelief(observed, confidence, readerAlts) {
     const c = clamp(confidence, 0.2, 0.985);
     const belief = {};
     if (!/^[0-9]$/.test(observed)) {
       for (let d = 0; d <= 9; d++) belief[String(d)] = 0.1;
       return belief;
     }
-    const alts = confusionFrom[observed];
+    const generic = confusionFrom[observed];
+    // When the reader named its own alternatives ("8, or maybe 3"), they
+    // take most of the doubt; the generic confusion table keeps the rest.
+    const named = (readerAlts || []).filter((a) => /^[0-9]$/.test(a) && a !== observed);
     for (let d = 0; d <= 9; d++) {
       const k = String(d);
-      belief[k] = k === observed ? c : (1 - c) * alts[k];
+      if (k === observed) { belief[k] = c; continue; }
+      const fromNamed = named.length ? (named.includes(k) ? 0.8 / named.length : 0) : 0;
+      const share = named.length ? fromNamed + 0.2 * generic[k] : generic[k];
+      belief[k] = (1 - c) * share;
     }
     return belief;
   }
@@ -99,7 +105,7 @@
   /** Belief over every possible 4-digit year for one observed token. */
   function yearBelief(token) {
     // token: { chars: [{ch, conf}] } with 4 entries
-    const per = token.chars.map(({ ch, conf }) => digitBelief(ch, conf));
+    const per = token.chars.map(({ ch, conf, alts }) => digitBelief(ch, conf, alts));
     const out = new Map();
     // Enumerate the top-4 digits at each position (4^4 = 256 combos).
     const tops = per.map((b) =>
@@ -119,7 +125,7 @@
     const s = String(year).padStart(4, '0');
     if (s.length !== 4) return 1e-6;
     let p = 1;
-    token.chars.forEach(({ ch, conf }, i) => { p *= digitBelief(ch, conf)[s[i]]; });
+    token.chars.forEach(({ ch, conf, alts }, i) => { p *= digitBelief(ch, conf, alts)[s[i]]; });
     return p;
   }
 
@@ -472,7 +478,8 @@
         const ch = /^[0-9]$/.test(t) ? t : (DIGIT_LOOKALIKES[t] || null);
         // A lookalike letter is itself evidence of uncertainty.
         const conf = (s.conf ?? w.conf ?? 50) / 100 * (ch === t ? 1 : 0.55);
-        return ch ? { ch, conf, raw: t } : null;
+        const alts = (s.alts || []).map((a) => (/^[0-9]$/.test(a) ? a : DIGIT_LOOKALIKES[a])).filter(Boolean);
+        return ch ? { ch, conf, raw: t, alts } : null;
       });
       let run = [];
       const flush = () => {
