@@ -386,3 +386,49 @@ blockquote.period .src-line { font-family: var(--body); }
 .papers .snip mark { background: color-mix(in srgb, var(--possible) 28%, transparent); color: inherit; padding: 0 1px; border-radius: 2px; font-style: normal; }
 .more.inline { display: inline; }
 .more.inline summary { display: inline-flex; min-height: 0; font-size: 0.85rem; margin-left: 4px; }
+
+/* ==== Life page ==================================================== */
+.life-hero { overflow: hidden; }
+.life-hero h2 { font-size: 1.6rem; margin-bottom: 4px; text-wrap: balance; }
+.life-hero .sub { margin: 0 0 6px; color: var(--muted); }
+.glance { margin: 4px 0 8px; font-family: 'Source Serif 4', Georgia, serif; font-size: 1.05rem; }
+.brief { margin-top: 18px; font-family: 'Source Serif 4', Georgia, serif; font-size: 1.08rem; line-height: 1.65; }
+.brief p { margin: 0 0 8px; }
+.brief .src-line, .brief .more summary { font-family: var(--body); }
+figure.pull { margin: 0; padding: 4px 0 4px 18px; border-left: 3px solid var(--possible); }
+figure.pull blockquote { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-style: italic; font-size: 1.1rem; line-height: 1.6; }
+figure.pull figcaption { margin-top: 8px; font-size: 0.82rem; color: var(--muted); }
+
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline::before { content: ''; position: absolute; left: 2.6em; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+.timeline li { display: grid; grid-template-columns: 2.4em 1fr; gap: 0 1.1em; padding: 8px 0; position: relative; }
+.timeline li::before { content: ''; position: absolute; left: calc(2.6em - 4px); top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--muted); }
+.timeline li.tl-end::before { background: var(--carve); border-color: var(--carve); }
+.tl-year { font-family: var(--display); font-weight: 600; font-size: 0.95rem; padding-top: 2px; font-variant-numeric: tabular-nums; }
+.tl-text { margin: 0 0 0 0.6em; font-family: 'Source Serif 4', Georgia, serif; font-size: 1rem; line-height: 1.55; min-width: 0; }
+li.tl-end .tl-text { font-family: var(--body); font-weight: 600; padding-top: 2px; }
+.tl-text cite { display: block; font-family: var(--body); font-style: normal; font-size: 0.75rem; margin-top: 4px; }
+.tl-text cite a { color: var(--muted); }
+.tl-period { font-style: italic; }
+
+.fact-group { margin-bottom: 10px; }
+.fg-title { margin: 12px 0 2px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+.period-all { margin-top: 18px; border-top: 1px solid var(--line); }
+.period-all > summary { cursor: pointer; color: var(--focus); min-height: 46px; display: flex; align-items: center; font-size: 0.95rem; }
+.unknown-note { margin-top: 10px; }
+.unknown-note p { color: var(--muted); }
+
+/* ==== Nearby ======================================================= */
+.radius { display: flex; gap: 6px; margin: 4px 0 14px; }
+.radius button { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font: 600 0.88rem/1 var(--body); padding: 8px 14px; border-radius: 999px; cursor: pointer; min-height: 38px; }
+.radius button.current { background: var(--carve); border-color: var(--carve); color: var(--bg); }
+.nearby-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.nearby-list li { border-bottom: 1px solid var(--line); }
+.near-person { appearance: none; width: 100%; background: none; border: 0; padding: 12px 2px; display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; text-align: left; cursor: pointer; color: var(--ink); font: inherit; }
+.np-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--line); overflow: hidden; }
+.np-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.np-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.np-name { font-weight: 600; }
+.np-meta { font-size: 0.85rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.np-dist { font-size: 0.88rem; color: var(--strong); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#nearby-btn { margin-top: 10px; }
