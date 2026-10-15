@@ -75,6 +75,7 @@ def main():
         if c and r['lat'] is None and c.startswith('Point('):
             lon, lat = c[6:-1].split()
             r['lat'], r['lon'] = round(float(lat), 6), round(float(lon), 6)
+            r['coordSource'] = 'Wikidata'
         fam = b.get('famLabel', {}).get('value', '')
         if fam and not (fam.startswith('Q') and fam[1:].isdigit()):
             r['family'] = r['family'] or fam
@@ -204,7 +205,13 @@ def main():
             title = back.get(pg.get('title'), pg.get('title', ''))
             meta = ii.get('extmetadata', {})
             artist = re.sub(r'<[^>]+>', '', meta.get('Artist', {}).get('value', '')).strip()
+            def num(k):
+                try:
+                    return float(str(meta.get(k, {}).get('value', '')).strip())
+                except ValueError:
+                    return None
             info[title[5:] if title.startswith('File:') else title] = {
+                'lat': num('GPSLatitude'), 'lon': num('GPSLongitude'),
                 'thumb': ii.get('thumburl'), 'page': ii.get('descriptionurl'),
                 'artist': re.sub(r'\s+', ' ', artist)[:120] or 'Unknown',
                 'license': meta.get('LicenseShortName', {}).get('value', ''),
@@ -218,6 +225,9 @@ def main():
         for key, out_key in (('portraitFile', 'portrait'), ('graveFile', 'grave')):
             f = p.pop(key, None)
             meta = info.get(f) if f else None
+            # A photo of the grave taken with a phone or GPS camera says where the grave is.
+            if out_key == 'grave' and meta and meta.get('lat') and p.get('lat') is None:
+                p['lat'], p['lon'], p['coordSource'] = round(meta['lat'], 6), round(meta['lon'], 6), 'grave photo'
             if not meta or not meta.get('thumb'):
                 continue
             try:
@@ -262,6 +272,43 @@ def main():
             continue
         lon, lat = c[6:-1].split()
         landmarks.append({'name': name, 'lat': round(float(lat), 6), 'lon': round(float(lon), 6)})
+    # OpenStreetMap: volunteers map graves and monuments, often tagged with
+    # who is buried there; plus named features to stand near.
+    osm_q = '''[out:json][timeout:180];
+      area["name"="Mount Auburn Cemetery"]["landuse"="cemetery"]->.ma;
+      ( nwr(area.ma)["cemetery"="grave"]; nwr(area.ma)["historic"~"tomb|memorial|grave|monument"];
+        nwr(area.ma)["buried:wikidata"]; nwr(area.ma)["subject:wikidata"]; nwr(area.ma)["memorial"];
+        nwr(area.ma)["name"]["building"]; nwr(area.ma)["name"]["man_made"]; nwr(area.ma)["name"]["natural"];
+        nwr(area.ma)["name"]["amenity"]; nwr(area.ma)["name"]["leisure"]; nwr(area.ma)["name"]["tourism"]; );
+      out center tags;'''
+    try:
+        osm = get('https://overpass-api.de/api/interpreter', data=urllib.parse.urlencode({'data': osm_q}).encode())['elements']
+    except Exception as e:
+        print('overpass failed', e, file=sys.stderr)
+        osm = []
+    by_norm = {}
+    for p in people.values():
+        by_norm.setdefault(re.sub(r'[^a-z ]', '', p['label'].lower()).strip(), []).append(p)
+    placed = 0
+    for el in osm:
+        t = el.get('tags', {})
+        lat = el.get('lat') or (el.get('center') or {}).get('lat')
+        lon = el.get('lon') or (el.get('center') or {}).get('lon')
+        if lat is None:
+            continue
+        grave_like = t.get('cemetery') == 'grave' or 'historic' in t or 'memorial' in t or 'buried:wikidata' in t or 'subject:wikidata' in t
+        ids = [x.strip() for k in ('buried:wikidata', 'subject:wikidata', 'wikidata') for x in t.get(k, '').split(';') if x.strip()]
+        match = [people[q] for q in ids if q in people]
+        if not match and grave_like and t.get('name'):
+            cands = by_norm.get(re.sub(r'[^a-z ]', '', t['name'].lower()).strip(), [])
+            match = cands if len(cands) == 1 else []
+        for p in match:
+            if p.get('coordSource') in (None, 'grave photo'):
+                p['lat'], p['lon'], p['coordSource'] = round(lat, 6), round(lon, 6), 'OpenStreetMap'
+                placed += 1
+        if not match and not grave_like and t.get('name') and not any(l['name'] == t['name'] for l in landmarks):
+            landmarks.append({'name': t['name'], 'lat': round(lat, 6), 'lon': round(lon, 6)})
+    print('OpenStreetMap:', len(osm), 'features,', placed, 'graves placed')
     landmarks.sort(key=lambda r: r['name'])
     print(len(landmarks), 'landmarks')
 
