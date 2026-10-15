@@ -7,7 +7,7 @@ Run by .github/workflows/records.yml so the app works with no live lookups
 
 Standard library only.
 """
-import json, time, urllib.parse, urllib.request, datetime, os, sys
+import json, re, time, urllib.parse, urllib.request, datetime, os, sys
 
 UA = 'Solstice/1.0 (https://github.com/samuelling/Solstice; Mount Auburn headstone app)'
 OUT = os.path.join(os.path.dirname(__file__), '..', 'data', 'burials.json')
@@ -160,6 +160,77 @@ def main():
                     cut = cut[:cut.rfind('. ') + 1] or cut
                 by_title[t]['summary'] = cut
         time.sleep(0.5)
+
+    # Portraits (P18) and photos of the grave (P1442) from Wikimedia Commons,
+    # as small thumbnails with their credits. The artifact can't load images
+    # from other sites, so they ship as data files: data/portraits/chunk-N.json.
+    def images(prop, key):
+        rows = sparql(f'''
+          SELECT ?p ?img WHERE {{ ?p wdt:P119 wd:{qid} ; wdt:{prop} ?img . }}''')
+        for b in rows:
+            q = b['p']['value'].rsplit('/', 1)[-1]
+            fname = urllib.parse.unquote(b['img']['value'].rsplit('/', 1)[-1]).replace('_', ' ')
+            if q in people and key not in people[q]:
+                people[q][key] = fname
+        time.sleep(1)
+
+    images('P18', 'portraitFile')
+    images('P1442', 'graveFile')
+
+    files = sorted({p[k] for p in people.values() for k in ('portraitFile', 'graveFile') if p.get(k)})
+    info = {}
+    for i in range(0, len(files), 40):
+        chunk = files[i:i + 40]
+        d = get('https://commons.wikimedia.org/w/api.php?' + urllib.parse.urlencode({
+            'action': 'query', 'prop': 'imageinfo', 'iiprop': 'url|extmetadata', 'iiurlwidth': 240,
+            'format': 'json', 'titles': '|'.join('File:' + f for f in chunk)}))
+        q = d.get('query', {})
+        back = {n['to']: n['from'] for n in q.get('normalized', [])}
+        for pg in q.get('pages', {}).values():
+            ii = (pg.get('imageinfo') or [{}])[0]
+            title = back.get(pg.get('title'), pg.get('title', ''))
+            meta = ii.get('extmetadata', {})
+            artist = re.sub(r'<[^>]+>', '', meta.get('Artist', {}).get('value', '')).strip()
+            info[title[5:] if title.startswith('File:') else title] = {
+                'thumb': ii.get('thumburl'), 'page': ii.get('descriptionurl'),
+                'artist': re.sub(r'\s+', ' ', artist)[:120] or 'Unknown',
+                'license': meta.get('LicenseShortName', {}).get('value', ''),
+            }
+        time.sleep(0.5)
+
+    import base64
+    chunks = {}
+    fetched = 0
+    for p in people.values():
+        for key, out_key in (('portraitFile', 'portrait'), ('graveFile', 'grave')):
+            f = p.pop(key, None)
+            meta = info.get(f) if f else None
+            if not meta or not meta.get('thumb'):
+                continue
+            try:
+                req = urllib.request.Request(meta['thumb'], headers={'User-Agent': UA})
+                with urllib.request.urlopen(req, timeout=60) as r:
+                    blob, ctype = r.read(), r.headers.get('Content-Type', 'image/jpeg')
+            except Exception as e:
+                print('skip image', f, e, file=sys.stderr)
+                continue
+            if len(blob) > 120_000:
+                continue
+            n = int(p['qid'][1:]) % 8
+            entry = chunks.setdefault(n, {}).setdefault(p['qid'], {})
+            entry[out_key] = {
+                'data': f'data:{ctype};base64,' + base64.b64encode(blob).decode(),
+                'page': meta['page'], 'artist': meta['artist'], 'license': meta['license'],
+            }
+            p['images'] = n
+            fetched += 1
+            time.sleep(0.15)
+    pdir = os.path.join(os.path.dirname(OUT), 'portraits')
+    os.makedirs(pdir, exist_ok=True)
+    for n in range(8):
+        with open(os.path.join(pdir, f'chunk-{n}.json'), 'w') as fh:
+            json.dump(chunks.get(n, {}), fh, separators=(',', ':'))
+    print(fetched, 'images baked')
 
     # Named places inside the cemetery with coordinates, for "I'm near…".
     lm_rows = sparql(f'''
