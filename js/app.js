@@ -564,6 +564,7 @@
       </div>
 
       <div id="wd-slot"></div>
+      <div id="period-slot"></div>
       <div id="grave-slot"></div>
       <div id="family-slot"></div>
 
@@ -616,7 +617,12 @@
         extras = { findAGraveId: det.value.findAGraveId };
         further();
         if (det.value.facts.length) {
-          html += `<ul class="facts">${det.value.facts.map((f) => `<li><span class="k">${esc(f.label)}</span><span>${esc(f.value)}</span></li>`).join('')}</ul>
+          const short = (v) => {
+            const parts = String(v).split(', ');
+            if (parts.length <= 6) return esc(v);
+            return `${esc(parts.slice(0, 6).join(', '))} <details class="more inline"><summary>and ${parts.length - 6} more</summary>${esc(parts.slice(6).join(', '))}</details>`;
+          };
+          html += `<ul class="facts">${det.value.facts.map((f) => `<li><span class="k">${esc(f.label)}</span><span>${short(f.value)}</span></li>`).join('')}</ul>
             <p class="src-line"><span class="tag record">Database record</span><a href="${esc(det.value.facts[0].url)}" target="_blank" rel="noopener">Wikidata</a></p>`;
         }
       } else {
@@ -634,32 +640,97 @@
       $('#wd-slot').innerHTML = html;
     }
 
-    // Newspapers
-    try {
-      const n = await Src.newspaperMentions(person);
-      if (S.recordToken !== token) return;
-      storyCtx.papers = n.items || [];
-      const slot = $('#papers-slot');
-      if (n.error) {
-        slot.innerHTML = `<p class="muted">The newspaper search didn’t answer from here. <a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">Run it on loc.gov</a>.</p>`;
-      } else if (!n.items.length) {
-        slot.innerHTML = `<p class="muted">${n.window ? `No digitized papers mention “${esc(tc(person.given + ' ' + person.family))}” between ${n.window[0]} and ${n.window[1]}.` : esc(n.note || 'Not enough to search on.')} ${n.searchUrl ? `<a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">Search loc.gov yourself</a>.` : ''}</p>`;
-      } else {
-        slot.innerHTML = `<p class="hint">Pages mentioning the name, ${n.window[0]}–${n.window[1]}, from ${esc(n.scope)}. A name match isn’t proof it’s the same person.</p>
-          <ul class="papers">${n.items.map((it) => `<li><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a>
-            <div class="meta"><span class="tag mention">Possible mention</span>${esc(it.date)}</div>
-            ${it.snippet ? `<p class="snip">${esc(String(it.snippet).slice(0, 220))}${String(it.snippet).length > 220 ? '…' : ''}</p>` : ''}</li>`).join('')}</ul>
-          <p class="hint"><a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">See every result on loc.gov</a></p>`;
+    // Longer texts, baked in by the Action: full Wikipedia, period
+    // encyclopedia entries, newspaper excerpts.
+    const texts = choice.kind === 'match' && person.qid && person.source !== 'notes' ? await Src.textsOf(person.qid) : null;
+    if (S.recordToken !== token) return;
+    if (texts) {
+      storyCtx.wikipedia = texts.wikipedia || null;
+      storyCtx.period = texts.wikisource || [];
+      if (storyCtx.period.length) renderPeriod(storyCtx.period);
+    }
+
+    // Newspapers: baked excerpts when gathered; otherwise a live search
+    // where the network allows (not inside a Claude artifact).
+    if (texts && texts.papers && texts.papers.checked) {
+      storyCtx.papers = (texts.papers.items || []).map((it) => ({ ...it, snippet: (it.excerpts || []).join(' … ') }));
+      renderBakedPapers(texts.papers.items || [], person);
+    } else {
+      try {
+        const n = await Src.newspaperMentions(person);
+        if (S.recordToken !== token) return;
+        storyCtx.papers = n.items || [];
+        const slot = $('#papers-slot');
+        if (n.error) {
+          slot.innerHTML = `<p class="muted">The newspaper search didn’t answer from here. <a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">Run it on loc.gov</a>.</p>`;
+        } else if (!n.items.length) {
+          slot.innerHTML = `<p class="muted">${n.window ? `No digitized papers mention “${esc(tc(person.given + ' ' + person.family))}” between ${n.window[0]} and ${n.window[1]}.` : esc(n.note || 'Not enough to search on.')} ${n.searchUrl ? `<a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">Search loc.gov yourself</a>.` : ''}</p>`;
+        } else {
+          slot.innerHTML = `<p class="hint">Pages mentioning the name, ${n.window[0]}–${n.window[1]}, from ${esc(n.scope)}. A name match isn’t proof it’s the same person.</p>
+            <ul class="papers">${n.items.map((it) => `<li><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a>
+              <div class="meta"><span class="tag mention">Possible mention</span>${esc(it.date)}</div>
+              ${it.snippet ? `<p class="snip">${esc(String(it.snippet).slice(0, 220))}${String(it.snippet).length > 220 ? '…' : ''}</p>` : ''}</li>`).join('')}</ul>
+            <p class="hint"><a href="${esc(n.searchUrl)}" target="_blank" rel="noopener">See every result on loc.gov</a></p>`;
+        }
+      } catch (e) {
+        if (S.recordToken !== token) return;
+        $('#papers-slot').innerHTML = `<p class="muted">The newspaper search failed: ${esc(e.message)}</p>`;
       }
-    } catch (e) {
-      if (S.recordToken !== token) return;
-      $('#papers-slot').innerHTML = `<p class="muted">The newspaper search failed: ${esc(e.message)}</p>`;
     }
 
     const btn = $('#story-btn');
     btn.disabled = false;
     btn.textContent = 'Tell their story';
     btn.onclick = () => tellStory(storyCtx, token);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Period accounts and newspaper excerpts
+  // ---------------------------------------------------------------------------
+
+  function paragraphs(text) {
+    return String(text).split(/\n\s*\n|\n(?=[A-Z])/).map((p) => p.replace(/\s+/g, ' ').trim()).filter((p) => p.length > 40);
+  }
+
+  function renderPeriod(accounts) {
+    $('#period-slot').innerHTML = `<h3>Period accounts</h3>
+      <p class="hint">Written in the 19th or early 20th century, in the language and with the views of their time.</p>
+      ${accounts.map((a) => {
+        const ps = paragraphs(a.text);
+        const lead = ps[0] || '', rest = ps.slice(1).join('\n\n');
+        return `<blockquote class="period">
+          <p class="period-work">${esc(a.work)}</p>
+          <p>${esc(lead.length > 600 ? lead.slice(0, 600) + '…' : lead)}</p>
+          ${rest || lead.length > 600 ? `<details class="more"><summary>Read the whole entry</summary>${paragraphs(a.text).map((p) => `<p>${esc(p)}</p>`).join('')}</details>` : ''}
+          <p class="src-line"><span class="tag period">Period source</span><a href="${esc(a.url)}" target="_blank" rel="noopener">Wikisource</a></p>
+        </blockquote>`;
+      }).join('')}`;
+  }
+
+  function markName(text, family) {
+    const safe = esc(text);
+    if (!family) return safe;
+    const re = new RegExp(`(${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return safe.replace(re, '<mark>$1</mark>');
+  }
+
+  function renderBakedPapers(items, person) {
+    const slot = $('#papers-slot');
+    const name = tc([person.given, person.family].filter(Boolean).join(' ')) || person.label;
+    const searchUrl = `https://www.loc.gov/collections/chronicling-america/?q=${encodeURIComponent('"' + name + '"')}`;
+    const withText = items.filter((it) => it.excerpts && it.excerpts.length);
+    if (!withText.length) {
+      slot.innerHTML = `<p class="muted">No Massachusetts paper in the Library of Congress collection names ${esc(name)} around ${esc(person.death || 'their death')}. <a href="${esc(searchUrl)}" target="_blank" rel="noopener">Search loc.gov yourself</a>.</p>`;
+      return;
+    }
+    const fam = (person.family || '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+    slot.innerHTML = `<p class="hint">Massachusetts newspaper pages that name them, from the Library of Congress. Old pages were read by machine, so expect garbled words, and a name match isn’t proof it’s the same person.</p>
+      <ul class="papers">${withText.map((it) => `<li>
+        <a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(tc(it.title))}</a>
+        <div class="meta"><span class="tag mention">Possible mention</span>${esc(it.date)}</div>
+        ${it.excerpts.map((x) => `<p class="snip">…${markName(x, fam)}…</p>`).join('')}
+      </li>`).join('')}</ul>
+      <p class="hint"><a href="${esc(searchUrl)}" target="_blank" rel="noopener">Search every paper on loc.gov</a></p>`;
   }
 
   // ---------------------------------------------------------------------------
@@ -789,7 +860,7 @@
 
   function renderStory(story, evidence, note, ctx, token) {
     const num = (id) => Number(id.slice(1));
-    const kindTag = { stone: ['you', 'From the stone'], derived: ['you', 'Worked out'], record: ['record', 'Database record'], summary: ['summary', 'Encyclopedia'], mention: ['mention', 'Possible mention'], place: ['you', 'Your field notes'] };
+    const kindTag = { stone: ['you', 'From the stone'], derived: ['you', 'Worked out'], record: ['record', 'Database record'], summary: ['summary', 'Encyclopedia'], period: ['period', 'Period source'], mention: ['mention', 'Possible mention'], place: ['you', 'Your field notes'] };
     const used = new Set(story.paragraphs.flat().flatMap((s) => s.cites));
     const r = story.report;
     const n = r.checked;

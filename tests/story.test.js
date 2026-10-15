@@ -104,3 +104,27 @@ test('request is shaped for a forced tool call', async () => {
   assert.ok(body.messages[0].content.includes('E1'));
   assert.strictEqual(r.title, 'x');
 });
+
+test('longer texts become separate, citable evidence', () => {
+  const e = St.buildEvidence({
+    ...ctx,
+    wikipedia: { url: 'w', sections: [
+      { h: 'Introduction', t: 'Intro paragraph that is long enough to count as evidence for the story.' },
+      { h: 'Death of Frances', t: 'In July 1861 Frances was fatally burned when her dress caught fire, and Longfellow was burned trying to save her.\nHe grew his beard because the burns made shaving difficult, a change that became his best-known image.' },
+    ] },
+    period: [{ work: 'The American Cyclopaedia', url: 'p', text: 'LONGFELLOW, Henry Wadsworth, an American poet, born in Portland, Me., Feb. 27, 1807. He graduated at Bowdoin college in 1825. '.repeat(8) }],
+    papers: [{ title: 'Boston globe', date: '1882-03-25', url: 'z', snippet: 'The funeral of the poet Longfellow took place at Mount Auburn' }],
+  });
+  const wiki = e.filter((x) => x.label === 'Wikipedia: Death of Frances');
+  assert.strictEqual(wiki.length, 2, 'one item per paragraph, intro skipped');
+  assert.ok(!e.some((x) => x.label === 'Wikipedia: Introduction'));
+  const period = e.filter((x) => x.kind === 'period');
+  assert.ok(period.length >= 1 && period.length <= 5, `period chunks: ${period.length}`);
+  const out = St.validateStory({ title: 't', paragraphs: [[
+    { text: 'In 1861 Frances was fatally burned when her dress caught fire.', kind: 'fact', cites: [wiki[0].id] },
+    { text: 'An 1879 encyclopedia noted he graduated at Bowdoin college in 1825.', kind: 'fact', cites: [period[0].id] },
+  ]], unknowns: [] }, e);
+  // "1879" is the work's date, which isn't in the cited text — the check catches it.
+  assert.strictEqual(out.report.kept, 1);
+  assert.ok(out.report.removed[0].reason.includes('1879'));
+});

@@ -77,9 +77,35 @@
       });
     }
     if (ctx.summary && ctx.summary.text) add('summary', 'Encyclopedia summary', ctx.summary.text, { source: 'Wikipedia', url: ctx.summary.url });
+
+    // The rest of the Wikipedia article, a paragraph per item (capped).
+    if (ctx.wikipedia && ctx.wikipedia.sections) {
+      let budget = 9000, count = 0;
+      for (const sec of ctx.wikipedia.sections) {
+        if (/^introduction$/i.test(sec.h)) continue; // already the summary
+        for (const para of String(sec.t).split(/\n+/).map((x) => x.trim()).filter((x) => x.length > 60)) {
+          if (budget <= 0 || count >= 18) break;
+          const t = para.slice(0, 1200);
+          add('summary', `Wikipedia: ${sec.h}`, t, { source: 'Wikipedia', url: ctx.wikipedia.url });
+          budget -= t.length; count++;
+        }
+      }
+    }
+
+    // Period encyclopedia entries (Wikisource), in chunks of a few sentences.
+    for (const acc of (ctx.period || []).slice(0, 3)) {
+      const sentences = String(acc.text).replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+(\s|$)/g) || [acc.text];
+      let chunk = '', made = 0;
+      for (const sn of sentences) {
+        chunk += sn;
+        if (chunk.length > 650 && made < 5) { add('period', `Period entry: ${acc.work}`, chunk.trim(), { source: `${acc.work} (Wikisource)`, url: acc.url }); chunk = ''; made++; }
+      }
+      if (chunk.trim().length > 60 && made < 5) add('period', `Period entry: ${acc.work}`, chunk.trim(), { source: `${acc.work} (Wikisource)`, url: acc.url });
+    }
+
     for (const n of (ctx.papers || []).slice(0, 6)) {
       add('mention', 'Newspaper page', `${n.title} (${n.date})${n.snippet ? `: ${n.snippet}` : ''}`, {
-        source: 'Chronicling America — name match only, may be someone else', url: n.url,
+        source: 'Chronicling America — name match only, may be someone else; machine-read text', url: n.url,
       });
     }
     for (const s of ctx.nearby || []) {
@@ -104,7 +130,8 @@ Rules:
   • "context" — well-established background about Cambridge, Boston, Massachusetts or America in the person's lifetime. At most two context sentences. Cite the evidence that anchors the time or place (usually the dates). Never use context to imply facts about the person.
 - Never invent names, relatives, feelings, causes of death, occupations, or events. Never put words in anyone's mouth. Quote only text that appears verbatim in the evidence.
 - Do not use any number that does not appear in the evidence you cite. Write decades or centuries only if a cited year falls in them.
-- Newspaper pages are name matches only and may be about someone else. Use one only if its text clearly fits this person (same name plus consistent place, role or date), and treat it as an inference.
+- Period entries are 19th- and early 20th-century encyclopedias. They are good sources for what was said about the person in their own era. When you use their judgements or their phrasing, attribute them by the work's name as given in the evidence ("the American Cyclopædia called him…"), never by a year the evidence doesn't state, and don't adopt their views on race, sex or class as your own.
+- Newspaper pages are name matches only and may be about someone else. Their text was read by machine and may be garbled; never quote garbled words. Use one only if its text clearly fits this person (same name plus consistent place, role or date), and treat it as an inference.
 - If the identity confidence is below 60 percent, or there is no match, write only about what the stone itself shows, and say plainly where the trail ends.
 - Family evidence says only who is related and whether they are also buried at Mount Auburn. "Not recorded" does not mean buried elsewhere. Never place relatives in the same lot or next to each other unless the evidence says so.
 - When the evidence is thin, write less. Two honest sentences beat a paragraph of filler. What the dates alone imply — an age, an era, a child's grave — can be enough.

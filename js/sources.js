@@ -98,6 +98,18 @@
 
   const hasImages = (qid) => { const b = baked.get(qid); return !!(b && b.images != null); };
 
+  // Longer texts (full Wikipedia, Wikisource period entries, newspaper
+  // excerpts), baked by scripts/fetch_texts.py into 16 chunks by Q-number.
+  const textChunks = new Map();
+  async function textsOf(qid) {
+    if (!qid || !/^Q\d+$/.test(qid)) return null;
+    const n = Number(qid.slice(1)) % 16;
+    if (!textChunks.has(n)) {
+      textChunks.set(n, fetch(`data/texts/chunk-${n}.json`).then((r) => (r.ok ? r.json() : {})).catch(() => ({})));
+    }
+    return (await textChunks.get(n))[qid] || null;
+  }
+
   // ---------------------------------------------------------------------------
   // Family within Mount Auburn
   // ---------------------------------------------------------------------------
@@ -385,6 +397,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, imagesOf, hasImages, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
+    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
   };
 })(window);

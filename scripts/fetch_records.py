@@ -195,7 +195,7 @@ def main():
     for i in range(0, len(files), 40):
         chunk = files[i:i + 40]
         d = get('https://commons.wikimedia.org/w/api.php?' + urllib.parse.urlencode({
-            'action': 'query', 'prop': 'imageinfo', 'iiprop': 'url|extmetadata', 'iiurlwidth': 240,
+            'action': 'query', 'prop': 'imageinfo', 'iiprop': 'url|extmetadata', 'iiurlwidth': 200,
             'format': 'json', 'titles': '|'.join('File:' + f for f in chunk)}))
         q = d.get('query', {})
         back = {n['to']: n['from'] for n in q.get('normalized', [])}
@@ -229,7 +229,7 @@ def main():
                 continue
             if len(blob) > 120_000:
                 continue
-            n = int(p['qid'][1:]) % 8
+            n = int(p['qid'][1:]) % 32
             entry = chunks.setdefault(n, {}).setdefault(p['qid'], {})
             entry[out_key] = {
                 'data': f'data:{ctype};base64,' + base64.b64encode(blob).decode(),
@@ -240,7 +240,9 @@ def main():
             time.sleep(0.15)
     pdir = os.path.join(os.path.dirname(OUT), 'portraits')
     os.makedirs(pdir, exist_ok=True)
-    for n in range(8):
+    for f in os.listdir(pdir):
+        os.remove(os.path.join(pdir, f))
+    for n in range(32):
         with open(os.path.join(pdir, f'chunk-{n}.json'), 'w') as fh:
             json.dump(chunks.get(n, {}), fh, separators=(',', ':'))
     print(fetched, 'images baked')

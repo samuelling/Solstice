@@ -376,3 +376,13 @@ footer { padding-top: 10px; padding-bottom: 40px; color: var(--muted); font-size
 .portrait-fig figcaption { font-size: 0.68rem; overflow-wrap: anywhere; }
 .favatar-slot:empty { display: none; }
 .favatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 8px; background: var(--line); }
+
+/* ---- period accounts and newspaper excerpts ---- */
+.tag.period { color: var(--possible); }
+blockquote.period { margin: 0 0 16px; padding: 2px 0 2px 14px; border-left: 3px solid var(--line); font-family: 'Source Serif 4', Georgia, serif; }
+blockquote.period p { margin: 0 0 8px; line-height: 1.6; }
+blockquote.period .period-work { font-family: var(--body); font-size: 0.82rem; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+blockquote.period .src-line { font-family: var(--body); }
+.papers .snip mark { background: color-mix(in srgb, var(--possible) 28%, transparent); color: inherit; padding: 0 1px; border-radius: 2px; font-style: normal; }
+.more.inline { display: inline; }
+.more.inline summary { display: inline-flex; min-height: 0; font-size: 0.85rem; margin-left: 4px; }
