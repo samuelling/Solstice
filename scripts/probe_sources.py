@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """One-off probe: record the response shapes of new sources (run in Actions)."""
-import json, os, urllib.parse, urllib.request, sys
+import json, os, re, urllib.parse, urllib.request, sys
 
 UA = 'Solstice/1.0 (https://github.com/samuelling/Solstice; Mount Auburn headstone app)'
 OUT = os.path.join(os.path.dirname(__file__), '..', 'data', 'probe')
@@ -101,11 +101,10 @@ def wikipedia_full():
 
 
 def loc_text():
-    q = urllib.parse.urlencode({'q': '"Henry W. Longfellow"', 'dates': '1882/1882', 'fo': 'json', 'c': 2,
-                                'fa': 'location_state:massachusetts'})
     import time
     d = None
-    for qq in (q, urllib.parse.urlencode({'q': 'Longfellow', 'dates': '1882/1882', 'fo': 'json', 'c': 2})):
+    for qq in (urllib.parse.urlencode({'q': '"Henry W. Longfellow"', 'dates': '1882/1882', 'fo': 'json', 'c': 2, 'fa': 'location_state:massachusetts'}),
+               urllib.parse.urlencode({'q': 'Longfellow', 'dates': '1882/1882', 'fo': 'json', 'c': 2})):
         for _ in range(3):
             d = get('https://www.loc.gov/collections/chronicling-america/?' + qq)
             if d.get('results'):
@@ -113,22 +112,28 @@ def loc_text():
             time.sleep(10)
         if d.get('results'):
             break
-    if not d.get('results'):
-        return {'no_results': True, 'total': d.get('total'), 'pagination': shape(d.get('pagination'))}
     r = d['results'][0]
-    out = {'id': r.get('id'), 'description_len': len((r.get('description') or [''])[0]),
-           'resources': r.get('resources'), 'word_coordinates_pages': shape(d.get('word_coordinates_pages')),
-           'keys': sorted(r.keys())}
-    tried = {}
-    for res in (r.get('resources') or []):
-        for k, v in res.items():
-            if isinstance(v, str) and v.startswith('http') and any(x in v for x in ('xml', 'txt', 'text', 'word')):
-                try:
-                    body = get(v, raw=True)
-                    tried[k] = {'url': v, 'len': len(body), 'head': body[:600]}
-                except Exception as e:
-                    tried[k] = {'url': v, 'error': repr(e)}
-    out['tried'] = tried
+    out = {'id': r['id'], 'word_coordinates_url': r.get('word_coordinates_url'), 'image_url': (r.get('image_url') or [''])[0]}
+    tries = {}
+    if r.get('word_coordinates_url'):
+        tries['word_coordinates'] = r['word_coordinates_url']
+    m = re.search(r'service:ndnp:([^:]+):batch_([^:]+):data:([^:]+):([^:]+):([^:]+):([^/]+)/', out['image_url'])
+    if m:
+        aw, batch, lccn, reel, dated, seq = m.groups()
+        base = f'service/ndnp/{aw}/batch_{batch}/data/{lccn}/{reel}/{dated}/{seq}'
+        tries['storage_ocr_txt'] = f'https://tile.loc.gov/storage-services/{base}/ocr.txt'
+        tries['storage_xml'] = f'https://tile.loc.gov/storage-services/{base}.xml'
+        tries['text_service_full'] = f'https://tile.loc.gov/text-services/word-coordinates-service?segment=/{base}.xml&format=alto_xml'
+        tries['text_service_plain'] = f'https://tile.loc.gov/text-services/word-coordinates-service?segment=/{base}.xml&full_text=1&format=alto_xml'
+    res = {}
+    for k, u in tries.items():
+        try:
+            body = get(u, raw=True)
+            res[k] = {'url': u, 'len': len(body), 'head': body[:500]}
+        except Exception as e:
+            res[k] = {'url': u, 'error': repr(e)[:200]}
+        time.sleep(1)
+    out['tried'] = res
     return out
 
 
