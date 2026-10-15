@@ -1,0 +1,183 @@
+{
+ "rows": [
+  {
+   "article": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q24703441"
+   },
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q19180675"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Small Brockhaus and Efron Encyclopedic Dictionary"
+   }
+  },
+  {
+   "article": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q125846615"
+   },
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q20078554"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Great Soviet Encyclopedia (1926–1947)"
+   }
+  },
+  {
+   "article": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q24461203"
+   },
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q602358"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Brockhaus and Efron Encyclopedic Dictionary"
+   }
+  },
+  {
+   "article": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q113067292"
+   },
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q4532138"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Granat Encyclopedic Dictionary"
+   }
+  },
+  {
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q3181656"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "The Nuttall Encyclopædia"
+   }
+  },
+  {
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q124821483"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "ProDetLit"
+   }
+  },
+  {
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q19098835"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Library of the World's Best Literature"
+   }
+  },
+  {
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q41981607"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Iedereen Leest"
+   }
+  },
+  {
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q124737630"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Armenian Soviet Encyclopedia, vol. 4"
+   }
+  },
+  {
+   "article": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q28806874"
+   },
+   "sitelink": {
+    "type": "uri",
+    "value": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Longfellow,_Henry_Wadsworth"
+   },
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q867541"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "Encyclopædia Britannica 11th edition"
+   }
+  },
+  {
+   "article": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q123916726"
+   },
+   "sitelink": {
+    "type": "uri",
+    "value": "https://en.wikisource.org/wiki/The_American_Cyclop%C3%A6dia_(1879)/Longfellow,_Henry_Wadsworth"
+   },
+   "work": {
+    "type": "uri",
+    "value": "http://www.wikidata.org/entity/Q19077875"
+   },
+   "workLabel": {
+    "xml:lang": "en",
+    "type": "literal",
+    "value": "The American Cyclopædia"
+   }
+  }
+ ],
+ "extract": {
+  "batchcomplete": "",
+  "query": {
+   "normalized": [
+    {
+     "from": "1911_Encyclopædia_Britannica/Longfellow,_Henry_Wadsworth",
+     "to": "1911 Encyclopædia Britannica/Longfellow, Henry Wadsworth"
+    }
+   ],
+   "pages": {
+    "367372": {
+     "pageid": 367372,
+     "ns": 0,
+     "title": "1911 Encyclopædia Britannica/Longfellow, Henry Wadsworth",
+     "extract": ""
+    }
+   }
+  }
+ },
+ "parse": {
+  "parse": {
+   "title": "1911 Encyclopædia Britannica/Longfellow, Henry Wadsworth",
+   "pageid": 367372,
+   "text": "<div class=\"mw-content-ltr mw-parser-output\" lang=\"en\" dir=\"ltr\" data-mw-parsoid-version=\"0.24.0.0-alpha25\" data-mw-html-version=\"2.8.0\"><section data-mw-section-id=\"0\" id=\"mwAQ\"><div class=\"ws-noexpo"
+  }
+ }
+}
