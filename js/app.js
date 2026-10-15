@@ -61,7 +61,7 @@
   // "I'm near…": landmarks, graves with known positions, and saved stones.
   function placesToPick() {
     const out = [];
-    for (const l of Src.landmarks()) out.push({ label: l.name, lat: l.lat, lon: l.lon, kind: 'Landmark' });
+    for (const l of Src.landmarks()) if (l.name !== 'Mount Auburn Cemetery') out.push({ label: l.name, lat: l.lat, lon: l.lon, kind: 'Landmark' });
     for (const p of S.known) if (p.lat != null) out.push({ label: p.label, lat: p.lat, lon: p.lon, kind: 'Grave' });
     for (const n of S.notes) if (n.lat != null) out.push({ label: n.label, lat: n.lat, lon: n.lon, kind: 'Your stone' });
     const seen = new Set();
