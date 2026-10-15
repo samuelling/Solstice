@@ -237,8 +237,20 @@ def main():
             except Exception as e:
                 print('skip image', f, e, file=sys.stderr)
                 continue
-            if len(blob) > 120_000:
+            if len(blob) > 400_000:
                 continue
+            # Shrink to a small, consistent thumbnail when Pillow is available.
+            try:
+                from PIL import Image
+                import io
+                im = Image.open(io.BytesIO(blob)).convert('RGB')
+                im.thumbnail((200, 260))
+                buf = io.BytesIO()
+                im.save(buf, 'JPEG', quality=78, optimize=True, progressive=True)
+                if buf.tell() < len(blob):
+                    blob, ctype = buf.getvalue(), 'image/jpeg'
+            except Exception:
+                pass
             n = int(p['qid'][1:]) % 32
             entry = chunks.setdefault(n, {}).setdefault(p['qid'], {})
             entry[out_key] = {

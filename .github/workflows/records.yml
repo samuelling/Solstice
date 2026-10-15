@@ -23,7 +23,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Fetch Mount Auburn burials from Wikidata and Wikipedia
-        run: python scripts/fetch_records.py
+        run: |
+          pip install --quiet pillow
+          python scripts/fetch_records.py
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
