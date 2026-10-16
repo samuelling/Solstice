@@ -34,11 +34,40 @@ SECTIONS = [
     (re.compile(r'st\.?\s*luke|\b8000\b', re.I), '8000', 'St. Luke’s Lot'),
     (re.compile(r'st\.?\s*paul|\b3730\b|^\s*\[?3?\]?730\s*$', re.I), '3730', 'St. Paul’s Lot'),
     (re.compile(r'st\.?\s*matthew|\b3280\b', re.I), '3280', 'St. Matthew’s Lot'),
-    (re.compile(r'st\.?\s*john|\[?1?7?\]?36\b|\b1736\b', re.I), '1736', 'St. John’s Lot'),
+    (re.compile(r'st\.?\s*john|\[17\]36|\[1\]736|\b1736\b', re.I), '1736', 'St. John’s Lot'),
     (re.compile(r'st\.?\s*james|\blot\s*82\b', re.I), '82', 'St. James Lot'),
     (re.compile(r'receiving\s+tomb|\br\.\s?t\.', re.I), None, 'Receiving Tomb'),
     (re.compile(r'crypt|urn\s+vault|columbarium', re.I), None, 'Crypts'),
 ]
+
+
+# The register's own index (its first page) gives each section's pages:
+# St. James 1-14, St. John's 28-59, St. Matthew's 60-75, St. Paul's 79-98
+# and from 140, Vesper 100-127, St. Luke's 164, St. Mark's 172, Garden Lot
+# 190, old receiving tomb 194-200, new receiving tomb from 204, urn vault
+# 273, single urn crypts 276, crypt register 278-323.
+BY_PAGE = [(1, '82', 'St. James Lot'), (28, '1736', 'St. John’s Lot'), (60, '3280', 'St. Matthew’s Lot'),
+           (79, '3730', 'St. Paul’s Lot'), (100, '5000', 'Vesper Lot'), (140, '3730', 'St. Paul’s Lot'),
+           (164, '8000', 'St. Luke’s Lot'), (172, '8001', 'St. Mark’s Lot'), (190, '8100', 'Garden Lot'),
+           (194, None, 'Receiving Tomb'), (273, None, 'Crypts'), (331, None, None)]
+
+
+def page_number(page_text):
+    """The book's page number, when the transcriber recorded it."""
+    for l in page_text.split('\n')[:12] + page_text.split('\n')[-6:]:
+        t = l.strip()
+        m = (re.fullmatch(r'\{?(\d{1,3})\}?', t) or re.search(r'\[page number:?\s*(\d{1,3})\]', t, re.I)
+             or re.match(r'\{(\d{1,3})\}', t))
+        if m and 1 <= int(m.group(1)) <= 330:
+            return int(m.group(1))
+    return None
+
+
+def section_by_page(n):
+    for (start, lot, name), (nxt, _, _) in zip(BY_PAGE, BY_PAGE[1:]):
+        if start <= n < nxt:
+            return {'lot': lot, 'name': name} if name else None
+    return None
 
 
 def section_of(page_text):
@@ -191,9 +220,13 @@ def parse_row(line, last_year=None, surname_first=False):
 def parse_pages(pages):
     """pages: [(page_id, text)] in order. Returns burial records."""
     out, seen = [], set()
-    section = None
+    section, last_pn = None, 0
     for pid, text in pages:
-        section = section_of(text) or section
+        pn = page_number(text)
+        if pn and last_pn - 2 <= pn <= last_pn + 60:
+            section, last_pn = section_by_page(pn) or section, pn
+        else:
+            section = section_of(text) or section
         surname_first = bool(re.search(r'names without numbers', text, re.I)) and not re.search(r'\|\s*\d{4}', text[:400])
         last_year = None
         for line in text.split('\n'):
