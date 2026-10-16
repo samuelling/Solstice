@@ -3,9 +3,9 @@ Mount Auburn is Q1950363
 942 images baked
 burial plot references: 39
 paths from Wikipedia text: 5
-commons: 492 categories, 13689 files
-commons photos placed 10 graves
-osm named paths: 144 | people with a path: 36 | of those, path mapped: 20
+commons: 1351 categories, 31156 files
+commons photos placed 15 graves
+osm named paths: 144 | people with a path: 61 | of those, path mapped: 20
 OpenStreetMap: 13 features, 0 graves placed
 11 landmarks
-wrote 1412 people, 41 with coordinates, 723 with summaries
+wrote 1412 people, 43 with coordinates, 723 with summaries
