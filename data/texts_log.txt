@@ -2,17 +2,17 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-newspapers checked: 10 608 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Irene+L.+Gibson%22&dates=1956%2F: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Davis%22&dates=1855%2F1856: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Davis%22&dates=1855%2F1856: The read operation timed out
-ERR loc search failed Isaac Davis The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Pratt%22&dates=1899%2F1900: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Pratt%22&dates=1899%2F1900: The read operation timed out
-ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: The read operation timed out
-newspapers checked: 20 1756 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22James+Alderson+Bailey%22&dates=1: The read operation timed out
-newspapers checked: 30 2496 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22James+Madison+Beebe%22&dates=187: The read operation timed out
-newspapers checked: 40 3020 s
-newspapers checked this run: 40 | still to check: 300
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Jared+Sparks+Moore%22&dates=1951: The read operation timed out
+newspapers checked: 10 577 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+B.+Potter%22&dates=1949%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Chipman+Gray%22&dates=1881%: The read operation timed out
+newspapers checked: 20 1143 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Lowell+Gardner%22&dates=188: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Gardner%22&dates=1884%2F188: The read operation timed out
+newspapers checked: 30 1824 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Rayner+Edmands%22&dates=191: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22John+Rayner+Edmands%22&dates=191: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+T.+Hassam%22&dates=1903%2F1: The read operation timed out
+newspapers checked: 40 2521 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Joseph+Putnam+Bradlee%22&dates=1: The read operation timed out
+newspapers checked this run: 46 | still to check: 254
