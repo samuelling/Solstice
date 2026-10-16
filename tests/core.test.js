@@ -123,3 +123,17 @@ test('reader-named alternatives take most of the doubt', () => {
   assert.ok(named['3'] < generic['3'], 'unnamed 3 falls');
   assert.ok(Math.abs(Object.values(named).reduce((a, v) => a + v, 0) - 1) < 1e-9);
 });
+
+test('a grave known only by its path: near the path helps, but less than a point', () => {
+  const line = [[42.3710, -71.1460], [42.3710, -71.1424]];         // ~300 m east-west
+  const onPath = { lat: 42.37102, lon: -71.1440, accuracy: 10 };     // standing on it
+  const away = { lat: 42.3740, lon: -71.1440, accuracy: 10 };        // ~330 m north
+  const viaPath = C.geoLikelihoodRatio(onPath, { pathLines: [line], path: 'Spruce Avenue' });
+  const viaPoint = C.geoLikelihoodRatio(onPath, { lat: 42.37102, lon: -71.1440 });
+  const far = C.geoLikelihoodRatio(away, { pathLines: [line] });
+  assert.ok(viaPath.distance < 5, `distance ${viaPath.distance}`);
+  assert.ok(viaPath.lr > 5, `on the path counts for something: ${viaPath.lr}`);
+  assert.ok(viaPath.lr < viaPoint.lr, 'but less than an exact point');
+  assert.ok(far.lr < 0.1, `far from the path counts against: ${far.lr}`);
+  assert.strictEqual(viaPath.onPath, 'Spruce Avenue');
+});

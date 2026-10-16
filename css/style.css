@@ -432,3 +432,6 @@ li.tl-end .tl-text { font-family: var(--body); font-weight: 600; padding-top: 2p
 .np-meta { font-size: 0.85rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .np-dist { font-size: 0.88rem; color: var(--strong); font-variant-numeric: tabular-nums; white-space: nowrap; }
 #nearby-btn { margin-top: 10px; }
+.lot-line { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+.np-dist { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.np-path { font-size: 0.72rem; color: var(--muted); }

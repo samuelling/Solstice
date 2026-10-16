@@ -60,7 +60,7 @@
     const r = await fetch('data/burials.json', { cache: 'no-cache' });
     if (!r.ok) throw new Error('no baked records');
     const d = await r.json();
-    bakedMeta = { generated: d.generated, landmarks: d.landmarks || [], source: d.source };
+    bakedMeta = { generated: d.generated, landmarks: d.landmarks || [], paths: d.paths || {}, source: d.source };
     const people = d.people.filter((p) => !/^Q\d+$/.test(p.label)).map((p) => {
       const rec = {
         id: p.qid, qid: p.qid, source: 'wikidata', baked: true,
@@ -69,6 +69,8 @@
         lat: p.lat ?? null, lon: p.lon ?? null, coordSource: p.coordSource || (p.lat != null ? 'Wikidata' : null),
         coordError: p.lat == null ? undefined : ({ OpenStreetMap: 8, 'grave photo': 25 }[p.coordSource] || 15),
         article: p.article || null,
+        path: p.path || null, lot: p.lot || null, plot: p.plot || null,
+        pathLines: p.path && d.paths && d.paths[p.path] ? d.paths[p.path] : null,
         given: C.normName(p.given || C.splitName(p.label).given),
         family: C.normName(p.family || C.splitName(p.label).family),
       };
@@ -156,6 +158,7 @@
           name: (b && b.label) || r.name || '',
           birth: b ? b.birth ?? null : null, death: b ? b.death ?? null : null,
           lat: b ? b.lat ?? null : null, lon: b ? b.lon ?? null : null,
+          path: b ? b.path || null : null, lot: b ? b.lot || null : null,
           findAGrave: b ? b.findAGrave || null : null,
           article: b ? b.article || null : null,
           description: b ? b.description || '' : '',
@@ -175,7 +178,7 @@
     const skip = new Set(exclude);
     return [...baked.values()]
       .filter((p) => !skip.has(p.qid) && !/^Q\d+$/.test(p.label) && C.normName(p.family || C.splitName(p.label).family) === fam)
-      .map((p) => ({ qid: p.qid, name: p.label, birth: p.birth ?? null, death: p.death ?? null, findAGrave: p.findAGrave || null, lat: p.lat ?? null, lon: p.lon ?? null }))
+      .map((p) => ({ qid: p.qid, name: p.label, birth: p.birth ?? null, death: p.death ?? null, findAGrave: p.findAGrave || null, lat: p.lat ?? null, lon: p.lon ?? null, path: p.path || null, lot: p.lot || null }))
       .sort((a, b) => (year == null ? 0 : Math.abs((a.birth || a.death || year) - year) - Math.abs((b.birth || b.death || year) - year)) || a.name.localeCompare(b.name));
   }
 
@@ -398,6 +401,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []),
+    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []), paths: () => (bakedMeta ? bakedMeta.paths : {}),
   };
 })(window);

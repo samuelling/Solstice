@@ -429,7 +429,8 @@
     else if (years > 1.5) out.push(['Dates close', 'good']);
     else if (years < 0.5) out.push(['Dates differ', 'bad']);
     else if (c.person.birth == null && c.person.death == null) out.push(['No dates on record', '']);
-    if (c.distance != null) out.push([`${fmtDist(c.distance)} from you`, geo > 5 ? 'good' : geo < 0.5 ? 'bad' : '']);
+    if (c.distance != null && c.onPath) out.push([`On ${c.onPath}, ${fmtDist(c.distance)} from you`, geo > 5 ? 'good' : geo < 0.5 ? 'bad' : '']);
+    else if (c.distance != null) out.push([`${fmtDist(c.distance)} from you`, geo > 5 ? 'good' : geo < 0.5 ? 'bad' : '']);
     else if (c.person.lat == null) out.push(['Grave location not on record', '']);
     else if (!gpsForMatching()) out.push(['Location not used', '']);
     if (c.person.locatedByYou) out.push(['You’ve stood here before', 'good']);
@@ -550,6 +551,7 @@
         <h2>${esc(person.label)}</h2>
         ${cleanDesc(person.description) ? `<p class="sub">${esc(cleanDesc(person.description))}</p>` : ''}
         <p class="glance" id="glance">${esc(Life.glance(person, []))}</p>
+        ${person.path || person.lot ? `<p class="lot-line">Buried ${person.lot ? `in Lot ${esc(person.lot)}, ` : 'on '}${esc(person.path || 'Mount Auburn')}</p>` : ''}
         ${fromStone ? `<p class="stone-line"><span class="tag you">On the stone</span>${esc(fromStone)}</p>` : ''}
         <p class="verdict-line">${verdict}</p>
       </div>
@@ -736,9 +738,14 @@
 
   const REL_LABEL = { father: 'Father', mother: 'Mother', parent: 'Parent', spouse: 'Spouse', sibling: 'Sibling', child: 'Child' };
 
-  function whereIs(r) {
+  function whereIs(r, subject) {
+    if (subject && r.lot && subject.lot && r.lot === subject.lot && (!r.path || !subject.path || r.path === subject.path)) {
+      return `Same lot — Lot ${r.lot}${r.path ? `, ${r.path}` : ''}`;
+    }
     const g = gpsForMatching();
     if (r.lat != null && g) return `${fmtDist(C.haversineM(g.lat, g.lon, r.lat, r.lon))} from you`;
+    if (subject && r.path && subject.path === r.path) return `Also on ${r.path}${r.lot ? `, Lot ${r.lot}` : ''}`;
+    if (r.path) return `${r.lot ? `Lot ${r.lot}, ` : ''}${r.path}`;
     if (r.lat != null) return 'Grave position on record';
     const note = S.notes.find((n) => n.qid === r.qid && n.lat != null);
     if (note && g) return `${fmtDist(C.haversineM(g.lat, g.lon, note.lat, note.lon))} from you (your field notes)`;
@@ -766,7 +773,7 @@
     if (here.length) {
       html += `<ul class="family">${here.map((r) => {
         const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
-        const where = whereIs(r);
+        const where = whereIs(r, person);
         const links = relLinks(r);
         return `<li data-qid="${esc(r.qid)}">
           <span class="rel">${REL_LABEL[r.rel] || 'Relative'}</span>
@@ -792,7 +799,7 @@
         <summary>${same.length} other${same.length === 1 ? '' : 's'} named ${esc(tc(surname))} buried here — same surname, not necessarily family</summary>
         <ul>${shown.map((r) => {
           const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
-          const where = whereIs(r);
+          const where = whereIs(r, person);
           return `<li><span class="fname">${esc(r.name)}</span> <span class="fyrs">${esc(yrs)}</span>${where ? ` · <span class="fwhere">${esc(where)}</span>` : ''}${r.findAGrave ? ` · <a href="https://www.findagrave.com/memorial/${esc(r.findAGrave)}" target="_blank" rel="noopener">Find a Grave</a>` : ''}</li>`;
         }).join('')}</ul>
         ${same.length > shown.length ? `<p class="hint">Showing the ${shown.length} closest in time.</p>` : ''}
@@ -849,21 +856,26 @@
       $('#nearby-set').onclick = openNearPicker;
       return;
     }
-    const located = peoplePool().filter((p) => p.lat != null);
-    const rows = located.map((p) => ({ p, d: C.haversineM(g.lat, g.lon, p.lat, p.lon) })).sort((a, b) => a.d - b.d);
+    const pool = peoplePool();
+    const located = pool.filter((p) => p.lat != null);
+    const onPaths = pool.filter((p) => p.lat == null && p.pathLines);
+    const rows = [
+      ...located.map((p) => ({ p, d: C.haversineM(g.lat, g.lon, p.lat, p.lon) })),
+      ...onPaths.map((p) => ({ p, d: C.distanceToLines(g.lat, g.lon, p.pathLines).distance, path: p.path })),
+    ].filter((r) => Number.isFinite(r.d)).sort((a, b) => a.d - b.d);
     const within = rows.filter((r) => r.d <= nearbyRadius);
     const where = g.source === 'near' ? `your spot near ${esc(g.label)}` : 'you';
     status.innerHTML = within.length
-      ? `${within.length} grave${within.length === 1 ? '' : 's'} with a known position within ${nearbyRadius} m of ${where}.`
+      ? `${within.length} grave${within.length === 1 ? '' : 's'} within ${nearbyRadius} m of ${where}.`
       : `No graves with a known position within ${nearbyRadius} m of ${where}. The nearest are below.`;
     const show = within.length ? within : rows.slice(0, 3);
-    list.innerHTML = show.map(({ p, d }) => `<li><button class="near-person" type="button" data-id="${esc(p.id)}">
+    list.innerHTML = show.map(({ p, d, path }) => `<li><button class="near-person" type="button" data-id="${esc(p.id)}">
         <span class="np-avatar" data-qid="${esc(p.qid || '')}"></span>
         <span class="np-body">
           <span class="np-name">${esc(p.label)}</span>
           <span class="np-meta">${esc([p.birth || '?', p.death || '?'].join('–'))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</span>
         </span>
-        <span class="np-dist">${fmtDist(d)}</span>
+        <span class="np-dist">${path ? `<span class="np-path">on ${esc(path)}</span>` : ''}${fmtDist(d)}</span>
       </button></li>`).join('');
     for (const btn of list.querySelectorAll('.near-person')) {
       btn.addEventListener('click', () => {
@@ -879,7 +891,7 @@
     }
     const bySource = {};
     for (const p of located) { const k = p.source === 'notes' || p.locatedByYou ? 'your saved stones' : (p.coordSource || 'Wikidata'); bySource[k] = (bySource[k] || 0) + 1; }
-    note.textContent = `Solstice knows where ${located.length} of Mount Auburn’s graves are so far (${Object.entries(bySource).map(([k, v]) => `${v} from ${k}`).join(', ')}). `
+    note.textContent = `Solstice knows where ${located.length} of Mount Auburn’s graves are to within a few metres (${Object.entries(bySource).map(([k, v]) => `${v} from ${k}`).join(', ')})${onPaths.length ? `, and the avenue or path for ${onPaths.length} more, measured to the nearest point of the path` : ''}. `
       + (g.accuracy > 30 ? `Your position is only good to about ${Math.round(g.accuracy)} m, so distances are rough. ` : '')
       + 'Save the stones you photograph and they’ll show up here next time.';
   }

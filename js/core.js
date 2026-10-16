@@ -304,7 +304,40 @@
    * cemetery. Phone GPS error plus uncertainty in where the record's own
    * coordinates were taken (~15 m) set the spread.
    */
+  // Local flat coordinates in metres around the cemetery (fine at this scale).
+  const M_LAT = 111320, M_LON = 111320 * Math.cos(CEMETERY.lat * Math.PI / 180);
+  const toXY = (lat, lon) => [(lon - CEMETERY.lon) * M_LON, (lat - CEMETERY.lat) * M_LAT];
+
+  /**
+   * Distance in metres from a point to the nearest of a set of polylines
+   * ([[lat, lon], ...] each), and their total length.
+   */
+  function distanceToLines(lat, lon, lines) {
+    const [px, py] = toXY(lat, lon);
+    let best = Infinity, length = 0;
+    for (const line of lines || []) {
+      for (let i = 1; i < line.length; i++) {
+        const [ax, ay] = toXY(line[i - 1][0], line[i - 1][1]);
+        const [bx, by] = toXY(line[i][0], line[i][1]);
+        const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
+        length += Math.sqrt(len2);
+        const t = len2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2)) : 0;
+        best = Math.min(best, Math.hypot(px - (ax + t * dx), py - (ay + t * dy)));
+      }
+    }
+    return { distance: best, length };
+  }
+
   function geoLikelihoodRatio(gps, c) {
+    // Known only to lie somewhere along a named avenue or path: the grave is
+    // spread evenly along the line, so the evidence is weaker than a point.
+    if (gps && (c.lat == null || c.lon == null) && c.pathLines && c.pathLines.length) {
+      const { distance, length } = distanceToLines(gps.lat, gps.lon, c.pathLines);
+      if (!Number.isFinite(distance) || length < 1) return { lr: 1, distance: null };
+      const sigma = Math.sqrt((gps.accuracy || 15) ** 2 + 20 ** 2); // lots run back from the path
+      const density = Math.exp(-(distance * distance) / (2 * sigma * sigma)) / (Math.sqrt(2 * Math.PI) * sigma * length);
+      return { lr: Math.max(density * CEMETERY.areaM2, 0.05), distance, onPath: c.path };
+    }
     if (!gps || c.lat == null || c.lon == null) return { lr: 1, distance: null };
     const dist = haversineM(gps.lat, gps.lon, c.lat, c.lon);
     const sigma = Math.sqrt((gps.accuracy || 15) ** 2 + (c.coordError || 15) ** 2);
@@ -385,6 +418,7 @@
         lr,
         parts: { name: nameLR, years: yearsLR, geo: geo.lr },
         distance: geo.distance,
+        onPath: geo.onPath || null,
         odds: (priorEach * lr),
       });
     }
@@ -602,7 +636,7 @@
   const api = {
     CEMETERY, digitBelief, yearBelief, yearLikelihood, decodeYears,
     deathYearPrior, agePrior, normName, splitName, nameSimilarity,
-    levenshtein, haversineM, geoLikelihoodRatio, matchCandidates,
+    levenshtein, haversineM, geoLikelihoodRatio, distanceToLines, matchCandidates,
     findYearTokens, parseInscription, typedYear, confidenceLabel,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
