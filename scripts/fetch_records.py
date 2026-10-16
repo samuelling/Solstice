@@ -214,7 +214,9 @@ def main():
         for pg in q.get('pages', {}).values():
             ii = (pg.get('imageinfo') or [{}])[0]
             title = back.get(pg.get('title'), pg.get('title', ''))
-            meta = ii.get('extmetadata', {})
+            meta = ii.get('extmetadata') or {}
+            if not isinstance(meta, dict):
+                meta = {}
             artist = re.sub(r'<[^>]+>', '', meta.get('Artist', {}).get('value', '')).strip()
             def num(k):
                 try:
@@ -358,7 +360,7 @@ def main():
             return get('https://commons.wikimedia.org/w/api.php?' + urllib.parse.urlencode({**params, 'format': 'json'}))
 
         seen_cats, queue, files = set(), [('Category:Mount Auburn Cemetery', 0)], set()
-        while queue and len(seen_cats) < 400:
+        while queue and len(seen_cats) < 1500:
             cat, depth = queue.pop(0)
             if cat in seen_cats:
                 continue
@@ -404,7 +406,9 @@ def main():
             cat_of = {t: c for t, c in batch}
             for pg in d.get('query', {}).get('pages', {}).values():
                 title = pg.get('title', '')
-                meta = ((pg.get('imageinfo') or [{}])[0]).get('extmetadata', {})
+                meta = ((pg.get('imageinfo') or [{}])[0]).get('extmetadata') or {}
+                if not isinstance(meta, dict):
+                    meta = {}
                 lat = lon = None
                 if pg.get('coordinates'):
                     lat, lon = pg['coordinates'][0]['lat'], pg['coordinates'][0]['lon']
@@ -412,7 +416,7 @@ def main():
                     try:
                         lat = float(meta.get('GPSLatitude', {}).get('value'))
                         lon = float(meta.get('GPSLongitude', {}).get('value'))
-                    except (TypeError, ValueError):
+                    except (TypeError, ValueError, AttributeError):
                         pass
                 desc = re.sub(r'<[^>]+>', ' ', meta.get('ImageDescription', {}).get('value', ''))
                 text = ' '.join([title[5:].rsplit('.', 1)[0], cat_of.get(title, '')[9:], desc])
