@@ -619,6 +619,7 @@
         if (q) $('#quote-slot').innerHTML = `<h3>In their own time</h3><figure class="pull"><blockquote>${esc(q.text)}</blockquote>
           <figcaption>${esc(q.work)} · <a href="${esc(q.url)}" target="_blank" rel="noopener">Wikisource</a></figcaption></figure>`;
         if ((texts.wikisource || []).length) renderPeriod(texts.wikisource);
+        renderOtherBios(texts);
       }
     }
 
@@ -704,6 +705,21 @@
           <p class="src-line"><span class="tag period">Period source</span><a href="${esc(a.url)}" target="_blank" rel="noopener">Wikisource</a></p>
         </blockquote>`).join('')}
     </details>`;
+  }
+
+
+  function renderOtherBios(texts) {
+    const bios = [
+      texts.congress && texts.congress.text && { name: 'Biographical Directory of the U.S. Congress', note: 'The official record of members of Congress.', ...texts.congress },
+      texts.snac && texts.snac.text && { name: 'SNAC archival biography', note: 'Written by archivists for the collections that hold their papers.', ...texts.snac },
+    ].filter(Boolean);
+    if (!bios.length) return;
+    $('#period-slot').insertAdjacentHTML('beforeend', bios.map((b) => `<details class="period-all">
+      <summary>Read the ${esc(b.name.startsWith('SNAC') ? 'archival biography' : 'congressional biography')}</summary>
+      <p class="hint">${esc(b.note)}</p>
+      <blockquote class="period">${paragraphs(b.text).map((p) => `<p>${esc(p)}</p>`).join('')}
+        <p class="src-line"><span class="tag record">Biography</span><a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.name)}</a></p>
+      </blockquote></details>`).join(''));
   }
 
   function markName(text, family) {

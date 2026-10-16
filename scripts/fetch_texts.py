@@ -160,6 +160,46 @@ def wikisource_text(url):
     return strip_wikitext(d.get('parse', {}).get('wikitext', ''))[:6000]
 
 
+
+# ---------------------------------------------------------------------------
+# Archival and official biographies linked from Wikidata
+# ---------------------------------------------------------------------------
+
+def linked_ids(cemetery_qid, prop):
+    q = f'''SELECT ?p ?id WHERE {{ ?p wdt:P119 wd:{cemetery_qid} ; wdt:{prop} ?id . }}'''
+    body = urllib.parse.urlencode({'query': q, 'format': 'json'}).encode()
+    rows = get('https://query.wikidata.org/sparql', data=body)['results']['bindings']
+    return {b['p']['value'].rsplit('/', 1)[-1]: b['id']['value'] for b in rows}
+
+
+def plain(html_text):
+    t = re.sub(r'<(p|br|div|li)[^>]*>', '\n', html_text or '', flags=re.I)
+    t = html.unescape(re.sub(r'<[^>]+>', ' ', t))
+    t = re.sub(r'[ \t]+', ' ', t)
+    return re.sub(r'\n\s*\n+', '\n\n', t).strip()
+
+
+def snac_bio(ark):
+    """SNAC (Social Networks and Archival Context): biography from archival finding aids."""
+    ark_url = ark if ark.startswith('http') else f'http://n2t.net/ark:/99166/{ark}'
+    body = json.dumps({'command': 'read', 'arkid': ark_url}).encode()
+    req = urllib.request.Request('https://api.snaccooperative.org/', data=body,
+                                 headers={'User-Agent': UA, 'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=40) as r:
+        d = json.load(r)
+    c = d.get('constellation') or {}
+    texts = [plain(b.get('text', '')) for b in c.get('biogHists', []) if b.get('text')]
+    text = max(texts, key=len) if texts else ''
+    return {'url': f'https://snaccooperative.org/ark:/99166/{ark.rsplit("/", 1)[-1]}', 'text': text[:5000]} if len(text) > 120 else None
+
+
+def bioguide(bid):
+    """Biographical Directory of the United States Congress (public domain)."""
+    d = get(f'https://bioguide.congress.gov/search/bio/{bid}.json')
+    data = d.get('data', d)
+    text = plain(data.get('profileText') or data.get('profile_text') or '')
+    return {'url': f'https://bioguide.congress.gov/search/bio/{bid}', 'text': text[:4000]} if len(text) > 60 else None
+
 # ---------------------------------------------------------------------------
 # Chronicling America: newspaper pages naming the person near their death
 # ---------------------------------------------------------------------------
@@ -336,6 +376,33 @@ def main():
         e['wikisource'] = got
         n += 1
     print('people with period entries:', n, 'of', len(links), 'linked')
+    save_chunks(chunks)
+
+    # SNAC archival biographies and Congress biographies, by Wikidata link.
+    for prop, key, fetch in (('P3430', 'snac', snac_bio), ('P1157', 'congress', bioguide)):
+        try:
+            ids = linked_ids(data['cemetery'], prop)
+        except Exception as ex:
+            print(key, 'id lookup failed', ex, file=sys.stderr)
+            continue
+        got = tried = 0
+        for qid, ident in ids.items():
+            e = entry(chunks, qid)
+            if key in e:
+                continue
+            tried += 1
+            try:
+                e[key] = fetch(ident)
+                got += 1 if e[key] else 0
+            except Exception as ex:
+                print(key, 'failed for', qid, ident, ex, file=sys.stderr)
+                if tried > 5 and got == 0:
+                    print(key, 'giving up this run: the service is not answering as expected', file=sys.stderr)
+                    for q2 in ids:
+                        entry(chunks, q2).pop(key, None)
+                    break
+            time.sleep(0.7)
+        print(key, ':', len(ids), 'linked,', got, 'biographies this run')
     save_chunks(chunks)
 
     # Re-centre excerpts gathered before the window was tightened.

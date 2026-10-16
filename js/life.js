@@ -81,6 +81,8 @@
     for (const acc of texts.wikisource || []) {
       consider(acc.text, { source: acc.work, url: acc.url, section: null, period: true }, 1.0);
     }
+    if (texts.snac && texts.snac.text) consider(texts.snac.text, { source: 'SNAC archival biography', url: texts.snac.url, section: null }, 1.0);
+    if (texts.congress && texts.congress.text) consider(texts.congress.text, { source: 'Biographical Directory of the U.S. Congress', url: texts.congress.url, section: null }, 1.1);
     // One per year, the best-scoring.
     const byYear = new Map();
     for (const c of cands) {
