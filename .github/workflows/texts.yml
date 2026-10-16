@@ -46,7 +46,7 @@ jobs:
           git add data/texts data/texts_log.txt
           git diff --cached --quiet || git commit -m "Gather texts for stories"
           for i in 1 2 3 4 5; do
-            git pull --rebase -X theirs origin main && git push && break
+            git pull --rebase --autostash -X theirs origin main && git push && break
             sleep $((i * 5))
           done
       # GitHub's hourly schedule is unreliable, so while people are left to
