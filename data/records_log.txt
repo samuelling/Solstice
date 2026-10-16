@@ -5,9 +5,25 @@ burial plot references: 39
 paths from Wikipedia text: 5
 commons: 1351 categories, 31158 files
 commons photos placed 15 graves
-roll of distinction: 193 matched, 115 paths; lot catalogues: 2 paths
+FAILED: Mount Auburn books
+Traceback (most recent call last):
+  File "/home/runner/work/Solstice/Solstice/scripts/fetch_records.py", line 534, in main
+    for q, (glot, gpath) in parse_guides.main(list(people.values()), known)['places'].items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/Solstice/Solstice/scripts/parse_guides.py", line 366, in main
+    found, placed = scan(people, known)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/Solstice/Solstice/scripts/parse_guides.py", line 281, in scan
+    p['_given'] = [ABBR.get(w, w) for w in words(p.get('given') or '')]
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/Solstice/Solstice/scripts/parse_guides.py", line 115, in words
+    return [w for w in re.findall(r"[A-Z][A-Z']*", s.upper())]
+                                                   ^^^^^^^
+AttributeError: 'list' object has no attribute 'upper'
+
 commons path names dropped as not Mount Auburn paths: 35
-osm named paths: 144 | people with a path: 154 | of those, path mapped: 103
+osm named paths: 144 | people with a path: 152 | of those, path mapped: 101
+monuments on Wikidata: 0 for 9 people; 0 graves placed
 OpenStreetMap: 13 features, 0 graves placed
 11 landmarks
 wrote 1412 people, 45 with coordinates, 723 with summaries
