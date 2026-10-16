@@ -1,0 +1,30 @@
+name: Probe sources (temporary)
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p data
+          {
+          echo "== SNAC read by ark"
+          curl -sS -m 40 -X POST https://api.snaccooperative.org/ -H 'Content-Type: application/json' \
+            -d '{"command":"read","arkid":"http://n2t.net/ark:/99166/w6w66bd4"}' | head -c 1500; echo
+          echo "== SNAC read by short ark"
+          curl -sS -m 40 -X POST https://api.snaccooperative.org/ -H 'Content-Type: application/json' \
+            -d '{"command":"read","arkid":"w6w66bd4"}' | head -c 600; echo
+          echo "== SNAC html page"
+          curl -sS -m 40 -L https://snaccooperative.org/ark:/99166/w6w66bd4 | grep -io 'biogHist.\{0,400\}' | head -3
+          echo "== bioguide json, browser UA"
+          curl -sS -m 30 -o /tmp/b.json -w "%{http_code}\n" -A 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' -H 'Accept: application/json' https://bioguide.congress.gov/search/bio/L000130.json; head -c 600 /tmp/b.json; echo
+          echo "== bioguide profiles zip head"
+          curl -sS -m 30 -I https://bioguide.congress.gov/bioguide/data/BioguideProfiles.zip | head -5
+          echo "== congress-legislators mirror"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" https://theunitedstates.io/congress-legislators/legislators-historical.json
+          } > data/probe.txt 2>&1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add data/probe.txt && git commit -m "Probe output" && git pull --rebase -X theirs origin main && git push
