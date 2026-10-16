@@ -3,27 +3,12 @@ Mount Auburn is Q1950363
 942 images baked
 burial plot references: 39
 paths from Wikipedia text: 5
-commons: 1351 categories, 31145 files
+commons: 1351 categories, 31155 files
 commons photos placed 15 graves
 dearborn's guide: 5 paths
 roll of distinction: 193 matched, 115 paths; lot catalogues: 2 paths
 commons path names dropped as not Mount Auburn paths: 35
 osm named paths: 144 | people with a path: 159 | of those, path mapped: 108
-  monument skipped: Q124387991 Plaque ot Helen Hopekirk at 148 High Street, Portobello, Edinburgh for Helen Hopekirk at 55.953166 -3.114576
-  monument skipped: Q7589721 St. Louis Walk of Fame for Carl Ferdinand Cori at 38.656 -90.3049
-  monument skipped: Q15223678 Henry Wadsworth Longfellow Memorial for Henry Wadsworth Longfellow at 38.905833 -77.041667
-  monument skipped: Q94441260 Q94441260 for Carl Ferdinand Cori at 50.074417 14.423215
-  monument skipped: Q111356188 American Philhellenes monument for Samuel Gridley Howe at 37.984269 23.754131
-  monument skipped: Q111696803 Q111696803 for Benjamin Apthorp Gould at -34.571264 -58.411933
-  monument skipped: Q111696804 Q111696804 for Benjamin Apthorp Gould at -34.571264 -58.411933
-  monument skipped: Q114140116 Bust of Samuel Gridley Howe, Tripoli for Samuel Gridley Howe at 37.51425 22.37436
-  monument skipped: Q114140119 Bust of Edward Everett, Tripoli for Edward Everett at 37.51418 22.37482
-  monument skipped: Q116689593 Samuel Gridley Howe memorial, Aegina for Samuel Gridley Howe at 37.7456 23.4264
-  monument skipped: Q124386328 Plaque to Williamina Fleming for Williamina Fleming at 56.4582 -2.9802
-  monument skipped: Q130792962 William T. G. Morton Monument for William T. G. Morton at 42.134049 -71.969567
-  monument skipped: Q130795021 William T. G. Morton Monument for William T. G. Morton at 42.16448 -71.952822
-  monument skipped: Q17300119 Josephine Shaw Lowell Memorial Fountain for Josephine Shaw Lowell at 40.754 -73.9841
-  monument skipped: Q111356188 American Philhellenes monument for Edward Everett at 37.984269 23.754131
 monuments on Wikidata: 0 for 9 people; 0 graves placed
 OpenStreetMap: 13 features, 0 graves placed
 11 landmarks
