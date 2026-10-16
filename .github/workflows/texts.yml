@@ -33,10 +33,13 @@ jobs:
           python-version: '3.12'
       - name: Gather texts
         id: gather
+        timeout-minutes: 58
         env:
           TEXT_BUDGET_SECONDS: '3000'
         run: python scripts/fetch_texts.py
+      # Save and continue even if the gathering step was cut short.
       - name: Commit if changed
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
@@ -49,7 +52,7 @@ jobs:
       # GitHub's hourly schedule is unreliable, so while people are left to
       # check, each run starts the next one.
       - name: Continue if people remain
-        if: steps.gather.outputs.remaining != '0'
+        if: always() && steps.gather.outputs.remaining != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run texts.yml --ref main

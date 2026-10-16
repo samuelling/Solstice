@@ -269,6 +269,166 @@ def main():
             json.dump(chunks.get(n, {}), fh, separators=(',', ':'))
     print(fetched, 'images baked')
 
+    # ---- Where graves are: lots and paths, Commons photo GPS ---------------
+    PATH_RE = re.compile(r"\b([A-Z][a-z]+(?:[- ][A-Z][a-z]+)?\s+(?:Path|Avenue|Ave\.?|Road|Way|Walk))\b")
+    LOT_RE = re.compile(r"\bLot\s*#?\s*(\d{1,5})\b", re.I)
+
+    def pick_path(text):
+        """The most specific way named: "Walnut Ave., Snowdrop Path" means Snowdrop Path."""
+        found = PATH_RE.findall(text or '')
+        paths = [f for f in found if f.endswith('Path')]
+        return (paths or found or [None])[0]
+
+    def norm_path(name):
+        name = re.sub(r"\bAve\.?$", "Avenue", name.strip())
+        return re.sub(r"\s+", " ", name).title()
+
+    # 1. Wikidata "burial plot reference" (P965) on the burial statement.
+    rows = sparql(f'''
+      SELECT ?p ?plot WHERE {{ ?p p:P119 ?st . ?st ps:P119 wd:{qid} ; pq:P965 ?plot . }}''')
+    plots = 0
+    for b in rows:
+        q = b['p']['value'].rsplit('/', 1)[-1]
+        txt = b['plot']['value']
+        if q not in people:
+            continue
+        people[q]['plot'] = txt
+        pth = pick_path(txt)
+        if pth:
+            people[q]['path'] = norm_path(pth)
+        lm = LOT_RE.search(txt)
+        if lm:
+            people[q]['lot'] = lm.group(1)
+        plots += 1
+    print('burial plot references:', plots)
+
+    # 2. Wikipedia lines like "buried at Mount Auburn Cemetery ... Magnolia Avenue, Lot 3112".
+    #    (Full articles are fetched by fetch_texts.py; reuse them when present.)
+    tdir = os.path.join(os.path.dirname(OUT), 'texts')
+    if os.path.isdir(tdir):
+        found = 0
+        for f in os.listdir(tdir):
+            try:
+                chunk = json.load(open(os.path.join(tdir, f)))
+            except Exception:
+                continue
+            for q, v in chunk.items():
+                if q not in people or people[q].get('path'):
+                    continue
+                for sec in (v.get('wikipedia') or {}).get('sections', []):
+                    m = re.search(r"[^.]*Mount Auburn[^.]*\.", sec.get('t', ''))
+                    pm = m and pick_path(m.group(0))
+                    if pm:
+                        people[q]['path'] = norm_path(pm)
+                        lm = LOT_RE.search(m.group(0))
+                        if lm:
+                            people[q]['lot'] = lm.group(1)
+                        found += 1
+                        break
+        print('paths from Wikipedia text:', found)
+
+    # 3. Wikimedia Commons: photos in the cemetery's categories that carry GPS
+    #    and name a person buried here.
+    by_label = {}
+    for p in people.values():
+        key = re.sub(r"[^a-z ]", "", p['label'].lower()).strip()
+        if len(key.split()) >= 2:
+            by_label.setdefault(key, []).append(p)
+
+    def commons(params):
+        return get('https://commons.wikimedia.org/w/api.php?' + urllib.parse.urlencode({**params, 'format': 'json'}))
+
+    seen_cats, queue, files = set(), [('Category:Mount Auburn Cemetery', 0)], set()
+    while queue and len(seen_cats) < 400:
+        cat, depth = queue.pop(0)
+        if cat in seen_cats:
+            continue
+        seen_cats.add(cat)
+        cont = {}
+        while True:
+            try:
+                d = commons({'action': 'query', 'list': 'categorymembers', 'cmtitle': cat, 'cmlimit': 500,
+                             'cmtype': 'file|subcat', **cont})
+            except Exception as e:
+                print('commons category failed', cat, e, file=sys.stderr)
+                break
+            for m in d.get('query', {}).get('categorymembers', []):
+                t = m['title']
+                if t.startswith('Category:') and depth < 3:
+                    queue.append((t, depth + 1))
+                elif t.startswith('File:'):
+                    files.add((t, cat))
+            if 'continue' not in d:
+                break
+            cont = {'cmcontinue': d['continue']['cmcontinue']}
+            time.sleep(0.2)
+    print('commons:', len(seen_cats), 'categories,', len(files), 'files')
+
+    def person_in(text):
+        flat = ' ' + re.sub(r"[^a-z ]", " ", text.lower()) + ' '
+        flat = re.sub(r"\s+", " ", flat)
+        hits = [p for key, ps in by_label.items() if len(ps) == 1 and f' {key} ' in flat for p in ps]
+        # Prefer the longest name ("Henry Wadsworth Longfellow" over "Henry Longfellow").
+        return max(hits, key=lambda p: len(p['label'])) if hits else None
+
+    files = sorted(files)
+    placed_commons = 0
+    for i in range(0, len(files), 50):
+        batch = files[i:i + 50]
+        try:
+            d = commons({'action': 'query', 'prop': 'coordinates|imageinfo', 'iiprop': 'extmetadata',
+                         'iiextmetadatafilter': 'GPSLatitude|GPSLongitude|ImageDescription',
+                         'titles': '|'.join(t for t, _ in batch), 'colimit': 'max'})
+        except Exception as e:
+            print('commons batch failed', e, file=sys.stderr)
+            continue
+        cat_of = {t: c for t, c in batch}
+        for pg in d.get('query', {}).get('pages', {}).values():
+            title = pg.get('title', '')
+            meta = ((pg.get('imageinfo') or [{}])[0]).get('extmetadata', {})
+            lat = lon = None
+            if pg.get('coordinates'):
+                lat, lon = pg['coordinates'][0]['lat'], pg['coordinates'][0]['lon']
+            else:
+                try:
+                    lat = float(meta.get('GPSLatitude', {}).get('value'))
+                    lon = float(meta.get('GPSLongitude', {}).get('value'))
+                except (TypeError, ValueError):
+                    pass
+            desc = re.sub(r'<[^>]+>', ' ', meta.get('ImageDescription', {}).get('value', ''))
+            text = ' '.join([title[5:].rsplit('.', 1)[0], cat_of.get(title, '')[9:], desc])
+            p = person_in(text)
+            if not p:
+                continue
+            pm = pick_path(desc)
+            if pm and not p.get('path'):
+                p['path'] = norm_path(pm)
+            if lat is None or not (42.365 < lat < 42.378 and -71.155 < lon < -71.135):
+                continue
+            if p.get('coordSource') in (None, 'grave photo'):
+                p['lat'], p['lon'], p['coordSource'] = round(lat, 6), round(lon, 6), 'Commons photo'
+                placed_commons += 1
+        time.sleep(0.3)
+    print('commons photos placed', placed_commons, 'graves')
+
+    # 4. OpenStreetMap's named avenues and paths, as lines.
+    paths_geo = {}
+    try:
+        osm_paths = get('https://overpass-api.de/api/interpreter', data=urllib.parse.urlencode({'data': '''[out:json][timeout:120];
+          area["name"="Mount Auburn Cemetery"]["landuse"="cemetery"]->.ma;
+          way(area.ma)["highway"]["name"];
+          out geom;'''}).encode())['elements']
+        for w in osm_paths:
+            name = norm_path(w['tags']['name'])
+            pts = [[round(g['lat'], 6), round(g['lon'], 6)] for g in w.get('geometry', [])]
+            if len(pts) >= 2:
+                paths_geo.setdefault(name, []).append(pts)
+    except Exception as e:
+        print('overpass paths failed', e, file=sys.stderr)
+    with_path = [p for p in people.values() if p.get('path')]
+    print('osm named paths:', len(paths_geo), '| people with a path:', len(with_path),
+          '| of those, path mapped:', sum(1 for p in with_path if p['path'] in paths_geo))
+
     # Named places inside the cemetery with coordinates, for "I'm near…".
     lm_rows = sparql(f'''
       SELECT DISTINCT ?x ?xLabel ?coord WHERE {{
@@ -342,6 +502,7 @@ def main():
             'count': len(out),
             'withCoordinates': sum(1 for r in out if 'lat' in r),
             'landmarks': landmarks,
+            'paths': paths_geo,
             'people': out,
         }, f, ensure_ascii=False, separators=(',', ':'))
     print('wrote', len(out), 'people,', sum(1 for r in out if 'lat' in r), 'with coordinates,',

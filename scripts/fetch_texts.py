@@ -28,18 +28,24 @@ DROP_SECTIONS = re.compile(r'^(references|notes|citations|sources|see also|exter
                            r'gallery|footnotes|works cited)\b', re.I)
 
 
-def get(url, raw=False, tries=4, data=None):
+def over_budget(grace=0):
+    return time.time() - T0 > BUDGET_S + grace
+
+
+def get(url, raw=False, tries=3, data=None):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, data=data, headers={'User-Agent': UA, 'Accept': 'application/json'})
-            with urllib.request.urlopen(req, timeout=90) as r:
+            with urllib.request.urlopen(req, timeout=40) as r:
                 body = r.read()
             return body.decode('utf-8', 'replace') if raw else json.loads(body)
         except Exception as e:
             if i == tries - 1:
                 raise
             print(f'retry {i + 1}: {url[:90]}: {e}', file=sys.stderr)
-            time.sleep(6 * (i + 1))
+            if over_budget(120):
+                raise
+            time.sleep(5 * (i + 1))
 
 
 def chunk_of(qid):
@@ -255,6 +261,8 @@ def newspapers(p):
     variants = name_variants(p)
     items, seen = [], set()
     for variant in variants:
+        if over_budget(60):
+            return None
         q = urllib.parse.urlencode({'q': f'"{variant}"', 'dates': f'{death}/{min(death + 1, 1963)}', 'fo': 'json', 'c': 4,
                                     'fa': 'location_state:massachusetts'})
         try:
@@ -352,7 +360,7 @@ def main():
             continue
         e['papers'] = res
         n += 1
-        if n % 25 == 0:
+        if n % 10 == 0:
             save_chunks(chunks)
             print('newspapers checked:', n, round(time.time() - T0), 's')
     save_chunks(chunks)
