@@ -314,7 +314,7 @@
    */
   function distanceToLines(lat, lon, lines) {
     const [px, py] = toXY(lat, lon);
-    let best = Infinity, length = 0;
+    let best = Infinity, length = 0, nx = px, ny = py;
     for (const line of lines || []) {
       for (let i = 1; i < line.length; i++) {
         const [ax, ay] = toXY(line[i - 1][0], line[i - 1][1]);
@@ -322,10 +322,11 @@
         const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
         length += Math.sqrt(len2);
         const t = len2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2)) : 0;
-        best = Math.min(best, Math.hypot(px - (ax + t * dx), py - (ay + t * dy)));
+        const qx = ax + t * dx, qy = ay + t * dy, d = Math.hypot(px - qx, py - qy);
+        if (d < best) { best = d; nx = qx; ny = qy; }
       }
     }
-    return { distance: best, length };
+    return { distance: best, length, point: [CEMETERY.lat + ny / M_LAT, CEMETERY.lon + nx / M_LON] };
   }
 
   function geoLikelihoodRatio(gps, c) {
@@ -636,7 +637,7 @@
   const api = {
     CEMETERY, digitBelief, yearBelief, yearLikelihood, decodeYears,
     deathYearPrior, agePrior, normName, splitName, nameSimilarity,
-    levenshtein, haversineM, geoLikelihoodRatio, distanceToLines, matchCandidates,
+    levenshtein, haversineM, geoLikelihoodRatio, distanceToLines, toXY, matchCandidates,
     findYearTokens, parseInscription, typedYear, confidenceLabel,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

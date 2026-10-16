@@ -137,3 +137,10 @@ test('a grave known only by its path: near the path helps, but less than a point
   assert.ok(far.lr < 0.1, `far from the path counts against: ${far.lr}`);
   assert.strictEqual(viaPath.onPath, 'Spruce Avenue');
 });
+
+test('distanceToLines also returns the nearest point on the path', () => {
+  const r = C.distanceToLines(42.3712, -71.1442, [[[42.3710, -71.1460], [42.3710, -71.1424]]]);
+  assert.ok(Math.abs(r.point[0] - 42.3710) < 1e-6);
+  assert.ok(Math.abs(r.point[1] - (-71.1442)) < 1e-5);
+  assert.ok(r.distance > 20 && r.distance < 25, `distance ${r.distance}`);
+});

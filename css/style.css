@@ -435,3 +435,17 @@ li.tl-end .tl-text { font-family: var(--body); font-weight: 600; padding-top: 2p
 .lot-line { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
 .np-dist { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .np-path { font-size: 0.72rem; color: var(--muted); }
+
+/* ---- nearby map ---- */
+.nearby-map { margin: 0 0 14px; }
+.nearby-map svg { display: block; width: 100%; max-height: 62vh; aspect-ratio: 1; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.nm-paths polyline { fill: none; stroke: var(--line); stroke-linecap: round; stroke-linejoin: round; }
+.nm-hl polyline { fill: none; stroke: color-mix(in srgb, var(--possible) 55%, transparent); stroke-linecap: round; stroke-linejoin: round; }
+.nm-grave { cursor: pointer; }
+.nm-grave circle { fill: var(--strong); }
+.nm-grave.approx circle { fill: var(--surface); stroke: var(--possible); stroke-width: 0.6%; }
+.nm-grave text { fill: var(--ink); font-family: var(--body); font-weight: 600; paint-order: stroke; stroke: var(--surface); stroke-width: 0.35em; stroke-linejoin: round; }
+.nm-grave:focus-visible circle { stroke: var(--focus); stroke-width: 1.5%; }
+.nm-acc { fill: color-mix(in srgb, var(--focus) 12%, transparent); }
+.nm-you { fill: var(--focus); stroke: var(--surface); }
+.nm-scale { fill: var(--muted); font-family: var(--body); }

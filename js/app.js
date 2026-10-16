@@ -850,6 +850,7 @@
     if (!g) {
       list.innerHTML = '';
       note.textContent = '';
+      if ($('#nearby-map')) $('#nearby-map').innerHTML = '';
       status.innerHTML = S.gps
         ? 'You don’t seem to be at Mount Auburn right now. <button class="inline-link" type="button" id="nearby-set">Tell Solstice what you’re near</button>'
         : 'Solstice needs to know where you are. Allow location when your phone asks, or <button class="inline-link" type="button" id="nearby-set">tell it what you’re standing near</button>.';
@@ -861,7 +862,7 @@
     const onPaths = pool.filter((p) => p.lat == null && p.pathLines);
     const rows = [
       ...located.map((p) => ({ p, d: C.haversineM(g.lat, g.lon, p.lat, p.lon) })),
-      ...onPaths.map((p) => ({ p, d: C.distanceToLines(g.lat, g.lon, p.pathLines).distance, path: p.path })),
+      ...onPaths.map((p) => { const r = C.distanceToLines(g.lat, g.lon, p.pathLines); return { p, d: r.distance, path: p.path, at: r.point }; }),
     ].filter((r) => Number.isFinite(r.d)).sort((a, b) => a.d - b.d);
     const within = rows.filter((r) => r.d <= nearbyRadius);
     const where = g.source === 'near' ? `your spot near ${esc(g.label)}` : 'you';
@@ -869,6 +870,7 @@
       ? `${within.length} grave${within.length === 1 ? '' : 's'} within ${nearbyRadius} m of ${where}.`
       : `No graves with a known position within ${nearbyRadius} m of ${where}. The nearest are below.`;
     const show = within.length ? within : rows.slice(0, 3);
+    drawNearbyMap(g, show, Math.max(nearbyRadius, show.length ? show[show.length - 1].d * 1.1 : 0));
     list.innerHTML = show.map(({ p, d, path }) => `<li><button class="near-person" type="button" data-id="${esc(p.id)}">
         <span class="np-avatar" data-qid="${esc(p.qid || '')}"></span>
         <span class="np-body">
@@ -894,6 +896,74 @@
     note.textContent = `Solstice knows where ${located.length} of Mount Auburn’s graves are to within a few metres (${Object.entries(bySource).map(([k, v]) => `${v} from ${k}`).join(', ')})${onPaths.length ? `, and the avenue or path for ${onPaths.length} more, measured to the nearest point of the path` : ''}. `
       + (g.accuracy > 30 ? `Your position is only good to about ${Math.round(g.accuracy)} m, so distances are rough. ` : '')
       + 'Save the stones you photograph and they’ll show up here next time.';
+  }
+
+
+  // A small map drawn from the app's own data: OpenStreetMap's paths, the
+  // graves Solstice can place, and you. North is up; units are metres.
+  function drawNearbyMap(g, rows, radius) {
+    const wrap = $('#nearby-map');
+    const lines = Src.paths();
+    if (!wrap) return;
+    if (!Object.keys(lines).length && !rows.length) { wrap.innerHTML = ''; return; }
+    const R = Math.max(60, Math.min(600, radius * 1.15));
+    const [ux, uy] = C.toXY(g.lat, g.lon);
+    const X = (lat, lon) => { const [x, y] = C.toXY(lat, lon); return [(x - ux).toFixed(1), (uy - y).toFixed(1)]; };
+    const sw = (R / 160).toFixed(2);
+    let paths = '';
+    for (const segs of Object.values(lines)) {
+      for (const seg of segs) {
+        const pts = seg.map(([la, lo]) => X(la, lo));
+        if (pts.every(([x, y]) => Math.abs(x) > R * 1.3 || Math.abs(y) > R * 1.3)) continue;
+        paths += `<polyline points="${pts.map((q) => q.join(',')).join(' ')}"/>`;
+      }
+    }
+    const highlighted = new Set(rows.filter((r) => r.path).map((r) => r.path));
+    let hl = '';
+    for (const name of highlighted) {
+      for (const seg of lines[name] || []) hl += `<polyline points="${seg.map(([la, lo]) => X(la, lo).join(',')).join(' ')}"/>`;
+    }
+    // Labels: nearest graves first; try right, left, above, below; drop the
+    // label (keep the dot) when every spot collides with one already placed.
+    const fs = R / 17, dotR = R / 38, placed = [{ x0: -R / 25, x1: R / 25, y0: -R / 25, y1: R / 25 }];
+    const hit = (b) => placed.some((q) => b.x0 < q.x1 && b.x1 > q.x0 && b.y0 < q.y1 && b.y1 > q.y0);
+    const pos = rows.map((r) => { const [la, lo] = r.at || [r.p.lat, r.p.lon]; const [xs, ys] = X(la, lo); return [+xs, +ys]; });
+    for (const [x, y] of pos) placed.push({ x0: x - dotR, x1: x + dotR, y0: y - dotR, y1: y + dotR });
+    const dots = rows.map((r, i) => {
+      const [x, y] = pos[i];
+      const name = r.p.family ? tc(r.p.family) : r.p.label.split(' ').pop();
+      const w = fs * 0.56 * name.length, h = fs;
+      const spots = [
+        [x + dotR * 1.4, y + h * 0.35, 'start'], [x - dotR * 1.4, y + h * 0.35, 'end'],
+        [x, y - dotR * 1.6, 'middle'], [x, y + dotR * 1.6 + h * 0.8, 'middle'],
+      ];
+      let label = '';
+      for (const [tx, ty, anchor] of spots) {
+        const x0 = anchor === 'start' ? tx : anchor === 'end' ? tx - w : tx - w / 2;
+        const box = { x0, x1: x0 + w, y0: ty - h * 0.85, y1: ty + h * 0.2 };
+        if (hit(box) || Math.abs(box.x0) > R || Math.abs(box.x1) > R) continue;
+        placed.push(box);
+        label = `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${anchor}" font-size="${fs.toFixed(1)}">${esc(name)}</text>`;
+        break;
+      }
+      return `<g class="nm-grave${r.path ? ' approx' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(r.p.label)}">
+        <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}"/>${label}
+      </g>`;
+    }).join('');
+    const acc = Math.min(g.accuracy || 10, R);
+    wrap.innerHTML = `<svg viewBox="${-R} ${-R} ${2 * R} ${2 * R}" role="img" aria-label="Map of graves around you">
+        <g class="nm-paths" stroke-width="${sw}">${paths}</g>
+        <g class="nm-hl" stroke-width="${(sw * 2.4).toFixed(2)}">${hl}</g>
+        <circle class="nm-acc" r="${acc.toFixed(1)}"/>
+        ${dots}
+        <circle class="nm-you" r="${(R / 32).toFixed(1)}" stroke-width="${(R / 110).toFixed(2)}"/>
+        <text class="nm-scale" x="${(-R + R / 20).toFixed(1)}" y="${(R - R / 20).toFixed(1)}" font-size="${(R / 17).toFixed(1)}">${Math.round(R)} m to the edge · north is up</text>
+      </svg>`;
+    for (const el of wrap.querySelectorAll('.nm-grave')) {
+      const open = () => { const r = rows[Number(el.dataset.i)]; S.stone = null; S.result = null; S.ocr = null; renderRecord({ kind: 'picked', person: r.p, distance: r.d }); };
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    }
   }
 
   // ---------------------------------------------------------------------------
