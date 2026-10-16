@@ -112,6 +112,8 @@ def is_header(line):
 
 
 def words(s):
+    if isinstance(s, (list, tuple)):
+        s = ' '.join(s)
     return [w for w in re.findall(r"[A-Z][A-Z']*", s.upper())]
 
 
@@ -314,7 +316,7 @@ def scan(people, known):
             placed[p['qid']].append((lot.group(1) if lot else None, path, b))
             # Dearborn often gives only verse under a header; keep prose.
             if len(text) > 80 and not re.match(r'["\u201c\'*]', text):
-                found[p['qid']].append({'book': b, 'text': trim(text, 0, p['family'], (p.get('given') or '').split(' ')[0]), 'header': clean(para), 'kind': 'entry'})
+                found[p['qid']].append({'book': b, 'text': trim(text, 0, p['family'], (p['_given'] or [''])[0]), 'header': clean(para), 'kind': 'entry'})
 
         # Prose mentions by full name, near monument words.
         flat = '\n'.join(paras)
@@ -334,7 +336,7 @@ def scan(people, known):
                 if hit:
                     break
             if hit:
-                win = trim(flat, hit.start(), p['family'], (p.get('given') or '').split(' ')[0])
+                win = trim(flat, hit.start(), p['family'], (p['_given'] or [''])[0])
                 if quality(win) > 0.85:
                     found[p['qid']].append({'book': b, 'text': clean(win), 'kind': 'prose'})
     return found, placed
