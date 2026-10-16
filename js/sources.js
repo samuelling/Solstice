@@ -78,7 +78,45 @@
       baked.set(p.qid, p);
       return rec;
     });
-    return { at: Date.now(), qid: d.cemetery, people, baked: true, generated: d.generated };
+    const reg = await loadRegister(d.paths || {}, people);
+    return { at: Date.now(), qid: d.cemetery, people: people.concat(reg), baked: true, generated: d.generated, registerCount: reg.length };
+  }
+
+  // Mount Auburn's public-lot register (scripts/fetch_register.py): ordinary
+  // burials from 1834 into the 1950s, with burial date, age, lot and grave.
+  let registerMeta = null;
+  async function loadRegister(paths, wikidataPeople) {
+    let d;
+    try {
+      const r = await fetch('data/register.json', { cache: 'no-cache' });
+      if (!r.ok) return [];
+      d = await r.json();
+    } catch (e) { return []; }
+    registerMeta = { source: d.source, work: d.work, pageUrl: d.pageUrl, generated: d.generated };
+    const byQid = new Map(wikidataPeople.map((p) => [p.qid, p]));
+    const out = [];
+    d.people.forEach((e, i) => {
+      const entry = { ...e, pageLink: d.pageUrl + e.p };
+      if (e.q && byQid.has(e.q)) {            // already known from Wikidata: attach the entry
+        const w = byQid.get(e.q);
+        (w.register = w.register || []).push(entry);
+        if (!w.path && e.path) Object.assign(w, { path: e.path, pathSource: 'Public-lot register', pathLines: paths[e.path] || null, lot: w.lot || e.lot });
+        return;
+      }
+      const sp = C.splitName(e.n);
+      out.push({
+        id: 'R' + i, source: 'register', register: [entry],
+        label: e.n.replace(/\s+/g, ' ').replace(/\b([A-Z])\s/g, '$1. '),
+        description: `Buried ${e.y}${e.a != null ? `, aged ${e.a}` : ''} · ${e.s || 'public-lot register'}`,
+        birth: null, death: e.y, deathAlt: e.m && e.m <= 3 ? e.y - 1 : null, age: e.a ?? null,
+        lat: null, lon: null, coordSource: null,
+        path: e.path || null, lot: e.lot || null, grave: e.g || null, pathSource: e.path ? 'Public-lot register' : null,
+        pathLines: e.path && paths[e.path] ? paths[e.path] : null,
+        gone: !!e.gone,
+        given: sp.given, family: sp.family,
+      });
+    });
+    return out;
   }
 
   // ---------------------------------------------------------------------------
@@ -409,6 +447,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, guidesOf, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []), paths: () => (bakedMeta ? bakedMeta.paths : {}),
+    deepLinks, titleCase, store, guidesOf, registerInfo: () => registerMeta, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []), paths: () => (bakedMeta ? bakedMeta.paths : {}),
   };
 })(window);

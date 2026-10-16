@@ -36,6 +36,7 @@ No AI writes anything on the life page. Everything shown is either quoted from a
 - **Family at Mount Auburn**, **newspaper excerpts** (Library of Congress, only pages that contain their actual name), **their grave** (Commons photo), and **facts** grouped as work, honours and societies, service, life and death.
 - **In the old guidebooks** — what the visitors' guides of 1839–1865 (Dearborn's Guide, Mount Auburn Illustrated, the Cambridge railroad hand-books) said at their monument, quoted from Internet Archive scans (`scripts/parse_guides.py`).
 - **Archival biography** — from SNAC, written by archivists for the collections that hold their papers.
+- **In Mount Auburn's register** — for about 5,000 ordinary burials in the public lots, receiving tomb and crypts (1834 onward): burial date, age, lot and grave, and any later move, from the cemetery's Receiving Tomb, Public Lot and Crypt Register as transcribed by volunteers on FromThePage (`scripts/fetch_register.py`, monthly). Only the parsed facts are kept, each linked to its transcribed page.
 - **Where they lie** — lot and path, with where that came from: Wikidata, Mount Auburn's 1952 Roll of Distinction, its 1857/1860 lot catalogues, or the headers in Dearborn's Guide ("ROBERT G. SHAW. LOT 85. PINE AVENUE.").
 
 When a stone isn't in the records, the page says so and points to Mount Auburn's archive, which confirms burials and lots for free.

@@ -144,3 +144,22 @@ test('distanceToLines also returns the nearest point on the path', () => {
   assert.ok(Math.abs(r.point[1] - (-71.1442)) < 1e-5);
   assert.ok(r.distance > 20 && r.distance < 25, `distance ${r.distance}`);
 });
+
+test('register entries: burial year and age stand in for birth', () => {
+  // Stone: ELIZABETH CUSHING 1780–1863. The register says buried Aug 1863, aged 83.
+  const stone = { given: 'ELIZABETH', family: 'CUSHING', birth: tok('1780'), death: tok('1863'), aged: null };
+  const people = [
+    { id: 'R1', label: 'Elizabeth Cushing', given: 'ELIZABETH', family: 'CUSHING', birth: null, death: 1863, age: 83 },
+    { id: 'R2', label: 'Elizabeth Cushing', given: 'ELIZABETH', family: 'CUSHING', birth: null, death: 1863, age: 41 },
+  ];
+  const r = C.matchCandidates(stone, null, people);
+  assert.strictEqual(r.candidates[0].person.id, 'R1');
+  assert.ok(r.candidates[0].posterior > 0.8, `posterior ${r.candidates[0].posterior}`);
+});
+
+test('register entries: a January burial can carry the previous year’s death', () => {
+  const stone = { given: 'SAMUEL', family: 'FOWLER', birth: null, death: tok('1863'), aged: null };
+  const people = [{ id: 'R1', label: 'Samuel Fowler', given: 'SAMUEL', family: 'FOWLER', birth: null, death: 1864, deathAlt: 1863, age: 85 }];
+  const r = C.matchCandidates(stone, null, people);
+  assert.ok(r.candidates[0].parts.years > 1, `years LR ${r.candidates[0].parts.years}`);
+});

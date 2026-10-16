@@ -461,3 +461,14 @@ figure.guide figcaption { font-size: 0.85rem; color: var(--muted); display: flex
 .monuments { margin: 4px 0 14px; }
 .monument-line { margin: 0 0 6px; font-size: 0.95rem; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
 .memorials { margin: 4px 0 14px; font-size: 0.92rem; color: var(--muted); }
+
+/* Public-lot register */
+.register { margin: 18px 0; }
+.register .reg-facts { margin: 0 0 6px; font-family: 'Source Serif 4', Georgia, serif; font-size: 1.05rem; line-height: 1.55; }
+.register .reg-line { margin: 0 0 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.register .reg-line code { font-size: 0.82rem; color: var(--muted); white-space: normal; word-break: break-word; }
+.lot-row details > summary { list-style: none; display: flex; justify-content: space-between; gap: 10px; align-items: center; cursor: pointer; padding: 10px 0; min-height: 46px; }
+.lot-row details > summary::-webkit-details-marker { display: none; }
+.lot-row .lot-filter { width: 100%; margin: 4px 0 8px; padding: 10px; font: inherit; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.lot-row .lot-names { list-style: none; margin: 0 0 10px; padding: 0; max-height: 320px; overflow-y: auto; }
+.lot-row .lot-name { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 9px 2px; font: inherit; color: var(--ink); cursor: pointer; }

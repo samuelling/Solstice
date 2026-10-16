@@ -399,16 +399,29 @@
 
       // --- years
       let yearsLR = 1;
+      // Register entries give burial year and age, not birth: birth is
+      // burial − age or one year earlier; death may fall the year before a
+      // winter burial (deathAlt).
+      const ageBirth = person.birth == null && person.age != null && person.death != null;
       if (stone.birth || stone.death) {
-        let p = 1, informative = false;
-        if (stone.birth && person.birth != null) { p *= yearLikelihood(stone.birth, person.birth); informative = true; }
-        if (stone.death && person.death != null) { p *= yearLikelihood(stone.death, person.death); informative = true; }
+        let p = 1, informative = false, usedBirth = false, usedDeath = false;
+        if (stone.birth && person.birth != null) { p *= yearLikelihood(stone.birth, person.birth); usedBirth = true; } else if (stone.birth && ageBirth) {
+          p *= Math.max(yearLikelihood(stone.birth, person.death - person.age), yearLikelihood(stone.birth, person.death - person.age - 1));
+          usedBirth = true;
+        }
+        if (stone.death && person.death != null) {
+          p *= Math.max(yearLikelihood(stone.death, person.death), person.deathAlt != null ? yearLikelihood(stone.death, person.deathAlt) : 0);
+          usedDeath = true;
+        }
+        informative = usedBirth || usedDeath;
         if (informative) {
           // Compare against the same fields under a random burial.
-          const base = baseline(!!(stone.birth && person.birth != null), !!(stone.death && person.death != null));
+          const base = baseline(usedBirth, usedDeath);
           yearsLR = p / Math.max(base, 1e-12);
         }
       }
+      // "Aged 83" on the stone against the register's recorded age.
+      if (stone.aged != null && person.age != null) yearsLR *= Math.abs(stone.aged - person.age) <= 1 ? 10 : 0.1;
 
       // --- place
       const geo = geoLikelihoodRatio(gps, person);

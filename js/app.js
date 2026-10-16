@@ -152,7 +152,7 @@
 
   /** Wikidata people, enriched with field-note locations, plus field-note-only stones. */
   function peoplePool() {
-    const byQid = new Map(S.known.map((p) => [p.qid, { ...p }]));
+    const byQid = new Map(S.known.map((p) => [p.qid || p.id, { ...p }]));
     const extra = [];
     for (const n of S.notes) {
       if (n.qid && byQid.has(n.qid)) {
@@ -446,12 +446,17 @@
     'Lot catalogue (1857/1860)': 'from Mount Auburn’s lot catalogues of 1857–60',
     "Dearborn's Guide (1848–1857)": 'from Dearborn’s Guide through Mount Auburn, 1848–57',
     'Wikidata monument': 'from their monument’s Wikidata entry',
+    'Public-lot register': 'from Mount Auburn’s public-lot register; path from the lot catalogues',
     Wikipedia: 'from Wikipedia',
   };
 
   // Commons sometimes doubles the author string ("Unknown authorUnknown author").
   const artistOf = (a) => String(a || 'Unknown').replace(/^(.+?)\s*\1$/, '$1');
   const credit = (img) => `Photo: <a href="${esc(img.page)}" target="_blank" rel="noopener">${esc(artistOf(img.artist))}${img.license ? `, ${esc(img.license)}` : ''}</a>, Wikimedia Commons`;
+
+  // "1780–1863", or "c. 1780–1863" when birth comes from a register's age.
+  const lifeYears = (p) => (p.birth == null && p.age != null && p.death
+    ? `c. ${p.death - p.age}–${p.death}` : `${p.birth || '?'}–${p.death || '?'}`);
 
   const fmtDist = (m) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(1)} km`);
 
@@ -473,7 +478,7 @@
       const p = best.person;
       html = `<div class="best">
         <p class="best-name">${esc(p.label)}</p>
-        <p class="best-sub">${esc([p.birth || '?', p.death || '?'].join('–'))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</p>
+        <p class="best-sub">${esc(lifeYears(p))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</p>
         ${meter(best.posterior)}
         <ul class="reasons">${reasons(best).map(([t, k]) => `<li class="${k}">${esc(t)}</li>`).join('')}</ul>
       </div>
@@ -490,7 +495,7 @@
     const others = list.map((c, i) => ({ c, i })).filter(({ c }) => c !== best);
     const rows = others.map(({ c, i }) => `<li><button class="other" data-pick="${i}">
         <span class="o-name">${esc(c.person.label)}</span>
-        <span class="o-meta">${esc([c.person.birth || '?', c.person.death || '?'].join('–'))} · ${pct(c.posterior)}</span>
+        <span class="o-meta">${esc(lifeYears(c.person))} · ${pct(c.posterior)}</span>
       </button></li>`);
     if (best) {
       rows.push(`<li><button class="other" data-pick="unknown">
@@ -531,6 +536,7 @@
       : picked ? choice.person
       : { given: stone.given, family: stone.family, birth: topYear('birth'), death: topYear('death'), label: tc([stone.given, stone.family].filter(Boolean).join(' ')) };
     const known = (choice.kind === 'match' || picked) && !!person.qid && person.source !== 'notes';
+    const fromRegister = (choice.kind === 'match' || picked) && person.source === 'register';
     const token = (S.recordToken = {});
     S.recordShown = true;
 
@@ -545,6 +551,7 @@
       verdict = '<span class="conf-weak">Not in Solstice’s records.</span> Here is what the stone says, and where to look next.';
     }
     if (known) verdict += ` <a href="https://www.wikidata.org/wiki/${esc(person.qid)}" target="_blank" rel="noopener">Wikidata record</a>`;
+    else if (fromRegister) verdict += ' From Mount Auburn’s public-lot register.';
     else if (person.source === 'notes') verdict += ' A stone you saved earlier.';
 
     const fromStone = stone ? [
@@ -560,7 +567,7 @@
         <h2>${esc(person.label)}</h2>
         ${cleanDesc(person.description) ? `<p class="sub">${esc(cleanDesc(person.description))}</p>` : ''}
         <p class="glance" id="glance">${esc(Life.glance(person, []))}</p>
-        ${person.path || person.lot ? `<p class="lot-line">Buried ${person.lot ? `in Lot ${esc(person.lot)}, ` : 'on '}${esc(person.path || 'Mount Auburn')}${person.pathSource ? ` <span class="lot-src">· ${esc(SOURCE_NOTE[person.pathSource] || person.pathSource)}</span>` : ''}</p>` : ''}
+        ${(person.path || person.lot) && !person.gone ? `<p class="lot-line">Buried ${person.lot ? `in Lot ${esc(person.lot)}${person.grave ? `, grave ${esc(person.grave)}` : ''}, ` : 'on '}${esc(person.path || 'Mount Auburn')}${person.pathSource ? ` <span class="lot-src">· ${esc(SOURCE_NOTE[person.pathSource] || person.pathSource)}</span>` : ''}</p>` : ''}
         ${person.roll1952 && person.roll1952.occupation ? `<p class="roll-line">Mount Auburn’s 1952 Roll of Distinction: “${esc(person.roll1952.occupation.replace(/\.$/, ''))}${person.roll1952.born_in ? `, born in ${esc(person.roll1952.born_in.replace(/\.$/, '.'))}` : ''}”</p>` : ''}
         ${fromStone ? `<p class="stone-line"><span class="tag you">On the stone</span>${esc(fromStone)}</p>` : ''}
         <p class="verdict-line">${verdict}</p>
@@ -570,13 +577,14 @@
       <div id="timeline-slot">${known ? '<p class="loading">Gathering their records…</p>' : ''}</div>
       <div id="family-slot"></div>
       <div id="papers-wrap"><h3>In the newspapers</h3><div id="papers-slot"><p class="loading">Looking for newspaper pages…</p></div></div>
+      ${(person.register || []).length && (known || fromRegister) ? registerBlock(person) : ''}
       <div id="grave-slot"></div>
       ${(person.monuments || []).length ? `<div class="monuments">${person.monuments.map(monumentLine).join('')}</div>` : ''}
       ${(person.memorials || []).length ? `<p class="memorials">Also remembered elsewhere: ${person.memorials.map((m) => `<a href="https://www.wikidata.org/wiki/${esc(m.qid)}" target="_blank" rel="noopener">${esc(m.name)}</a>`).join(' · ')}</p>` : ''}
       <div id="guides-slot"></div>
       <div id="facts-slot"></div>
       <div id="period-slot"></div>
-      ${known ? '' : `<div class="unknown-note"><h3>Nothing more on record here</h3><p>Solstice holds the ${S.known.length.toLocaleString()} people at Mount Auburn who have entries on Wikidata, out of roughly 100,000 buried here. Mount Auburn’s own archive can confirm a burial and its lot for free, and Find a Grave volunteers have photographed many more stones.</p></div>`}
+      ${known || fromRegister ? '' : `<div class="unknown-note"><h3>Nothing more on record here</h3><p>Solstice holds the ${S.known.length.toLocaleString()} people at Mount Auburn who have entries on Wikidata, out of roughly 100,000 buried here. Mount Auburn’s own archive can confirm a burial and its lot for free, and Find a Grave volunteers have photographed many more stones.</p></div>`}
       <h3>Look further</h3>
       <ul class="further" id="further-slot"></ul>
       <div class="finish">
@@ -726,6 +734,33 @@
   }
 
 
+  const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const fmtDay = (y, m, d) => [d, m ? MONTH_NAMES[m] : '', y].filter(Boolean).join(' ');
+
+  /** What Mount Auburn's public-lot register says, in words, with the row as transcribed. */
+  function registerBlock(person) {
+    const info = Src.registerInfo() || {};
+    return `<div class="register"><h3>In Mount Auburn’s register</h3>${person.register.map((e) => {
+      const where = e.s ? `${e.s}${e.sl ? ` (Lot ${e.sl})` : ''}${e.g0 ? `, grave ${e.g0}` : ''}` : (e.g0 ? `grave ${e.g0}` : '');
+      const mv = e.mv;
+      let moved = '';
+      if (mv) {
+        const when = mv.year ? ` on ${fmtDay(mv.year, mv.month, mv.day)}` : '';
+        moved = mv.kind === 'lot' ? `Moved${when} to Lot ${mv.lot}${mv.grave ? `, grave ${mv.grave}` : ''}${e.path ? `, on ${e.path}` : ''}.`
+          : mv.kind === 'same' ? `Moved${when} to grave ${mv.grave} in the same lot.`
+          : mv.kind === 'cremated' ? `Cremated${when}.`
+          : mv.kind === 'niche' ? `Moved${when} to a niche: “${mv.to}”.`
+          : mv.kind === 'scattered' ? `Ashes scattered${when}: “${mv.to}”.`
+          : mv.kind === 'away' ? `Removed${when}: “${mv.to.replace(/^to\s+/i, 'to ')}”, so no longer at Mount Auburn.`
+          : '';
+      }
+      return `<p class="reg-facts">Buried ${esc(fmtDay(e.y, e.m, e.d))}${e.a != null ? `, aged ${e.a === 0 ? 'under a year' : e.a}` : ''}${where ? `, in ${esc(where)}` : ''}. ${esc(moved)}</p>
+        <p class="reg-line"><span class="tag record">As transcribed</span><code>${esc(e.l)}</code></p>
+        <p class="src-line"><a href="${esc(e.pageLink)}" target="_blank" rel="noopener">Page ${e.pg || ''} of the Receiving Tomb, Public Lot and Crypt Register</a> · transcribed by volunteers on FromThePage</p>`;
+    }).join('')}
+      <p class="hint">Mount Auburn’s own record of burials in its public lots, receiving tomb and crypts, 1834 onward. Check the scan on the linked page; the reading may have slips.</p></div>`;
+  }
+
   function monumentLine(m) {
     const bits = [(m.materials || []).join(' and '), (m.creators || []).length ? `by ${m.creators.join(' and ')}` : '', m.year || ''].filter(Boolean);
     return `<p class="monument-line"><span class="tag record">Monument</span><a href="https://www.wikidata.org/wiki/${esc(m.qid)}" target="_blank" rel="noopener">${esc(m.name)}</a>${bits.length ? ` <span class="muted">${esc(bits.join(', '))}</span>` : ''}</p>`;
@@ -821,7 +856,7 @@
     let html = '<h3>Family at Mount Auburn</h3>';
     if (here.length) {
       html += `<ul class="family">${here.map((r) => {
-        const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
+        const yrs = r.birth || r.death ? lifeYears(r) : '';
         const where = whereIs(r, person);
         const links = relLinks(r);
         return `<li data-qid="${esc(r.qid)}">
@@ -847,7 +882,7 @@
       html += `<details class="same-surname"${choice.kind === 'match' ? '' : ' open'}>
         <summary>${same.length} other${same.length === 1 ? '' : 's'} named ${esc(tc(surname))} buried here — same surname, not necessarily family</summary>
         <ul>${shown.map((r) => {
-          const yrs = r.birth || r.death ? `${r.birth || '?'}–${r.death || '?'}` : '';
+          const yrs = r.birth || r.death ? lifeYears(r) : '';
           const where = whereIs(r, person);
           return `<li><span class="fname">${esc(r.name)}</span> <span class="fyrs">${esc(yrs)}</span>${where ? ` · <span class="fwhere">${esc(where)}</span>` : ''}${r.findAGrave ? ` · <a href="https://www.findagrave.com/memorial/${esc(r.findAGrave)}" target="_blank" rel="noopener">Find a Grave</a>` : ''}</li>`;
         }).join('')}</ul>
@@ -908,26 +943,71 @@
     }
     const pool = peoplePool();
     const located = pool.filter((p) => p.lat != null);
-    const onPaths = pool.filter((p) => p.lat == null && p.pathLines);
+    const onPaths = pool.filter((p) => p.lat == null && p.pathLines && !p.gone);
+    // Register burials share a few public lots (Vesper Lot alone holds over a
+    // thousand), so each lot is one row that opens to its names.
+    const lots = new Map();
+    const single = [];
+    for (const p of onPaths) {
+      if (p.source !== 'register' || !p.lot) { single.push(p); continue; }
+      if (!lots.has(p.lot)) lots.set(p.lot, []);
+      lots.get(p.lot).push(p);
+    }
+    for (const [lot, members] of [...lots.entries()]) if (members.length < 3) { single.push(...members); lots.delete(lot); }
+    const lotRows = [...lots.entries()].map(([lot, members]) => {
+      const first = members[0];
+      const sec = (first.register[0] || {}).sl === lot ? first.register[0].s : null;
+      const r = C.distanceToLines(g.lat, g.lon, first.pathLines);
+      return { p: { id: 'lot-' + lot, label: sec ? `${sec} (Lot ${lot})` : `Lot ${lot}`, lotName: sec || `Lot ${lot}` }, d: r.distance, path: first.path, at: r.point, lotGroup: members.sort((a, b) => (a.death || 0) - (b.death || 0)) };
+    });
     const rows = [
       ...located.map((p) => ({ p, d: C.haversineM(g.lat, g.lon, p.lat, p.lon) })),
-      ...onPaths.map((p) => { const r = C.distanceToLines(g.lat, g.lon, p.pathLines); return { p, d: r.distance, path: p.path, at: r.point }; }),
+      ...single.map((p) => { const r = C.distanceToLines(g.lat, g.lon, p.pathLines); return { p, d: r.distance, path: p.path, at: r.point }; }),
+      ...lotRows,
     ].filter((r) => Number.isFinite(r.d)).sort((a, b) => a.d - b.d);
     const within = rows.filter((r) => r.d <= nearbyRadius);
     const where = g.source === 'near' ? `your spot near ${esc(g.label)}` : 'you';
+    const graves = within.reduce((n, r) => n + (r.lotGroup ? r.lotGroup.length : 1), 0);
     status.innerHTML = within.length
-      ? `${within.length} grave${within.length === 1 ? '' : 's'} within ${nearbyRadius} m of ${where}.`
+      ? `${graves.toLocaleString()} grave${graves === 1 ? '' : 's'} within ${nearbyRadius} m of ${where}.`
       : `No graves with a known position within ${nearbyRadius} m of ${where}. The nearest are below.`;
     const show = within.length ? within : rows.slice(0, 3);
     drawNearbyMap(g, show, Math.max(nearbyRadius, show.length ? show[show.length - 1].d * 1.1 : 0));
-    list.innerHTML = show.map(({ p, d, path }) => `<li><button class="near-person" type="button" data-id="${esc(p.id)}">
+    const lotItem = ({ p, d, path, lotGroup }) => `<li class="lot-row"><details>
+        <summary><span class="np-body"><span class="np-name">${esc(p.label)}</span>
+          <span class="np-meta">${lotGroup.length.toLocaleString()} burials in Mount Auburn’s register, ${lotGroup[0].death}–${lotGroup[lotGroup.length - 1].death}</span></span>
+          <span class="np-dist"><span class="np-path">on ${esc(path)}</span>${d < 12 ? 'here' : fmtDist(d)}</span></summary>
+        <input class="lot-filter" type="search" placeholder="Find a name in ${esc(p.lotName)}" aria-label="Find a name in ${esc(p.lotName)}">
+        <ul class="lot-names"></ul>
+      </details></li>`;
+    list.innerHTML = show.map((row) => (row.lotGroup ? lotItem(row) : '') || (({ p, d, path }) => `<li><button class="near-person" type="button" data-id="${esc(p.id)}">
         <span class="np-avatar" data-qid="${esc(p.qid || '')}"></span>
         <span class="np-body">
           <span class="np-name">${esc(p.label)}</span>
-          <span class="np-meta">${esc([p.birth || '?', p.death || '?'].join('–'))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</span>
+          <span class="np-meta">${esc(lifeYears(p))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</span>
         </span>
         <span class="np-dist">${path ? `<span class="np-path">on ${esc(path)}</span>` : ''}${d < (path ? 12 : 6) ? 'here' : fmtDist(d)}</span>
-      </button></li>`).join('');
+      </button></li>`)(row)).join('');
+    // Lot rows: list names on open, filter as you type (first 150 shown).
+    for (const li of list.querySelectorAll('li.lot-row')) {
+      const row = show.find((r) => r.lotGroup && li.querySelector('.np-name').textContent === r.p.label);
+      const ul = li.querySelector('.lot-names'), input = li.querySelector('.lot-filter');
+      const fill = () => {
+        const q = C.normName(input.value);
+        const hits = row.lotGroup.filter((m) => !q || C.normName(m.label).includes(q));
+        ul.innerHTML = hits.slice(0, 150).map((m) => `<li><button class="lot-name" type="button" data-id="${esc(m.id)}">${esc(m.label)} <span class="muted">${esc(lifeYears(m))}${m.grave ? ` · grave ${esc(m.grave)}` : ''}</span></button></li>`).join('')
+          + (hits.length > 150 ? `<li class="muted">and ${hits.length - 150} more; type a name to narrow it.</li>` : '') + (!hits.length ? '<li class="muted">No one by that name here.</li>' : '');
+        for (const b of ul.querySelectorAll('.lot-name')) {
+          b.addEventListener('click', () => {
+            const m = row.lotGroup.find((x) => x.id === b.dataset.id);
+            S.stone = null; S.result = null; S.ocr = null;
+            renderRecord({ kind: 'picked', person: m, distance: row.d });
+          });
+        }
+      };
+      li.querySelector('details').addEventListener('toggle', () => { if (li.querySelector('details').open && !ul.children.length) fill(); });
+      input.addEventListener('input', fill);
+    }
     for (const btn of list.querySelectorAll('.near-person')) {
       btn.addEventListener('click', () => {
         const hit = show.find((r) => String(r.p.id) === btn.dataset.id);
@@ -979,10 +1059,10 @@
     // Graves known only by their path: one marker per path, with a count.
     const exact = rows.map((r, i) => ({ r, i })).filter(({ r }) => !r.path);
     const byPath = new Map();
-    rows.forEach((r, i) => { if (r.path) { if (!byPath.has(r.path)) byPath.set(r.path, { r, idx: [] }); byPath.get(r.path).idx.push(i); } });
+    rows.forEach((r, i) => { if (r.path) { if (!byPath.has(r.path)) byPath.set(r.path, { r, idx: [], n: 0 }); const gp = byPath.get(r.path); gp.idx.push(i); gp.n += r.lotGroup ? r.lotGroup.length : 1; } });
     const marks = [
       ...exact.map(({ r, i }) => ({ r, i, name: r.p.family ? tc(r.p.family) : r.p.label.split(' ').pop() })),
-      ...[...byPath.entries()].map(([path, g]) => ({ r: g.r, i: g.idx[0], group: g.idx, name: g.idx.length > 1 ? `${path.replace(/ (Path|Avenue|Road)$/, '')} · ${g.idx.length}` : (g.r.p.family ? tc(g.r.p.family) : g.r.p.label.split(' ').pop()) })),
+      ...[...byPath.entries()].map(([path, g]) => ({ r: g.r, i: g.idx[0], group: g.idx, name: g.n > 1 ? `${path.replace(/ (Path|Avenue|Road)$/, '')} · ${g.n.toLocaleString()}` : (g.r.p.family ? tc(g.r.p.family) : g.r.p.label.split(' ').pop()) })),
     ];
     const pos = marks.map(({ r }) => { const [la, lo] = r.at || [r.p.lat, r.p.lon]; const [xs, ys] = X(la, lo); return [+xs, +ys]; });
     for (const [x, y] of pos) placed.push({ x0: x - dotR, x1: x + dotR, y0: y - dotR, y1: y + dotR });
@@ -1004,8 +1084,9 @@
         label = `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${anchor}" font-size="${fs.toFixed(1)}">${esc(name)}</text>`;
         break;
       }
-      const aria = mk.group && mk.group.length > 1 ? `${mk.group.length} graves on ${r.path}` : r.p.label;
-      return `<g class="nm-grave${r.path ? ' approx' : ''}" data-i="${i}"${mk.group && mk.group.length > 1 ? ` data-path="${esc(r.path)}"` : ''} tabindex="0" role="button" aria-label="${esc(aria)}">
+      const multi = mk.group && (mk.group.length > 1 || r.lotGroup);
+      const aria = multi ? `Graves on ${r.path}` : r.p.label;
+      return `<g class="nm-grave${r.path ? ' approx' : ''}" data-i="${i}"${multi ? ` data-path="${esc(r.path)}"` : ''} tabindex="0" role="button" aria-label="${esc(aria)}">
         <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}"/>${label}
       </g>`;
     }).join('');
