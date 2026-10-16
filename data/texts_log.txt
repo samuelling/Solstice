@@ -1,5 +1,4 @@
 wikipedia articles: 0
-ERR retry 1: https://query.wikidata.org/sparql: The read operation timed out
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
@@ -23,22 +22,27 @@ ERR retry 2: https://bioguide.congress.gov/search/bio/E000264.json: HTTP Error 4
 ERR congress failed for Q434905 E000264 HTTP Error 403: Forbidden
 ERR congress giving up this run: the service is not answering as expected
 congress : 46 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+K.+Shaw%22&dates=1822%: HTTP Error 503: Service Unavailable
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+K.+Shaw%22&dates=1822%: HTTP Error 503: Service Unavailable
-ERR loc search failed Elizabeth K. Shaw HTTP Error 503: Service Unavailable
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+Lyman+Eliot%22&dates=1: HTTP Error 503: Service Unavailable
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+Lyman+Eliot%22&dates=1: HTTP Error 503: Service Unavailable
-newspapers checked: 10 951 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Emil+C.+Hammer%22&dates=1894%2F1: HTTP Error 500: Internal Server Error
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Emily+Crosby+Low%22&dates=1871%2: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Emily+P.+Locke%22&dates=1953%2F1: HTTP Error 500: Internal Server Error
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Enoch+Hale%22&dates=1848%2F1849&: The read operation timed out
-newspapers checked: 20 1571 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Fanny+A.+Longfellow%22&dates=186: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Fanny+A.+Longfellow%22&dates=186: The read operation timed out
-newspapers checked: 30 2149 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Florence+Sparks+Moore%22&dates=1: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Florence+Sparks+Moore%22&dates=1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Frances+Dunlap%22&dates=1885%2F1: The read operation timed out
-newspapers checked: 40 2907 s
-newspapers checked this run: 41 | still to check: 463
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+H.+Appleton%22&dates=193: The read operation timed out
+ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Batchelder%22&dates=1858: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Batchelder%22&dates=1858: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Peabody+Magoun%22&dates=: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Tiffany%22&dates=1908%2F: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Tiffany%22&dates=1908%2F: The read operation timed out
+ERR loc search failed Francis Tiffany The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Smith%22&dates=1932%2F19: The read operation timed out
+newspapers checked: 10 1386 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+W.+Sargent%22&dates=1920: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Williams+Sargent%22&date: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Williams+Sargent%22&date: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+A.+Kennedy%22&dates=1926%2: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+A.+Kennedy%22&dates=1926%2: The read operation timed out
+ERR loc search failed Frank A. Kennedy The read operation timed out
+ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+L.+Kennedy%22&dates=1939%2: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+L.+Kennedy%22&dates=1939%2: HTTP Error 503: Service Unavailable
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+Paterson+Smith%22&dates=19: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+P.+Smith%22&dates=1943%2F1: HTTP Error 503: Service Unavailable
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Frank+P.+Smith%22&dates=1943%2F1: HTTP Error 503: Service Unavailable
+newspapers checked: 20 2677 s
+newspapers checked this run: 26 | still to check: 437
