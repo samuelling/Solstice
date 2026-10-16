@@ -28,6 +28,16 @@ DROP_SECTIONS = re.compile(r'^(references|notes|citations|sources|see also|exter
                            r'gallery|footnotes|works cited)\b', re.I)
 
 
+LOG = []
+_print = print
+
+
+def print(*a, **k):  # noqa: A001 — keep progress and errors for data/texts_log.txt
+    LOG.append(('ERR ' if k.get('file') is sys.stderr else '') + ' '.join(str(x) for x in a))
+    del LOG[:-400]
+    _print(*a, **k)
+
+
 def over_budget(grace=0):
     return time.time() - T0 > BUDGET_S + grace
 
@@ -438,4 +448,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import traceback
+    try:
+        main()
+    except Exception:
+        LOG.append('FAILED\n' + traceback.format_exc())
+        raise
+    finally:
+        with open(os.path.join(ROOT, 'texts_log.txt'), 'w') as fh:
+            fh.write('\n'.join(LOG) + '\n')

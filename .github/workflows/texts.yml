@@ -43,7 +43,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add data/texts
+          git add data/texts data/texts_log.txt
           git diff --cached --quiet || git commit -m "Gather texts for stories"
           for i in 1 2 3 4 5; do
             git pull --rebase -X theirs origin main && git push && break
