@@ -54,6 +54,31 @@ def year(v):
     return None if neg or y <= 0 else y
 
 
+def match_known_path(text, names):
+    """
+    Find a Mount Auburn avenue or path in free text by its distinctive word:
+    "HOLLY PATH", "AZALEA 9943-6-1", "Birch Av. 6566-1". Where both an avenue
+    and a path appear ("SPRUCE AVE x HAREBELL PATH") the path is the lot's own.
+    """
+    t = ' ' + re.sub(r"[^a-z]+", " ", (text or '').lower()) + ' '
+    if re.search(r' chapel ', t) and re.search(r' colum| niche', t):
+        return None  # a columbarium niche, placed at its chapel instead
+    kind_written = re.search(r' (path|av|ave|avenue|road|way|walk) ', t) is not None
+    hits = []
+    for name in names:
+        words = name.lower().split()
+        base = ' '.join(words[:-1]) if len(words) > 1 else words[0]
+        if f' {base} ' in t:
+            kind_named = f' {base} {words[-1][:2]}' in t
+            if kind_written and not kind_named:
+                continue  # "Oak Knoll Path" is not "Oak Avenue"
+            hits.append((kind_named, name.endswith('Path'), len(base), name))
+    if not hits:
+        return None
+    # Prefer a name whose kind is written out, then paths, then longer names.
+    return max(hits)[3]
+
+
 def main():
     pages = get('https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item'
                 '&redirects=1&format=json&titles=Mount_Auburn_Cemetery')['query']['pages']
@@ -284,8 +309,8 @@ def main():
     print(fetched, 'images baked')
 
     # ---- Where graves are: lots and paths, Commons photo GPS ---------------
-    PATH_RE = re.compile(r"\b([A-Z][a-z]+(?:[- ][A-Z][a-z]+)?\s+(?:Path|Avenue|Ave\.?|Road|Way|Walk))\b")
-    LOT_RE = re.compile(r"\bLot\s*#?\s*(\d{1,5})\b", re.I)
+    PATH_RE = re.compile(r"\b([A-Z][a-z]+(?:[- ][A-Z][a-z]+)?\s+(?:Path|Avenue|Ave\.?|Av\.?|Road|Way|Walk))(?![a-z])")
+    LOT_RE = re.compile(r"\bLot\s*#?\s*(\d{1,5})\b|(?:,|\b)\s*(\d{3,5})\b", re.I)
 
     def pick_path(text):
         """The most specific way named: "Walnut Ave., Snowdrop Path" means Snowdrop Path."""
@@ -294,7 +319,7 @@ def main():
         return (paths or found or [None])[0]
 
     def norm_path(name):
-        name = re.sub(r"\bAve\.?$", "Avenue", name.strip())
+        name = re.sub(r"\bAve?\.?$", "Avenue", name.strip())
         return re.sub(r"\s+", " ", name).title()
 
     paths_geo = {}
@@ -438,6 +463,7 @@ def main():
                 pm = pick_path(desc)
                 if pm and not p.get('path'):
                     p['path'] = norm_path(pm)
+                    p['pathSource'] = 'Commons'
                 if lat is None or not (42.3672 < lat < 42.3762 and -71.1520 < lon < -71.1380):  # the cemetery itself, not nearby houses
                     continue
                 if p.get('coordSource') in (None, 'grave photo'):
@@ -463,6 +489,27 @@ def main():
                     paths_geo.setdefault(name, []).append(pts)
         except Exception as e:
             print('overpass paths failed', e, file=sys.stderr)
+        # Columbarium niches: at the chapel itself.
+        chapels = {'bigelow': (42.373725, -71.145516), 'biglow': (42.373725, -71.145516), 'story': (42.374885, -71.144489)}  # OpenStreetMap
+        for p in people.values():
+            pl = (p.get('plot') or '').lower()
+            if 'chapel' in pl and re.search(r'colum|niche', pl) and p.get('lat') is None:
+                for k, (la, lo) in chapels.items():
+                    if k in pl:
+                        p['lat'], p['lon'], p['coordSource'] = la, lo, 'chapel columbarium'
+                        break
+        # Plot references in any style, matched against the real path names.
+        for p in people.values():
+            if p.get('plot'):
+                m = match_known_path(p['plot'], list(paths_geo))
+                if m:
+                    p['path'], p['pathSource'] = m, 'Wikidata'
+        # A photo description naming "Fifth Avenue" is about a house, not a grave.
+        dropped = 0
+        for p in people.values():
+            if p.get('pathSource') == 'Commons' and p.get('path') not in paths_geo:
+                p.pop('path', None); p.pop('pathSource', None); dropped += 1
+        print('commons path names dropped as not Mount Auburn paths:', dropped)
         with_path = [p for p in people.values() if p.get('path')]
         print('osm named paths:', len(paths_geo), '| people with a path:', len(with_path),
               '| of those, path mapped:', sum(1 for p in with_path if p['path'] in paths_geo))
