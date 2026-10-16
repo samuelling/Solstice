@@ -572,6 +572,7 @@
       <div id="papers-wrap"><h3>In the newspapers</h3><div id="papers-slot"><p class="loading">Looking for newspaper pages…</p></div></div>
       <div id="grave-slot"></div>
       ${(person.monuments || []).length ? `<div class="monuments">${person.monuments.map(monumentLine).join('')}</div>` : ''}
+      ${(person.memorials || []).length ? `<p class="memorials">Also remembered elsewhere: ${person.memorials.map((m) => `<a href="https://www.wikidata.org/wiki/${esc(m.qid)}" target="_blank" rel="noopener">${esc(m.name)}</a>`).join(' · ')}</p>` : ''}
       <div id="guides-slot"></div>
       <div id="facts-slot"></div>
       <div id="period-slot"></div>

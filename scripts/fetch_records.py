@@ -607,8 +607,11 @@ def main():
                     r[field].append(v)
         got = moved = 0
         for (m, q), r in mons.items():
-            if q not in people or r['inside'] is False or re.fullmatch(r'Q\d+', r['name'] or 'Q0'):
-                print('  monument skipped:', m, r['name'], 'for', people.get(q, {}).get('label', q), 'at', r['lat'], r['lon'])
+            if q not in people or re.fullmatch(r'Q\d+', r['name'] or 'Q0'):
+                continue
+            if r['inside'] is False:
+                # A memorial elsewhere (a bust in Greece, a plaque in Edinburgh).
+                people[q].setdefault('memorials', []).append({'qid': m, 'name': r['name']})
                 continue
             p = people[q]
             p.setdefault('monuments', []).append({k: v for k, v in r.items() if v not in (None, [], '') and k != 'inside'})

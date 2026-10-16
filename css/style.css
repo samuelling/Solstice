@@ -460,3 +460,4 @@ figure.guide blockquote { margin: 0 0 6px; font-family: 'Source Serif 4', Georgi
 figure.guide figcaption { font-size: 0.85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .monuments { margin: 4px 0 14px; }
 .monument-line { margin: 0 0 6px; font-size: 0.95rem; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.memorials { margin: 4px 0 14px; font-size: 0.92rem; color: var(--muted); }

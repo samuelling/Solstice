@@ -68,7 +68,7 @@
         birth: p.birth ?? null, death: p.death ?? null,
         lat: p.lat ?? null, lon: p.lon ?? null, coordSource: p.coordSource || (p.lat != null ? 'Wikidata' : null),
         coordError: p.lat == null ? undefined : ({ OpenStreetMap: 8, 'Wikidata monument': 10, 'grave photo': 25 }[p.coordSource] || 15),
-        monuments: p.monuments || null,
+        monuments: p.monuments || null, memorials: p.memorials || null,
         article: p.article || null,
         path: p.path || null, lot: p.lot || null, plot: p.plot || null, pathSource: p.pathSource || null, roll1952: p.roll1952 || null,
         pathLines: p.path && d.paths && d.paths[p.path] ? d.paths[p.path] : null,
