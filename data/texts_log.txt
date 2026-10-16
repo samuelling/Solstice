@@ -1,0 +1,44 @@
+wikipedia articles: 0
+ERR retry 1: https://query.wikidata.org/sparql: The read operation timed out
+people with period entries: 0 of 193 linked
+ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
+snac : 548 linked, 0 biographies this run
+ERR retry 1: https://bioguide.congress.gov/search/bio/L000393.json: HTTP Error 403: Forbidden
+ERR retry 2: https://bioguide.congress.gov/search/bio/L000393.json: HTTP Error 403: Forbidden
+ERR congress failed for Q174037 L000393 HTTP Error 403: Forbidden
+ERR retry 1: https://bioguide.congress.gov/search/bio/M001012.json: HTTP Error 403: Forbidden
+ERR retry 2: https://bioguide.congress.gov/search/bio/M001012.json: HTTP Error 403: Forbidden
+ERR congress failed for Q216750 M001012 HTTP Error 403: Forbidden
+ERR retry 1: https://bioguide.congress.gov/search/bio/P000033.json: HTTP Error 403: Forbidden
+ERR retry 2: https://bioguide.congress.gov/search/bio/P000033.json: HTTP Error 403: Forbidden
+ERR congress failed for Q221926 P000033 HTTP Error 403: Forbidden
+ERR retry 1: https://bioguide.congress.gov/search/bio/L000130.json: HTTP Error 403: Forbidden
+ERR retry 2: https://bioguide.congress.gov/search/bio/L000130.json: HTTP Error 403: Forbidden
+ERR congress failed for Q306762 L000130 HTTP Error 403: Forbidden
+ERR retry 1: https://bioguide.congress.gov/search/bio/C000009.json: HTTP Error 403: Forbidden
+ERR retry 2: https://bioguide.congress.gov/search/bio/C000009.json: HTTP Error 403: Forbidden
+ERR congress failed for Q382723 C000009 HTTP Error 403: Forbidden
+ERR retry 1: https://bioguide.congress.gov/search/bio/E000264.json: HTTP Error 403: Forbidden
+ERR retry 2: https://bioguide.congress.gov/search/bio/E000264.json: HTTP Error 403: Forbidden
+ERR congress failed for Q434905 E000264 HTTP Error 403: Forbidden
+ERR congress giving up this run: the service is not answering as expected
+congress : 46 linked, 0 biographies this run
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+K.+Shaw%22&dates=1822%: HTTP Error 503: Service Unavailable
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+K.+Shaw%22&dates=1822%: HTTP Error 503: Service Unavailable
+ERR loc search failed Elizabeth K. Shaw HTTP Error 503: Service Unavailable
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+Lyman+Eliot%22&dates=1: HTTP Error 503: Service Unavailable
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Elizabeth+Lyman+Eliot%22&dates=1: HTTP Error 503: Service Unavailable
+newspapers checked: 10 951 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Emil+C.+Hammer%22&dates=1894%2F1: HTTP Error 500: Internal Server Error
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Emily+Crosby+Low%22&dates=1871%2: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Emily+P.+Locke%22&dates=1953%2F1: HTTP Error 500: Internal Server Error
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Enoch+Hale%22&dates=1848%2F1849&: The read operation timed out
+newspapers checked: 20 1571 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Fanny+A.+Longfellow%22&dates=186: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Fanny+A.+Longfellow%22&dates=186: The read operation timed out
+newspapers checked: 30 2149 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Florence+Sparks+Moore%22&dates=1: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Florence+Sparks+Moore%22&dates=1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Frances+Dunlap%22&dates=1885%2F1: The read operation timed out
+newspapers checked: 40 2907 s
+newspapers checked this run: 41 | still to check: 463
