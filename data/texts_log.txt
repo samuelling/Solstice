@@ -2,25 +2,17 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Harriet+Templeton+Lee%22&dates=1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Austin+Whitney%22&dates=18: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Austin+Whitney%22&dates=18: The read operation timed out
-newspapers checked: 10 701 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Bacon%22&dates=1856%2F1857: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Bacon%22&dates=1856%2F1857: The read operation timed out
-ERR loc search failed Henry Bacon The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+B.+McLellan%22&dates=1833%: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+B.+McLellan%22&dates=1833%: HTTP Error 503: Service Unavailable
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Bromfield+Rogers%22&dates=: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Bromfield+Rogers%22&dates=: The read operation timed out
-ERR loc search failed Henry Bromfield Rogers The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+Cabot%22&dates=1864%2F1865: The read operation timed out
-newspapers checked: 20 1722 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Henry+W.+Paine%22&dates=1893%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Hepzibah+Swan+Howard%22&dates=18: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Hepzibah+Swan+Howard%22&dates=18: The read operation timed out
-newspapers checked: 30 2606 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Hope+Savage+Shaw%22&dates=1879%2: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Hope+Savage+Shaw%22&dates=1879%2: The read operation timed out
-ERR loc search failed Hope Savage Shaw The read operation timed out
-newspapers checked this run: 34 | still to check: 340
+newspapers checked: 10 608 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Irene+L.+Gibson%22&dates=1956%2F: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Davis%22&dates=1855%2F1856: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Davis%22&dates=1855%2F1856: The read operation timed out
+ERR loc search failed Isaac Davis The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Pratt%22&dates=1899%2F1900: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Isaac+Pratt%22&dates=1899%2F1900: The read operation timed out
+ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: The read operation timed out
+newspapers checked: 20 1756 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22James+Alderson+Bailey%22&dates=1: The read operation timed out
+newspapers checked: 30 2496 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22James+Madison+Beebe%22&dates=187: The read operation timed out
+newspapers checked: 40 3020 s
+newspapers checked this run: 40 | still to check: 300
