@@ -445,6 +445,7 @@
     'Roll of Distinction (1952)': 'from Mount Auburn’s 1952 Roll of Distinction',
     'Lot catalogue (1857/1860)': 'from Mount Auburn’s lot catalogues of 1857–60',
     "Dearborn's Guide (1848–1857)": 'from Dearborn’s Guide through Mount Auburn, 1848–57',
+    'Wikidata monument': 'from their monument’s Wikidata entry',
     Wikipedia: 'from Wikipedia',
   };
 
@@ -570,6 +571,7 @@
       <div id="family-slot"></div>
       <div id="papers-wrap"><h3>In the newspapers</h3><div id="papers-slot"><p class="loading">Looking for newspaper pages…</p></div></div>
       <div id="grave-slot"></div>
+      ${(person.monuments || []).length ? `<div class="monuments">${person.monuments.map(monumentLine).join('')}</div>` : ''}
       <div id="guides-slot"></div>
       <div id="facts-slot"></div>
       <div id="period-slot"></div>
@@ -722,6 +724,11 @@
     </details>`;
   }
 
+
+  function monumentLine(m) {
+    const bits = [(m.materials || []).join(' and '), (m.creators || []).length ? `by ${m.creators.join(' and ')}` : '', m.year || ''].filter(Boolean);
+    return `<p class="monument-line"><span class="tag record">Monument</span><a href="https://www.wikidata.org/wiki/${esc(m.qid)}" target="_blank" rel="noopener">${esc(m.name)}</a>${bits.length ? ` <span class="muted">${esc(bits.join(', '))}</span>` : ''}</p>`;
+  }
 
   function renderGuides(passages) {
     $('#guides-slot').innerHTML = `<h3>In the old guidebooks</h3>

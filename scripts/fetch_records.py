@@ -573,6 +573,52 @@ def main():
             continue
         lon, lat = c[6:-1].split()
         landmarks.append({'name': name, 'lat': round(float(lat), 6), 'lon': round(float(lon), 6)})
+    # Monuments on Wikidata that commemorate (P547) or depict (P180) someone
+    # buried here and stand in the cemetery: the Bowditch statue, the Sphinx.
+    # They carry sculptor, material and date, and often exact coordinates.
+    try:
+        mrows = sparql(f'''
+          SELECT ?m ?mLabel ?p ?coord ?inception ?creatorLabel ?materialLabel ?instLabel WHERE {{
+            ?p wdt:P119 wd:{qid} .
+            {{ ?m wdt:P547 ?p }} UNION {{ ?m wdt:P180 ?p . ?m wdt:P31/wdt:P279* wd:Q4989906 }}
+            {{ ?m wdt:P276 wd:{qid} }} UNION {{ ?m wdt:P361 wd:{qid} }} UNION {{ ?m wdt:P131 wd:{qid} }} UNION {{ ?m wdt:P625 ?c0 }}
+            OPTIONAL {{ ?m wdt:P625 ?coord }}
+            OPTIONAL {{ ?m wdt:P571 ?inception }}
+            OPTIONAL {{ ?m wdt:P170 ?creator }}
+            OPTIONAL {{ ?m wdt:P186 ?material }}
+            OPTIONAL {{ ?m wdt:P31 ?inst }}
+            SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en,mul". }}
+          }}''')
+        inside = lambda la, lo: 42.3672 <= la <= 42.3762 and -71.1520 <= lo <= -71.1380
+        mons = {}
+        for b in mrows:
+            m = b['m']['value'].rsplit('/', 1)[-1]
+            q = b['p']['value'].rsplit('/', 1)[-1]
+            r = mons.setdefault((m, q), {'qid': m, 'name': b.get('mLabel', {}).get('value', ''), 'creators': [], 'materials': [],
+                                         'kind': [], 'year': None, 'lat': None, 'lon': None, 'inside': None})
+            c = b.get('coord', {}).get('value', '')
+            if c.startswith('Point('):
+                lo, la = map(float, c[6:-1].split())
+                r['lat'], r['lon'], r['inside'] = round(la, 6), round(lo, 6), inside(la, lo)
+            r['year'] = r['year'] or year(b.get('inception', {}).get('value'))
+            for key, field in (('creatorLabel', 'creators'), ('materialLabel', 'materials'), ('instLabel', 'kind')):
+                v = b.get(key, {}).get('value')
+                if v and not re.fullmatch(r'Q\d+', v) and v not in r[field]:
+                    r[field].append(v)
+        got = moved = 0
+        for (m, q), r in mons.items():
+            if q not in people or r['inside'] is False or re.fullmatch(r'Q\d+', r['name'] or 'Q0'):
+                continue
+            p = people[q]
+            p.setdefault('monuments', []).append({k: v for k, v in r.items() if v not in (None, [], '') and k != 'inside'})
+            got += 1
+            if r['inside'] and p.get('coordSource') in (None, 'grave photo'):
+                p['lat'], p['lon'], p['coordSource'] = r['lat'], r['lon'], 'Wikidata monument'
+                moved += 1
+        print('monuments on Wikidata:', got, 'for', len({q for (m, q) in mons if q in people}), 'people;', moved, 'graves placed')
+    except Exception:
+        LOG.append('FAILED: monuments\n' + traceback.format_exc())
+
     # OpenStreetMap: volunteers map graves and monuments, often tagged with
     # who is buried there; plus named features to stand near.
     osm_q = '''[out:json][timeout:180];
