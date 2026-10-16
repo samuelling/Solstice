@@ -132,6 +132,7 @@ def main():
     multi('P551', 'residences')
     multi('P509', 'causeOfDeath')
     multi('P1196', 'mannerOfDeath')
+    multi('P373', 'commonsCategory')
 
     # Family links with Wikidata IDs, so the app can tell which relatives
     # are also buried here. Each: {rel, qid, name}.
@@ -359,8 +360,15 @@ def main():
         def commons(params):
             return get('https://commons.wikimedia.org/w/api.php?' + urllib.parse.urlencode({**params, 'format': 'json'}))
 
+        cat_person = {}
+        for p in people.values():
+            for c in p.get('commonsCategory', [])[:1]:
+                cat_person['Category:' + c.replace('_', ' ')] = p
         seen_cats, queue, files = set(), [('Category:Mount Auburn Cemetery', 0)], set()
-        while queue and len(seen_cats) < 1500:
+        # Each person's own category, and its grave/tomb subcategories.
+        for c in cat_person:
+            queue.append((c, 2))
+        while queue and len(seen_cats) < 4000:
             cat, depth = queue.pop(0)
             if cat in seen_cats:
                 continue
@@ -377,6 +385,10 @@ def main():
                     t = m['title']
                     if t.startswith('Category:') and depth < 3:
                         queue.append((t, depth + 1))
+                    elif t.startswith('Category:') and re.search(r'grave|tomb|burial|monument|memorial|mount auburn', t, re.I) and depth < 4:
+                        queue.append((t, depth + 1))
+                        if cat in cat_person:
+                            cat_person.setdefault(t, cat_person[cat])
                     elif t.startswith('File:'):
                         files.add((t, cat))
                 if 'continue' not in d:
@@ -420,7 +432,7 @@ def main():
                         pass
                 desc = re.sub(r'<[^>]+>', ' ', meta.get('ImageDescription', {}).get('value', ''))
                 text = ' '.join([title[5:].rsplit('.', 1)[0], cat_of.get(title, '')[9:], desc])
-                p = person_in(text)
+                p = cat_person.get(cat_of.get(title, '')) or person_in(text)
                 if not p:
                     continue
                 pm = pick_path(desc)

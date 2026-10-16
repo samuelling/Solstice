@@ -875,7 +875,7 @@
           <span class="np-name">${esc(p.label)}</span>
           <span class="np-meta">${esc([p.birth || '?', p.death || '?'].join('–'))}${cleanDesc(p.description) ? ` · ${esc(cleanDesc(p.description))}` : ''}</span>
         </span>
-        <span class="np-dist">${path ? `<span class="np-path">on ${esc(path)}</span>` : ''}${fmtDist(d)}</span>
+        <span class="np-dist">${path ? `<span class="np-path">on ${esc(path)}</span>` : ''}${d < (path ? 12 : 6) ? 'here' : fmtDist(d)}</span>
       </button></li>`).join('');
     for (const btn of list.querySelectorAll('.near-person')) {
       btn.addEventListener('click', () => {
