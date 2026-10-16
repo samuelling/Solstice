@@ -1,0 +1,17 @@
+Mount Auburn is Q1950363
+1412 people
+942 images baked
+burial plot references: 39
+paths from Wikipedia text: 5
+commons: 400 categories, 11306 files
+FAILED: 3. Wikimedia Commons photos
+Traceback (most recent call last):
+  File "/home/runner/work/Solstice/Solstice/scripts/fetch_records.py", line 413, in main
+    lat = float(meta.get('GPSLatitude', {}).get('value'))
+                ^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+
+osm named paths: 144 | people with a path: 24 | of those, path mapped: 19
+OpenStreetMap: 13 features, 0 graves placed
+11 landmarks
+wrote 1412 people, 37 with coordinates, 723 with summaries
