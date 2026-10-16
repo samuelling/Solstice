@@ -14,15 +14,20 @@ OUT = os.path.join(os.path.dirname(__file__), '..', 'data', 'sources', 'ia')
 KEEP = re.compile(r'catalogue|guide|hand-?book|pocket|annual report|proprietors|illustrated|sweet auburn|scenes', re.I)
 
 
+PRIORITY = re.compile(r'catalogue|proprietor', re.I)
+BUDGET = float(os.environ.get('IA_BUDGET_SECONDS', 1500))
+T0 = time.time()
+
+
 def get(url, raw=False):
-    for i in range(4):
+    for i in range(2):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': UA})
-            with urllib.request.urlopen(req, timeout=120) as r:
+            with urllib.request.urlopen(req, timeout=60) as r:
                 body = r.read()
             return body.decode('utf-8', 'replace') if raw else json.loads(body)
         except Exception as e:
-            if i == 3:
+            if i == 1:
                 raise
             print('retry', url[:80], e, file=sys.stderr)
             time.sleep(5 * (i + 1))
@@ -34,7 +39,12 @@ def main():
                                 'rows': 400, 'output': 'json'}, doseq=True)
     docs = get('https://archive.org/advancedsearch.php?' + q)['response']['docs']
     index = []
+    # Lot catalogues first: they place graves. Then guides and reports.
+    docs.sort(key=lambda d: (0 if PRIORITY.search(d.get('title', '')) else 1, d['identifier']))
     for d in docs:
+        if time.time() - T0 > BUDGET:
+            print('time budget reached; the next run continues', file=sys.stderr)
+            break
         ident, title = d['identifier'], d.get('title', '')
         if not KEEP.search(title) or ident.startswith('gov.uscourts'):
             continue
