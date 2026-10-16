@@ -449,3 +449,6 @@ li.tl-end .tl-text { font-family: var(--body); font-weight: 600; padding-top: 2p
 .nm-acc { fill: color-mix(in srgb, var(--focus) 12%, transparent); }
 .nm-you { fill: var(--focus); stroke: var(--surface); }
 .nm-scale { fill: var(--muted); font-family: var(--body); }
+.lot-src { font-size: 0.8rem; }
+.roll-line { margin: 0 0 8px; font-size: 0.88rem; color: var(--muted); font-family: 'Source Serif 4', Georgia, serif; font-style: italic; }
+.nearby-list li.flash { animation: flash 2s ease-out; }

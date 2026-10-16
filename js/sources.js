@@ -69,7 +69,7 @@
         lat: p.lat ?? null, lon: p.lon ?? null, coordSource: p.coordSource || (p.lat != null ? 'Wikidata' : null),
         coordError: p.lat == null ? undefined : ({ OpenStreetMap: 8, 'grave photo': 25 }[p.coordSource] || 15),
         article: p.article || null,
-        path: p.path || null, lot: p.lot || null, plot: p.plot || null,
+        path: p.path || null, lot: p.lot || null, plot: p.plot || null, pathSource: p.pathSource || null, roll1952: p.roll1952 || null,
         pathLines: p.path && d.paths && d.paths[p.path] ? d.paths[p.path] : null,
         given: C.normName(p.given || C.splitName(p.label).given),
         family: C.normName(p.family || C.splitName(p.label).family),

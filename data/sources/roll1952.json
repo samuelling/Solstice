@@ -1,0 +1,2125 @@
+{
+ "Q505990": {
+  "roll_name": "Ezra Abbot",
+  "lot": "3705",
+  "way": "Fuchsia Path",
+  "born_in": "Maine",
+  "occupation": "Biblical scholar.",
+  "years": [
+   "1819",
+   "1884"
+  ]
+ },
+ "Q3057348": {
+  "roll_name": "Henry Larcom Abbot",
+  "lot": "3705",
+  "way": "Fuchsia Path",
+  "born_in": "Mass.",
+  "occupation": "Military engineer, soldier.",
+  "years": [
+   "1831",
+   "1927"
+  ]
+ },
+ "Q951122": {
+  "roll_name": "Jacob Abbott",
+  "lot": "921",
+  "way": "Fir Avenue",
+  "born_in": "Maine",
+  "occupation": "Congregational clergyman, educator, author.",
+  "years": [
+   "1803",
+   "1679"
+  ]
+ },
+ "Q515868": {
+  "roll_name": "Hannah Adams",
+  "lot": "180",
+  "way": "Central Avenue",
+  "born_in": "Mass.",
+  "occupation": "Author.",
+  "years": [
+   "1755",
+   "1831"
+  ]
+ },
+ "Q8004147": {
+  "roll_name": "William Adams",
+  "lot": "1792",
+  "way": "Fir Avenue",
+  "born_in": "Conn.",
+  "occupation": "Presbyterian clergyman, president of Union Theolog-",
+  "years": [
+   "1807",
+   "1880"
+  ]
+ },
+ "Q272750": {
+  "roll_name": "Elizabeth Cabot Cary Agassiz",
+  "lot": null,
+  "way": "Bellwort Path",
+  "born_in": "Mass.",
+  "occupation": "President of Radcliffe College, writer.",
+  "years": [
+   "1822",
+   "1907"
+  ]
+ },
+ "Q5536099": {
+  "roll_name": "George L. Aiken",
+  "lot": null,
+  "way": "Spruce Avenue",
+  "born_in": "Mass.",
+  "occupation": "Actor, playwright.",
+  "years": [
+   "1830",
+   "1876"
+  ]
+ },
+ "Q922191": {
+  "roll_name": "Thomas Bailey Aldrich",
+  "lot": "6109",
+  "way": "Grapevine Path",
+  "born_in": "N.H.",
+  "occupation": "Poet, author, editor, essayist.",
+  "years": [
+   "1836",
+   "1907"
+  ]
+ },
+ "Q5201062": {
+  "roll_name": "Cyrus Alger",
+  "lot": "2123",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Ironmaster, metallurgist, inventor.",
+  "years": [
+   "1781",
+   "1856"
+  ]
+ },
+ "Q15940742": {
+  "roll_name": "William Rounseville Alger",
+  "lot": "57",
+  "way": "Walnut Avenue",
+  "born_in": "Mass.",
+  "occupation": "Unitarian clergyman, author, lecturer.",
+  "years": [
+   "1822",
+   "1905"
+  ]
+ },
+ "Q3101719": {
+  "roll_name": "George Leonard Andrews",
+  "lot": null,
+  "way": "Fir Avenue",
+  "born_in": "Mass.",
+  "occupation": "Soldier, professor of modern languages.",
+  "years": [
+   "1828",
+   "1899"
+  ]
+ },
+ "Q5545204": {
+  "roll_name": "George Thorndike Angell",
+  "lot": null,
+  "way": "Poplar Avenue",
+  "born_in": "Mass.",
+  "occupation": "Reformer, humanitarian.",
+  "years": [
+   "1823",
+   "1909"
+  ]
+ },
+ "Q7790099": {
+  "roll_name": "Thomas Gold Appleton",
+  "lot": "197",
+  "way": "Alder Path",
+  "born_in": "Mass.",
+  "occupation": "Essayist, artist, poet.",
+  "years": [
+   "1812",
+   "1884"
+  ]
+ },
+ "Q6152255": {
+  "roll_name": "Jane Goodwin Austin",
+  "lot": "237",
+  "way": "Mountain Avenue",
+  "born_in": "Mass.",
+  "occupation": "Author.",
+  "years": [
+   "1831",
+   "1894"
+  ]
+ },
+ "Q5907257": {
+  "roll_name": "Hosea Ballou",
+  "lot": "103",
+  "way": "Central Avenue",
+  "born_in": "N.H.",
+  "occupation": "Universalist clergyman, religious writer & editor.",
+  "years": [
+   "1771",
+   "1852"
+  ]
+ },
+ "Q3397832": {
+  "roll_name": "John Bartlett",
+  "lot": "1108",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Editor, publisher.",
+  "years": [
+   "1820",
+   "1905"
+  ]
+ },
+ "Q111025423": {
+  "roll_name": "George Batchelor",
+  "lot": null,
+  "way": null,
+  "born_in": "Conn.",
+  "occupation": "Unitarian clergyman, religious editor.",
+  "years": [
+   "1836",
+   "1923"
+  ]
+ },
+ "Q62002154": {
+  "roll_name": "Barnabas Bates",
+  "lot": null,
+  "way": "Pyrola Path",
+  "born_in": "England",
+  "occupation": "Unitarian clergyman, pioneer in postal reform..",
+  "years": [
+   "1785",
+   "1853"
+  ]
+ },
+ "Q6705647": {
+  "roll_name": "Luther Vose Bell",
+  "lot": null,
+  "way": null,
+  "born_in": "N.H.",
+  "occupation": "Physician, politician, writer.",
+  "years": [
+   "1806",
+   "1862"
+  ]
+ },
+ "Q433304": {
+  "roll_name": "Henry Jacob Bigelow",
+  "lot": "116",
+  "way": "Beech Avenue",
+  "born_in": "Mass.",
+  "occupation": "Surgeon, professor of surgery.",
+  "years": [
+   "1818",
+   "1890"
+  ]
+ },
+ "Q1236142": {
+  "roll_name": "Jacob Bigelow",
+  "lot": "116",
+  "way": "Beech Avenue",
+  "born_in": "Mass.",
+  "occupation": "Botanist, physician, professor of materia media.",
+  "years": [
+   "1787",
+   "1879"
+  ]
+ },
+ "Q7787689": {
+  "roll_name": "Thomas Blanchard",
+  "lot": "1568",
+  "way": "Spruce Avenue",
+  "born_in": "Mass.",
+  "occupation": "Inventor.",
+  "years": [
+   "1788",
+   "1864"
+  ]
+ },
+ "Q314565": {
+  "roll_name": "William Cranch Bond",
+  "lot": null,
+  "way": "Geranium Path",
+  "born_in": "Maine",
+  "occupation": "Astronomer.",
+  "years": [
+   "1789",
+   "1859"
+  ]
+ },
+ "Q798506": {
+  "roll_name": "Edwin (Thomas) Booth",
+  "lot": "3281",
+  "way": "Anemone Path",
+  "born_in": "Md.",
+  "occupation": "Actor.",
+  "years": [
+   "1833",
+   "1893"
+  ]
+ },
+ "Q5723585": {
+  "roll_name": "Henry Ingersoll Bowditch",
+  "lot": "1206",
+  "way": "Tulip Path",
+  "born_in": "Mass.",
+  "occupation": "Physician, professor of clinical medicine, public",
+  "years": [
+   "1808",
+   "1892"
+  ]
+ },
+ "Q7965515": {
+  "roll_name": "Walter M. Brackett",
+  "lot": "1200",
+  "way": "Fir Avenue",
+  "born_in": "Maine",
+  "occupation": "Painter;",
+  "years": [
+   "1823",
+   "1919"
+  ]
+ },
+ "Q4713532": {
+  "roll_name": "Alden Bradford",
+  "lot": null,
+  "way": "Walnut Avenue",
+  "born_in": "Mass.",
+  "occupation": "Congregational clergyman, historical writer.",
+  "years": [
+   "1765",
+   "1843"
+  ]
+ },
+ "Q2119625": {
+  "roll_name": "William Brewster",
+  "lot": "1099",
+  "way": "Larch Avenue",
+  "born_in": "Mass.",
+  "occupation": "Ornithologist.",
+  "years": [
+   "1851",
+   "1919"
+  ]
+ },
+ "Q974734": {
+  "roll_name": "Phillips Brooks",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1835",
+   "1893"
+  ]
+ },
+ "Q6130342": {
+  "roll_name": "James Brown",
+  "lot": "1126",
+  "way": "Chapel Avenue",
+  "born_in": "Mass.",
+  "occupation": "Publisher, bookseller.",
+  "years": [
+   "1800",
+   "1855"
+  ]
+ },
+ "Q1063849": {
+  "roll_name": "Charles Bulfinch",
+  "lot": "2308",
+  "way": "Bellwort Path",
+  "born_in": "Mass.",
+  "occupation": "Architect, public official.",
+  "years": [
+   "1763",
+   "1841"
+  ]
+ },
+ "Q569962": {
+  "roll_name": "Anson Burlingame",
+  "lot": null,
+  "way": null,
+  "born_in": "181*8-1922",
+  "occupation": "",
+  "years": [
+   "1820",
+   "1870"
+  ]
+ },
+ "Q16977044": {
+  "roll_name": "Walter Lincoln Burrage",
+  "lot": null,
+  "way": null,
+  "born_in": "181*9-1935",
+  "occupation": "",
+  "years": [
+   "1860",
+   "1935"
+  ]
+ },
+ "Q382723": {
+  "roll_name": "George Cabot",
+  "lot": null,
+  "way": null,
+  "born_in": "",
+  "occupation": "",
+  "years": [
+   "1752",
+   "1823"
+  ]
+ },
+ "Q988129": {
+  "roll_name": "Mary Whiton Calkins",
+  "lot": null,
+  "way": null,
+  "born_in": "",
+  "occupation": "",
+  "years": [
+   "1863",
+   "1930"
+  ]
+ },
+ "Q5366576": {
+  "roll_name": "Elmer Hewitt Capen",
+  "lot": null,
+  "way": null,
+  "born_in": "",
+  "occupation": "",
+  "years": [
+   "1838",
+   "1905"
+  ]
+ },
+ "Q16031169": {
+  "roll_name": "James Coolidge Carter",
+  "lot": null,
+  "way": null,
+  "born_in": "",
+  "occupation": "",
+  "years": [
+   "1827",
+   "1905"
+  ]
+ },
+ "Q1352783": {
+  "roll_name": "William Ellery Channing",
+  "lot": null,
+  "way": null,
+  "born_in": "",
+  "occupation": "",
+  "years": [
+   "1780",
+   "1842"
+  ]
+ },
+ "Q6272039": {
+  "roll_name": "Jonas Chickering",
+  "lot": "2282",
+  "way": "Magnolia Avenue",
+  "born_in": "N.H.",
+  "occupation": "Manufacturer.",
+  "years": [
+   "1798",
+   "1353"
+  ]
+ },
+ "Q2174770": {
+  "roll_name": "Rufus Choate",
+  "lot": "3050",
+  "way": "Walnut Avenue",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, orator. Congressman, U.S. Senator.",
+  "years": [
+   "1799",
+   "1859"
+  ]
+ },
+ "Q5076100": {
+  "roll_name": "Charles Carleton Coffin",
+  "lot": "5981",
+  "way": "Gentian Path",
+  "born_in": "N.H.",
+  "occupation": "War correspondent, journalist, author, lecturer.",
+  "years": [
+   "1823",
+   "1896"
+  ]
+ },
+ "Q904911": {
+  "roll_name": "Josiah Parsons Cooke",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Chemist, mineralogist.",
+  "years": [
+   "1827",
+   "1894"
+  ]
+ },
+ "Q4786267": {
+  "roll_name": "Archibald Cary Coolidge",
+  "lot": "938",
+  "way": "Heliotrope Path",
+  "born_in": "Mass.",
+  "occupation": "Historian, librarian, editor.",
+  "years": [
+   "1866",
+   "1928"
+  ]
+ },
+ "Q106814360": {
+  "roll_name": "Charles Allerton Coolidge",
+  "lot": "7218",
+  "way": "Bradlee Road",
+  "born_in": "Mass.",
+  "occupation": "Architect.",
+  "years": [
+   "1858",
+   "1936"
+  ]
+ },
+ "Q5113040": {
+  "roll_name": "Christopher Pearse Cranch",
+  "lot": "5116",
+  "way": null,
+  "born_in": "Virginia",
+  "occupation": "Unitarian clergyman, poet, painter.",
+  "years": [
+   "1813",
+   "1892"
+  ]
+ },
+ "Q817746": {
+  "roll_name": "Benjamin Williams Crowninshield",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1772",
+   "1851"
+  ]
+ },
+ "Q5075111": {
+  "roll_name": "Charles Amos Cummings",
+  "lot": null,
+  "way": "Thistle Path",
+  "born_in": "Mass.",
+  "occupation": "Architect, writer.",
+  "years": [
+   "1833",
+   "1905"
+  ]
+ },
+ "Q6252572": {
+  "roll_name": "John Perkins Cushing",
+  "lot": "385",
+  "way": "Narcissus Path",
+  "born_in": "Mass.",
+  "occupation": "Merchant, philanthropist.",
+  "years": [
+   "1787",
+   "1862"
+  ]
+ },
+ "Q448890": {
+  "roll_name": "Charlotte Saunders Cushman",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Actress.",
+  "years": [
+   "1816",
+   "1876"
+  ]
+ },
+ "Q7326394": {
+  "roll_name": "Richard Henry Dana",
+  "lot": null,
+  "way": "Jonquil Path",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, legal writer, reformer.",
+  "years": [
+   "1851",
+   "1931"
+  ]
+ },
+ "Q52149878": {
+  "roll_name": "Andrew McFarland Davis",
+  "lot": "6117",
+  "way": "Orient Path",
+  "born_in": "Mass.",
+  "occupation": "Antiquarian.",
+  "years": [
+   "1833",
+   "1920"
+  ]
+ },
+ "Q52482529": {
+  "roll_name": "Charles Deane",
+  "lot": "5892",
+  "way": "Beryl Path",
+  "born_in": "Maine",
+  "occupation": "Merchant, antiquarian.",
+  "years": [
+   "1813",
+   "1889"
+  ]
+ },
+ "Q94533341": {
+  "roll_name": "Elias Hasket Derby",
+  "lot": null,
+  "way": "Poplar Avenue",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, railroad executive, writer.",
+  "years": [
+   "1803",
+   "1880"
+  ]
+ },
+ "Q1378807": {
+  "roll_name": "Thomas Wilmer Dewing",
+  "lot": "5696",
+  "way": "Vinca Path",
+  "born_in": "Mass.",
+  "occupation": "Painter.",
+  "years": [
+   "1851",
+   "1938"
+  ]
+ },
+ "Q452469": {
+  "roll_name": "Dorothea Lynde Dix",
+  "lot": null,
+  "way": "Spruce Avenue",
+  "born_in": "Maine",
+  "occupation": "Humanitarian, reformer, writer, teacher.",
+  "years": [
+   "1802",
+   "1887"
+  ]
+ },
+ "Q55726137": {
+  "roll_name": "Thomas Dowse",
+  "lot": "1809",
+  "way": "Gentian Path",
+  "born_in": "Mass.",
+  "occupation": "Bibliophile.",
+  "years": [
+   "1772",
+   "1856"
+  ]
+ },
+ "Q5721497": {
+  "roll_name": "Henry Fowle Durant",
+  "lot": null,
+  "way": "Osier Path",
+  "born_in": "N.H.",
+  "occupation": "Lawyer, evangelist, founder of Wellesley College,",
+  "years": [
+   "1822",
+   "1881"
+  ]
+ },
+ "Q235069": {
+  "roll_name": "Mary (Morse) Baker Eddy",
+  "lot": null,
+  "way": "Halcyon Avenue",
+  "born_in": "N.H.",
+  "occupation": "Founder of Christian Science Church, religious",
+  "years": [
+   "1821",
+   "1910"
+  ]
+ },
+ "Q5382264": {
+  "roll_name": "Ephraim Emerton",
+  "lot": null,
+  "way": "Jonquil Path",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, legal writer, reformer.",
+  "years": [
+   "1851",
+   "1931"
+  ]
+ },
+ "Q5362211": {
+  "roll_name": "Eliza Ware Rotch Farrar",
+  "lot": "2267",
+  "way": "Hibiscus Path",
+  "born_in": "Belgium",
+  "occupation": "Author.",
+  "years": [
+   "1791",
+   "1870"
+  ]
+ },
+ "Q1133760": {
+  "roll_name": "Cornelius Conway Felton",
+  "lot": null,
+  "way": "Bellwort Path",
+  "born_in": "Mass.",
+  "occupation": "Greek scholar, president of Harvard University.",
+  "years": [
+   "1807",
+   "1862"
+  ]
+ },
+ "Q2656885": {
+  "roll_name": "Merritt Lyndon Fernald",
+  "lot": "6736",
+  "way": null,
+  "born_in": "Maine",
+  "occupation": "Botanist, curator.",
+  "years": [
+   "1873",
+   "1950"
+  ]
+ },
+ "Q4483821": {
+  "roll_name": "James Thomas Fields",
+  "lot": "2700",
+  "way": "Elder Path",
+  "born_in": "N.H.",
+  "occupation": "Publisher, author, editor, lecturer.",
+  "years": [
+   "1817",
+   "1881"
+  ]
+ },
+ "Q679414": {
+  "roll_name": "Richard Fletcher",
+  "lot": null,
+  "way": null,
+  "born_in": "Vermont",
+  "occupation": "",
+  "years": [
+   "1788",
+   "1869"
+  ]
+ },
+ "Q5362163": {
+  "roll_name": "Eliza Lee Cabot Follen",
+  "lot": "526",
+  "way": "Rose Path",
+  "born_in": "Mass.",
+  "occupation": "Author, abolitionist.",
+  "years": [
+   "1787",
+   "1860"
+  ]
+ },
+ "Q709384": {
+  "roll_name": "Arthur Foote",
+  "lot": "6201",
+  "way": "Aspen Path",
+  "born_in": "Mass.",
+  "occupation": "Composer, organist, teacher.",
+  "years": [
+   "1853",
+   "1937"
+  ]
+ },
+ "Q113954390": {
+  "roll_name": "Charles Kemble Fox",
+  "lot": "1358",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Actor.",
+  "years": [
+   "1833",
+   "1875"
+  ]
+ },
+ "Q5541452": {
+  "roll_name": "George Washington Lafayette Fox",
+  "lot": "1358",
+  "way": "Ailanthus Path",
+  "born_in": "Mass.",
+  "occupation": "Actor, theatrical manager.",
+  "years": [
+   "1825",
+   "1877"
+  ]
+ },
+ "Q7076829": {
+  "roll_name": "Octavius Brooks Frothingham",
+  "lot": "665",
+  "way": "Greenbrier Path",
+  "born_in": "Mass.",
+  "occupation": "Unitarian and independent clergyman, author.",
+  "years": [
+   "1822",
+   "1895"
+  ]
+ },
+ "Q151165": {
+  "roll_name": "Charles Dana Gibson",
+  "lot": "3629",
+  "way": "Halcyon Avenue",
+  "born_in": "Mass.",
+  "occupation": "Artist, illustrator.",
+  "years": [
+   "1867",
+   "1941"
+  ]
+ },
+ "Q16037689": {
+  "roll_name": "Arthur Gilman",
+  "lot": "5893",
+  "way": "Beryl Path",
+  "born_in": "Illinois",
+  "occupation": "Educational promoter, editor, historical writer.",
+  "years": [
+   "1837",
+   "1909"
+  ]
+ },
+ "Q1497113": {
+  "roll_name": "Joseph Albree Gilmore",
+  "lot": null,
+  "way": "Asphodel Path",
+  "born_in": "Vermont",
+  "occupation": "Governor of New Hampshire, railroad executive.",
+  "years": [
+   "1811",
+   "1867"
+  ]
+ },
+ "Q663550": {
+  "roll_name": "Frank Austin Gooch",
+  "lot": "2815",
+  "way": "Oak Avenue",
+  "born_in": "Mass.",
+  "occupation": "Chemist.",
+  "years": [
+   "1852",
+   "1929"
+  ]
+ },
+ "Q770126": {
+  "roll_name": "Augustus Addison Gould",
+  "lot": null,
+  "way": "Fir Avenue",
+  "born_in": "N.H.",
+  "occupation": "Conchologist, zoologist, physician.",
+  "years": [
+   "1805",
+   "1866"
+  ]
+ },
+ "Q1064713": {
+  "roll_name": "Charles Hall Grandgent",
+  "lot": "5057",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Romance scholar, essayist.",
+  "years": [
+   "1862",
+   "1939"
+  ]
+ },
+ "Q347356": {
+  "roll_name": "Asa Gray",
+  "lot": null,
+  "way": "Holly Path",
+  "born_in": "N.T.",
+  "occupation": "Botanist.",
+  "years": [
+   "1810",
+   "1888"
+  ]
+ },
+ "Q5478625": {
+  "roll_name": "Francis Calley Gray",
+  "lot": "1087",
+  "way": "Hemlock Path",
+  "born_in": "Mass.",
+  "occupation": "Philanthropist, legislator.",
+  "years": [
+   "1790",
+   "1856"
+  ]
+ },
+ "Q6969640": {
+  "roll_name": "Nathaniel Greene",
+  "lot": "1256",
+  "way": "Geranium Path",
+  "born_in": "N.H.",
+  "occupation": "Journalist, postmaster, translator.",
+  "years": [
+   "1797",
+   "1877"
+  ]
+ },
+ "Q7518882": {
+  "roll_name": "Simon Greenleaf",
+  "lot": "509",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Lawyer, professor of law.",
+  "years": [
+   "1783",
+   "1653"
+  ]
+ },
+ "Q22002639": {
+  "roll_name": "Henry Greenough",
+  "lot": "2525",
+  "way": "Mistletoe Path",
+  "born_in": "Mass.",
+  "occupation": "Architect, painter.",
+  "years": [
+   "1807",
+   "1883"
+  ]
+ },
+ "Q978253": {
+  "roll_name": "Horatio Greenough",
+  "lot": "97",
+  "way": "Cedar Avenue",
+  "born_in": "Mass.",
+  "occupation": "Sculptor.",
+  "years": [
+   "1805",
+   "1852"
+  ]
+ },
+ "Q707340": {
+  "roll_name": "Henry Kimball Hadley",
+  "lot": "8055",
+  "way": "Indian  Ridge Path",
+  "born_in": "Mass.",
+  "occupation": "Composer, conductor, teacher of music.",
+  "years": [
+   "1871",
+   "1937"
+  ]
+ },
+ "Q5078694": {
+  "roll_name": "Charles Hale",
+  "lot": "1613",
+  "way": "Magnolia Avenue",
+  "born_in": "Mass.",
+  "occupation": "Journalist, consul, public official.",
+  "years": [
+   "1831",
+   "1882"
+  ]
+ },
+ "Q94511947": {
+  "roll_name": "Enoch Hale",
+  "lot": null,
+  "way": "Dell Path",
+  "born_in": "Mass.",
+  "occupation": "Physician, teacher of medicine.",
+  "years": [
+   "1790",
+   "1848"
+  ]
+ },
+ "Q6698108": {
+  "roll_name": "Lucretia Peabody Hale",
+  "lot": "1613",
+  "way": "Magnolia Avenue",
+  "born_in": "Mass.",
+  "occupation": "Author.",
+  "years": [
+   "1820",
+   "1900"
+  ]
+ },
+ "Q4888540": {
+  "roll_name": "Benjamin Franklin Hallett",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Journalist, politician.",
+  "years": [
+   "1797",
+   "1862"
+  ]
+ },
+ "Q97156592": {
+  "roll_name": "Charles Harrington",
+  "lot": null,
+  "way": "Amethyst Path",
+  "born_in": "Mass.",
+  "occupation": "Public health administrator, professor of hygiene.",
+  "years": [
+   "1856",
+   "1908"
+  ]
+ },
+ "Q7167383": {
+  "roll_name": "Percy Duncan Haughton",
+  "lot": null,
+  "way": "Cypress Avenue",
+  "born_in": "N.T.",
+  "occupation": "Football coach.",
+  "years": [
+   "1876",
+   "1924"
+  ]
+ },
+ "Q5078859": {
+  "roll_name": "Charles Hayden",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Banker, philanthropist.",
+  "years": [
+   "1870",
+   "1937"
+  ]
+ },
+ "Q5497046": {
+  "roll_name": "Frederic Henry Hedge",
+  "lot": "966",
+  "way": "Oleander Path",
+  "born_in": "Mass.",
+  "occupation": "Unitarian clergyman, transcendentalist, professor",
+  "years": [
+   "1805",
+   "1890"
+  ]
+ },
+ "Q6535430": {
+  "roll_name": "Levi Hedge",
+  "lot": "966",
+  "way": "Oleander Path",
+  "born_in": "Mass.",
+  "occupation": "Philosopher.",
+  "years": [
+   "1766",
+   "1841"
+  ]
+ },
+ "Q705550": {
+  "roll_name": "Lawrence Joseph Henderson",
+  "lot": "7583",
+  "way": "Mound Avenue",
+  "born_in": "Mass.",
+  "occupation": "Biological chemist.",
+  "years": [
+   "1878",
+   "1942"
+  ]
+ },
+ "Q61946964": {
+  "roll_name": "Philip Hichborn",
+  "lot": null,
+  "way": "Evergreen Path",
+  "born_in": "Mass.",
+  "occupation": "Naval constructor and officer, inventor.",
+  "years": [
+   "1839",
+   "1910"
+  ]
+ },
+ "Q15527838": {
+  "roll_name": "George Stillman Hillard",
+  "lot": null,
+  "way": "Sumac Path",
+  "born_in": "Maine",
+  "occupation": "Lawyer, author, editor, public official.",
+  "years": [
+   "1808",
+   "1879"
+  ]
+ },
+ "Q1443358": {
+  "roll_name": "Frank Harris Hitchcock",
+  "lot": "5221",
+  "way": null,
+  "born_in": "Ohio",
+  "occupation": "Postmaster General, campaign manager, lawyer.",
+  "years": [
+   "1867",
+   "1935"
+  ]
+ },
+ "Q5540653": {
+  "roll_name": "George Hodges",
+  "lot": "5306",
+  "way": "Excelsior Path",
+  "born_in": "N.T.",
+  "occupation": "Episcopal clergyman, author.",
+  "years": [
+   "1856",
+   "1919"
+  ]
+ },
+ "Q4667626": {
+  "roll_name": "Abiel Holmes",
+  "lot": null,
+  "way": null,
+  "born_in": "Conn.",
+  "occupation": "",
+  "years": [
+   "1763",
+   "1837"
+  ]
+ },
+ "Q319829": {
+  "roll_name": "Oliver Wendell Holmes",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1809",
+   "1894"
+  ]
+ },
+ "Q344838": {
+  "roll_name": "Winslow Homer",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1836",
+   "1910"
+  ]
+ },
+ "Q905966": {
+  "roll_name": "Eben Norton Horsford",
+  "lot": null,
+  "way": null,
+  "born_in": "N.Y.",
+  "occupation": "",
+  "years": [
+   "1818",
+   "1893"
+  ]
+ },
+ "Q448214": {
+  "roll_name": "Harriet Goodhue Hosmer",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1830",
+   "1908"
+  ]
+ },
+ "Q4712535": {
+  "roll_name": "Albion Parris Howe",
+  "lot": null,
+  "way": null,
+  "born_in": "Maine",
+  "occupation": "",
+  "years": [
+   "1818",
+   "1897"
+  ]
+ },
+ "Q241299": {
+  "roll_name": "Julia Ward Howe",
+  "lot": null,
+  "way": null,
+  "born_in": "N.Y.",
+  "occupation": "",
+  "years": [
+   "1819",
+   "1910"
+  ]
+ },
+ "Q256073": {
+  "roll_name": "Samuel Gridley Howe",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1801",
+   "1876"
+  ]
+ },
+ "Q5628285": {
+  "roll_name": "Horatio Hollis Hunnewell",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1810",
+   "1902"
+  ]
+ },
+ "Q4793814": {
+  "roll_name": "Harriot Kezia Hunt",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1805",
+   "1875"
+  ]
+ },
+ "Q5361770": {
+  "roll_name": "Elisha Huntington",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1796",
+   "1865"
+  ]
+ },
+ "Q8017439": {
+  "roll_name": "William Reed Huntington",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1838",
+   "1909"
+  ]
+ },
+ "Q715644": {
+  "roll_name": "Charles Thomas Jackson",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1805",
+   "1880"
+  ]
+ },
+ "Q2074738": {
+  "roll_name": "Patrick Tracy Jackson",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1780",
+   "1847"
+  ]
+ },
+ "Q5677338": {
+  "roll_name": "Harvey Jewell",
+  "lot": null,
+  "way": null,
+  "born_in": "N.H.",
+  "occupation": "",
+  "years": [
+   "1820",
+   "1881"
+  ]
+ },
+ "Q5364782": {
+  "roll_name": "Ellen Cheney Johnson",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1829",
+   "1899"
+  ]
+ },
+ "Q59729": {
+  "roll_name": "Edward Kent",
+  "lot": null,
+  "way": null,
+  "born_in": "N.H.",
+  "occupation": "",
+  "years": [
+   "1802",
+   "1877"
+  ]
+ },
+ "Q6260755": {
+  "roll_name": "John Thornton Kirkland",
+  "lot": null,
+  "way": null,
+  "born_in": "N.Y.",
+  "occupation": "",
+  "years": [
+   "1770",
+   "1840"
+  ]
+ },
+ "Q1507861": {
+  "roll_name": "George Martin Lane",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1823",
+   "1897"
+  ]
+ },
+ "Q2072796": {
+  "roll_name": "Christopher Coluatius Langdell",
+  "lot": null,
+  "way": null,
+  "born_in": "N.H.",
+  "occupation": "",
+  "years": [
+   "1826",
+   "1906"
+  ]
+ },
+ "Q306762": {
+  "roll_name": "Abbott Lawrence",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1792",
+   "1855"
+  ]
+ },
+ "Q8014355": {
+  "roll_name": "William Lawrence",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1850",
+   "1941"
+  ]
+ },
+ "Q37506083": {
+  "roll_name": "Hannah Farnham Sawyer Lee",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1780",
+   "1865"
+  ]
+ },
+ "Q5724779": {
+  "roll_name": "Henry Lee",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1782",
+   "1867"
+  ]
+ },
+ "Q110276010": {
+  "roll_name": "William Lindsey",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1858",
+   "1922"
+  ]
+ },
+ "Q174037": {
+  "roll_name": "Henry Cabot Lodge",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1850",
+   "1924"
+  ]
+ },
+ "Q152513": {
+  "roll_name": "Henry Wadsworth Longfellow",
+  "lot": null,
+  "way": null,
+  "born_in": "Maine",
+  "occupation": "",
+  "years": [
+   "1807",
+   "1882"
+  ]
+ },
+ "Q6285034": {
+  "roll_name": "Joseph Lovering",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1813",
+   "1892"
+  ]
+ },
+ "Q449670": {
+  "roll_name": "James Russell Lowell",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1819",
+   "1891"
+  ]
+ },
+ "Q6761651": {
+  "roll_name": "Maria White Lowell",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1821",
+   "1853"
+  ]
+ },
+ "Q7324809": {
+  "roll_name": "Richard Cockburn Maclaurin",
+  "lot": null,
+  "way": null,
+  "born_in": "Scotland",
+  "occupation": "/",
+  "years": [
+   "1870",
+   "1920"
+  ]
+ },
+ "Q55403594": {
+  "roll_name": "Henry Orlando Marcy",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1837",
+   "1924"
+  ]
+ },
+ "Q918671": {
+  "roll_name": "Jeremiah Mason",
+  "lot": "628",
+  "way": "Cypress Avenue",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, political leader, orator.",
+  "years": [
+   "1765",
+   "1848"
+  ]
+ },
+ "Q15452658": {
+  "roll_name": "Isaac McLellan",
+  "lot": "123",
+  "way": "Poplar Avenue",
+  "born_in": "Maine",
+  "occupation": "Sportsman, poet.",
+  "years": [
+   "1806",
+   "1899"
+  ]
+ },
+ "Q100918309": {
+  "roll_name": "Charles Marsh Mead",
+  "lot": "221",
+  "way": null,
+  "born_in": "Vermont",
+  "occupation": "Congregational clergyman. Biblical scholar.",
+  "years": [
+   "1336",
+   "1911"
+  ]
+ },
+ "Q94427757": {
+  "roll_name": "James Cushing Merrill",
+  "lot": null,
+  "way": "Snowdrop Path",
+  "born_in": "Mass.",
+  "occupation": "Arny surgeon, ornithologist, librarian.",
+  "years": [
+   "1853",
+   "1902"
+  ]
+ },
+ "Q64793": {
+  "roll_name": "Clifford Herschel Moore",
+  "lot": null,
+  "way": "Amethyst Path",
+  "born_in": "Mass.",
+  "occupation": "Classical scholar.",
+  "years": [
+   "1866",
+   "1931"
+  ]
+ },
+ "Q1498065": {
+  "roll_name": "Joseph Ballard Murdock",
+  "lot": "5152",
+  "way": "Crocus Path",
+  "born_in": "Conn.",
+  "occupation": "Naval officer, instructor in electricity",
+  "years": [
+   "1851",
+   "1931"
+  ]
+ },
+ "Q2628443": {
+  "roll_name": "Charles Eliot Norton",
+  "lot": "712",
+  "way": "Thistle Path",
+  "born_in": "Mass.",
+  "occupation": "Editor, professor of history of art at Harvard.",
+  "years": [
+   "1827",
+   "1908"
+  ]
+ },
+ "Q708039": {
+  "roll_name": "Richard Olney",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1835",
+   "1917"
+  ]
+ },
+ "Q2671428": {
+  "roll_name": "Frances Sargent Locke Osgood",
+  "lot": "280",
+  "way": "Orange Path",
+  "born_in": "Mass.",
+  "occupation": "Poet.",
+  "years": [
+   "1811",
+   "1850"
+  ]
+ },
+ "Q1586268": {
+  "roll_name": "Harrison Gray Otis",
+  "lot": "628",
+  "way": "Cypress Avenue",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, political leader, orator.",
+  "years": [
+   "1765",
+   "1848"
+  ]
+ },
+ "Q2839658": {
+  "roll_name": "Alpheus Spring Packard",
+  "lot": "2573",
+  "way": "Rose Path",
+  "born_in": "Maine",
+  "occupation": "Entomologist, editor.",
+  "years": [
+   "1839",
+   "1905"
+  ]
+ },
+ "Q5079404": {
+  "roll_name": "Charles Jackson Paine",
+  "lot": null,
+  "way": "Wistaria Path",
+  "born_in": "Mass.",
+  "occupation": "Soldier, capitalist, yachtsman.",
+  "years": [
+   "1833",
+   "1916"
+  ]
+ },
+ "Q94120925": {
+  "roll_name": "Henry Warren Paine",
+  "lot": "3130",
+  "way": "Arbutus Path",
+  "born_in": "Maine",
+  "occupation": "Lawyer, lecturer on law.",
+  "years": [
+   "1810",
+   "1893"
+  ]
+ },
+ "Q221926": {
+  "roll_name": "John Gorham Palfrey",
+  "lot": "36",
+  "way": "Sweetbrier Path",
+  "born_in": "Mass.",
+  "occupation": "Unitarian clergyman, professor of sacred litera-",
+  "years": [
+   "1796",
+   "1881"
+  ]
+ },
+ "Q289420": {
+  "roll_name": "James Cutler Dunn Parker",
+  "lot": "3917",
+  "way": "Vinca Path",
+  "born_in": "Mass.",
+  "occupation": "Composer, organist, teacher of music.",
+  "years": [
+   "1828",
+   "1916"
+  ]
+ },
+ "Q1340161": {
+  "roll_name": "Francis Parkman",
+  "lot": "2919",
+  "way": "Indian  Ridge Path",
+  "born_in": "Mass.",
+  "occupation": "Historian, horticulturist.",
+  "years": [
+   "1823",
+   "1393"
+  ]
+ },
+ "Q5081652": {
+  "roll_name": "Charles Pickering",
+  "lot": null,
+  "way": "Maple Avenue",
+  "born_in": "Pa.",
+  "occupation": "Physician, naturalist, botanist, zoologist.",
+  "years": [
+   "1805",
+   "1873"
+  ]
+ },
+ "Q2742184": {
+  "roll_name": "John Pierpont",
+  "lot": null,
+  "way": "Lavender Path",
+  "born_in": "Conn.",
+  "occupation": "Unitarian clergyman, poet, reformer.",
+  "years": [
+   "1785",
+   "1866"
+  ]
+ },
+ "Q505844": {
+  "roll_name": "William Hickling Prescott",
+  "lot": "5975",
+  "way": "Orion Path",
+  "born_in": "Mass.",
+  "occupation": "Historian.",
+  "years": [
+   "1796",
+   "1359"
+  ]
+ },
+ "Q5339769": {
+  "roll_name": "Edmund Quincy",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Abolitionist, author.",
+  "years": [
+   "1808",
+   "1877"
+  ]
+ },
+ "Q189465": {
+  "roll_name": "Theodore William Richards",
+  "lot": "221",
+  "way": null,
+  "born_in": "Pa.",
+  "occupation": "Chemist.",
+  "years": [
+   "1868",
+   "1928"
+  ]
+ },
+ "Q28935221": {
+  "roll_name": "Maurice Howe Richardson",
+  "lot": "6271",
+  "way": "Wistaria Path",
+  "born_in": "Mass.",
+  "occupation": "Surgeon, professor of surgery.",
+  "years": [
+   "1851",
+   "1912"
+  ]
+ },
+ "Q19596699": {
+  "roll_name": "George Feabody Riddle",
+  "lot": null,
+  "way": "Larch Avenue",
+  "born_in": "Mass.",
+  "occupation": "Actor, reader.",
+  "years": [
+   "1851",
+   "1910"
+  ]
+ },
+ "Q3048662": {
+  "roll_name": "Edward Robinson",
+  "lot": "5355",
+  "way": "Grapevine Path",
+  "born_in": "Mass.",
+  "occupation": "Director of Metropolitan Museum of Art,",
+  "years": [
+   "1858",
+   "1931"
+  ]
+ },
+ "Q306767": {
+  "roll_name": "Abbott Lawrence Rotch",
+  "lot": null,
+  "way": "Bellwort Path",
+  "born_in": "Mass.",
+  "occupation": "Meteorologist.",
+  "years": [
+   "1861",
+   "1912"
+  ]
+ },
+ "Q471260": {
+  "roll_name": "Josiah Royce",
+  "lot": "5278",
+  "way": "Excelsior Path",
+  "born_in": "California",
+  "occupation": "Philosopher.",
+  "years": [
+   "1855",
+   "1916"
+  ]
+ },
+ "Q680460": {
+  "roll_name": "William Eustis Russell",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1857",
+   "1896"
+  ]
+ },
+ "Q111722851": {
+  "roll_name": "James S. Sanborn",
+  "lot": "6005",
+  "way": "Bradlee Road",
+  "born_in": "Maine",
+  "occupation": "Merchant.",
+  "years": [
+   "1835",
+   "1903"
+  ]
+ },
+ "Q99674441": {
+  "roll_name": "John Osborne Sargent",
+  "lot": null,
+  "way": "Indian  Ridge Path",
+  "born_in": "Mass.",
+  "occupation": "Lawyer, journalist, translator.",
+  "years": [
+   "1811",
+   "1891"
+  ]
+ },
+ "Q5902117": {
+  "roll_name": "Horace Elisha Scudder",
+  "lot": "392",
+  "way": "Oak Avenue",
+  "born_in": "Mass.",
+  "occupation": "Editor, author.",
+  "years": [
+   "1838",
+   "1902"
+  ]
+ },
+ "Q723149": {
+  "roll_name": "Samuel Hubbard Scudder",
+  "lot": null,
+  "way": "Myrtle Path",
+  "born_in": "Mass.",
+  "occupation": "Entomologist, paleontologist.",
+  "years": [
+   "1837",
+   "1911"
+  ]
+ },
+ "Q5218746": {
+  "roll_name": "Daniel Sharp",
+  "lot": "902",
+  "way": "Chapel Avenue",
+  "born_in": "England",
+  "occupation": "Baptist clergyman, religious writer.",
+  "years": [
+   "1783",
+   "1853"
+  ]
+ },
+ "Q63112067": {
+  "roll_name": "George Cheyne Shattuck",
+  "lot": "575",
+  "way": "Pilgrim Path",
+  "born_in": "Mass.",
+  "occupation": "Physician, philanthropist, founder of St. Paul's",
+  "years": [
+   "1813",
+   "1893"
+  ]
+ },
+ "Q6521576": {
+  "roll_name": "Lemuel Shaw",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1781",
+   "1861"
+  ]
+ },
+ "Q5080239": {
+  "roll_name": "Charles Lewis Slattery",
+  "lot": "5362",
+  "way": "Glen Avenue",
+  "born_in": "Pa.",
+  "occupation": "Episcopal bishop, religious writer.",
+  "years": [
+   "1867",
+   "1930"
+  ]
+ },
+ "Q471925": {
+  "roll_name": "Herbert Weir Smyth",
+  "lot": "6602",
+  "way": "Goldenrod Path",
+  "born_in": "Delaware",
+  "occupation": "Greek scholar.",
+  "years": [
+   "1851",
+   "1937"
+  ]
+ },
+ "Q589759": {
+  "roll_name": "Jared Sparks",
+  "lot": "3397",
+  "way": "Garden Avenue",
+  "born_in": "Conn.",
+  "occupation": "Unitarian clergyman, editor, historian.",
+  "years": [
+   "1789",
+   "1866"
+  ]
+ },
+ "Q2067943": {
+  "roll_name": "Peleg Sprague",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1793",
+   "1880"
+  ]
+ },
+ "Q5541884": {
+  "roll_name": "George Luther Stearns",
+  "lot": null,
+  "way": "Sedge Path",
+  "born_in": "Mass.",
+  "occupation": "Free-Soiler.",
+  "years": [
+   "1809",
+   "1867"
+  ]
+ },
+ "Q17037802": {
+  "roll_name": "Francis Humphreys Storer",
+  "lot": "973",
+  "way": "Heliotrope Path",
+  "born_in": "Mass.",
+  "occupation": "Agricultural chemist.",
+  "years": [
+   "1832",
+   "1914"
+  ]
+ },
+ "Q16031063": {
+  "roll_name": "Charles Storer Storrow",
+  "lot": "1698",
+  "way": "Thistle Path",
+  "born_in": "Canada",
+  "occupation": "Engineer.",
+  "years": [
+   "1809",
+   "1904"
+  ]
+ },
+ "Q1368374": {
+  "roll_name": "Joseph Story",
+  "lot": null,
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "",
+  "years": [
+   "1779",
+   "1845"
+  ]
+ },
+ "Q8008879": {
+  "roll_name": "William Sturgis",
+  "lot": "310",
+  "way": "Catalpa Path",
+  "born_in": "Mass.",
+  "occupation": "Merchant, legislator.",
+  "years": [
+   "1782",
+   "1863"
+  ]
+ },
+ "Q1066198": {
+  "roll_name": "Charles Sumner",
+  "lot": null,
+  "way": "Arethusa Path",
+  "born_in": "Mass.",
+  "occupation": "Abolitionist, orator, political leader.",
+  "years": [
+   "1811",
+   "1874"
+  ]
+ },
+ "Q515330": {
+  "roll_name": "Frank William Taussig",
+  "lot": "1520",
+  "way": "Colunbine Path",
+  "born_in": "Missouri",
+  "occupation": "Economist.",
+  "years": [
+   "1859",
+   "1940"
+  ]
+ },
+ "Q6283949": {
+  "roll_name": "Joseph Henry Thayer",
+  "lot": "221",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Congregational clergyman. Biblical scholar.",
+  "years": [
+   "1828",
+   "1901"
+  ]
+ },
+ "Q8017754": {
+  "roll_name": "William Roscoe Thayer",
+  "lot": "675",
+  "way": "Iris Path",
+  "born_in": "Mass.",
+  "occupation": "Biographer, historian, editor.",
+  "years": [
+   "1859",
+   "1923"
+  ]
+ },
+ "Q5083046": {
+  "roll_name": "Charles Tufts",
+  "lot": "2870",
+  "way": "Central Avenue",
+  "born_in": "Mass.",
+  "occupation": "Founder of Tufts College.",
+  "years": [
+   "1781",
+   "1876"
+  ]
+ },
+ "Q15430967": {
+  "roll_name": "Robert DeCourcy Ward",
+  "lot": "6253",
+  "way": "Orion Path",
+  "born_in": "Mass.",
+  "occupation": "Meteorologist, climatologist, technical editor.",
+  "years": [
+   "1867",
+   "1931"
+  ]
+ },
+ "Q3568911": {
+  "roll_name": "William Robert Ware",
+  "lot": "202",
+  "way": "Locust Avenue",
+  "born_in": "Mass.",
+  "occupation": "Architect, educator, writer.",
+  "years": [
+   "1832",
+   "1915"
+  ]
+ },
+ "Q931005": {
+  "roll_name": "Josiah Warren",
+  "lot": "2078",
+  "way": "Eglantine Path",
+  "born_in": "Mass.",
+  "occupation": "Social reformer, philosophical anarchist, inventor.",
+  "years": [
+   "1798",
+   "1374"
+  ]
+ },
+ "Q8008913": {
+  "roll_name": "William Fairfield Warren",
+  "lot": "5263",
+  "way": null,
+  "born_in": "Mass.",
+  "occupation": "Methodist clergyman, first president of",
+  "years": [
+   "1833",
+   "1929"
+  ]
+ },
+ "Q440607": {
+  "roll_name": "Emory Washburn",
+  "lot": null,
+  "way": "Spruce Avenue",
+  "born_in": "Mass.",
+  "occupation": "Governor of Massachusetts, professor of law.",
+  "years": [
+   "1800",
+   "1377"
+  ]
+ },
+ "Q960820": {
+  "roll_name": "Sereno Watson",
+  "lot": "330",
+  "way": "Amaranth Path",
+  "born_in": "Conn.",
+  "occupation": "Botanist.",
+  "years": [
+   "1826",
+   "1892"
+  ]
+ },
+ "Q377651": {
+  "roll_name": "Edwin Percy Whipple",
+  "lot": "2699",
+  "way": "Bellwort Path",
+  "born_in": "Mass.",
+  "occupation": "Critic, essayist, lecturer.",
+  "years": [
+   "1819",
+   "1886"
+  ]
+ },
+ "Q94900293": {
+  "roll_name": "Horatio Stevens White",
+  "lot": "7869",
+  "way": "Pond Road",
+  "born_in": "N.Y.",
+  "occupation": "German scholar, editor.",
+  "years": [
+   "1852",
+   "1934"
+  ]
+ },
+ "Q55720814": {
+  "roll_name": "James Clarke White",
+  "lot": "1396",
+  "way": "Heliotrope Path",
+  "born_in": "Maine",
+  "occupation": "Dermatologist, curator of comparative anatomy,",
+  "years": [
+   "1833",
+   "1916"
+  ]
+ },
+ "Q7795085": {
+  "roll_name": "Thomas Whittemore",
+  "lot": "2007",
+  "way": "Sorrel Path",
+  "born_in": "Mass.",
+  "occupation": "Universalist clergyman, religious editor, writer,",
+  "years": [
+   "1800",
+   "1661"
+  ]
+ },
+ "Q971493": {
+  "roll_name": "Nathaniel Parker Willis",
+  "lot": "972",
+  "way": "Spruce Avenue",
+  "born_in": "Maine",
+  "occupation": "Journalist, poet, editor, essayist, playwright.",
+  "years": [
+   "1806",
+   "1867"
+  ]
+ },
+ "Q2048239": {
+  "roll_name": "Joseph Winlock",
+  "lot": "3019",
+  "way": "Buckthorn Path",
+  "born_in": "Kentucky",
+  "occupation": "Astronomer, mathematician.",
+  "years": [
+   "1826",
+   "1875"
+  ]
+ },
+ "Q1375119": {
+  "roll_name": "Robert Charles Winthrop",
+  "lot": null,
+  "way": "Lawn Avenue",
+  "born_in": "Mass.",
+  "occupation": "Political leader, orator, historical writer.",
+  "years": [
+   "1809",
+   "1894"
+  ]
+ },
+ "Q14593752": {
+  "roll_name": "Henry Augustus Wise",
+  "lot": "17",
+  "way": "Magnolia Avenue",
+  "born_in": "N.Y.",
+  "occupation": "Naval officer, author.",
+  "years": [
+   "1819",
+   "1869"
+  ]
+ },
+ "Q6238997": {
+  "roll_name": "John Henry Wright",
+  "lot": "5081",
+  "way": null,
+  "born_in": "Persia",
+  "occupation": "Greek scholar, editor.",
+  "years": [
+   "1852",
+   "1908"
+  ]
+ },
+ "Q6969701": {
+  "roll_name": "Nathaniel Jarvis Wyeth",
+  "lot": "3031",
+  "way": "Fountain Avenue",
+  "born_in": "Mass.",
+  "occupation": "Trader, explorer.",
+  "years": [
+   "1802",
+   "1856"
+  ]
+ },
+ "Q3956787": {
+  "roll_name": "John Wesley Young",
+  "lot": "3816",
+  "way": "Mistletoe Path",
+  "born_in": "Ohio",
+  "occupation": "Mathematician, technical editor.",
+  "years": [
+   "1879",
+   "1932"
+  ]
+ }
+}

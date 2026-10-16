@@ -504,6 +504,36 @@ def main():
                 m = match_known_path(p['plot'], list(paths_geo))
                 if m:
                     p['path'], p['pathSource'] = m, 'Wikidata'
+        # Mount Auburn's own books (Internet Archive, public domain):
+        # the 1952 Roll of Distinction (lot and path for notable residents)
+        # and the 1857/1860 lot catalogues (path for each lot number).
+        try:
+            sys.path.insert(0, os.path.dirname(__file__))
+            import parse_roll, parse_catalogues
+            iadir = os.path.join(os.path.dirname(OUT), 'sources', 'ia')
+            known = list(paths_geo)
+            roll = {}
+            if os.path.exists(os.path.join(iadir, 'proprietorsofcem00moun.txt')):
+                names, recs = parse_roll.parse(open(os.path.join(iadir, 'proprietorsofcem00moun.txt')).read())
+                roll = parse_roll.match(names, recs, list(people.values()))
+            lots = parse_catalogues.main(known)['lot_paths'] if os.path.exists(os.path.join(iadir, 'index.json')) else {}
+            from_roll = from_table = 0
+            for q, v in roll.items():
+                p = people[q]
+                way = parse_catalogues.to_known(re.sub(r'\s+', ' ', v['way']), known) if v.get('way') else None
+                p['roll1952'] = {k: v[k] for k in ('occupation', 'born_in') if v.get(k)}
+                if way and not p.get('path'):
+                    p['path'], p['pathSource'] = way, 'Roll of Distinction (1952)'
+                    from_roll += 1
+                if v.get('lot') and not p.get('lot') and (not way or way == p.get('path')):
+                    p['lot'] = v['lot']
+            for p in people.values():
+                if p.get('lot') and not p.get('path') and lots.get(p['lot']):
+                    p['path'], p['pathSource'] = lots[p['lot']], 'Lot catalogue (1857/1860)'
+                    from_table += 1
+            print('roll of distinction:', len(roll), 'matched,', from_roll, 'paths; lot catalogues:', from_table, 'paths')
+        except Exception:
+            LOG.append('FAILED: Mount Auburn books\n' + traceback.format_exc())
         # A photo description naming "Fifth Avenue" is about a house, not a grave.
         dropped = 0
         for p in people.values():

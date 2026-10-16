@@ -440,6 +440,13 @@
   // Wikidata descriptions often end with the dates already shown beside them.
   const cleanDesc = (d) => String(d || '').replace(/\s*\(\s*\d{3,4}\s*[-–]\s*\d{0,4}\s*\)\s*$/, '').trim();
 
+  const SOURCE_NOTE = {
+    'Wikidata': 'from Wikidata',
+    'Roll of Distinction (1952)': 'from Mount Auburn’s 1952 Roll of Distinction',
+    'Lot catalogue (1857/1860)': 'from Mount Auburn’s lot catalogues of 1857–60',
+    Wikipedia: 'from Wikipedia',
+  };
+
   // Commons sometimes doubles the author string ("Unknown authorUnknown author").
   const artistOf = (a) => String(a || 'Unknown').replace(/^(.+?)\s*\1$/, '$1');
   const credit = (img) => `Photo: <a href="${esc(img.page)}" target="_blank" rel="noopener">${esc(artistOf(img.artist))}${img.license ? `, ${esc(img.license)}` : ''}</a>, Wikimedia Commons`;
@@ -551,7 +558,8 @@
         <h2>${esc(person.label)}</h2>
         ${cleanDesc(person.description) ? `<p class="sub">${esc(cleanDesc(person.description))}</p>` : ''}
         <p class="glance" id="glance">${esc(Life.glance(person, []))}</p>
-        ${person.path || person.lot ? `<p class="lot-line">Buried ${person.lot ? `in Lot ${esc(person.lot)}, ` : 'on '}${esc(person.path || 'Mount Auburn')}</p>` : ''}
+        ${person.path || person.lot ? `<p class="lot-line">Buried ${person.lot ? `in Lot ${esc(person.lot)}, ` : 'on '}${esc(person.path || 'Mount Auburn')}${person.pathSource ? ` <span class="lot-src">· ${esc(SOURCE_NOTE[person.pathSource] || person.pathSource)}</span>` : ''}</p>` : ''}
+        ${person.roll1952 && person.roll1952.occupation ? `<p class="roll-line">Mount Auburn’s 1952 Roll of Distinction: “${esc(person.roll1952.occupation.replace(/\.$/, ''))}${person.roll1952.born_in ? `, born in ${esc(person.roll1952.born_in.replace(/\.$/, '.'))}` : ''}”</p>` : ''}
         ${fromStone ? `<p class="stone-line"><span class="tag you">On the stone</span>${esc(fromStone)}</p>` : ''}
         <p class="verdict-line">${verdict}</p>
       </div>
@@ -943,11 +951,20 @@
     // label (keep the dot) when every spot collides with one already placed.
     const fs = R / 17, dotR = R / 38, placed = [{ x0: -R / 25, x1: R / 25, y0: -R / 25, y1: R / 25 }];
     const hit = (b) => placed.some((q) => b.x0 < q.x1 && b.x1 > q.x0 && b.y0 < q.y1 && b.y1 > q.y0);
-    const pos = rows.map((r) => { const [la, lo] = r.at || [r.p.lat, r.p.lon]; const [xs, ys] = X(la, lo); return [+xs, +ys]; });
+    // Graves known only by their path: one marker per path, with a count.
+    const exact = rows.map((r, i) => ({ r, i })).filter(({ r }) => !r.path);
+    const byPath = new Map();
+    rows.forEach((r, i) => { if (r.path) { if (!byPath.has(r.path)) byPath.set(r.path, { r, idx: [] }); byPath.get(r.path).idx.push(i); } });
+    const marks = [
+      ...exact.map(({ r, i }) => ({ r, i, name: r.p.family ? tc(r.p.family) : r.p.label.split(' ').pop() })),
+      ...[...byPath.entries()].map(([path, g]) => ({ r: g.r, i: g.idx[0], group: g.idx, name: g.idx.length > 1 ? `${path.replace(/ (Path|Avenue|Road)$/, '')} · ${g.idx.length}` : (g.r.p.family ? tc(g.r.p.family) : g.r.p.label.split(' ').pop()) })),
+    ];
+    const pos = marks.map(({ r }) => { const [la, lo] = r.at || [r.p.lat, r.p.lon]; const [xs, ys] = X(la, lo); return [+xs, +ys]; });
     for (const [x, y] of pos) placed.push({ x0: x - dotR, x1: x + dotR, y0: y - dotR, y1: y + dotR });
-    const dots = rows.map((r, i) => {
-      const [x, y] = pos[i];
-      const name = r.p.family ? tc(r.p.family) : r.p.label.split(' ').pop();
+    const dots = marks.map((mk, k) => {
+      const r = mk.r, i = mk.i;
+      const [x, y] = pos[k];
+      const name = mk.name;
       const w = fs * 0.56 * name.length, h = fs;
       const spots = [
         [x + dotR * 1.4, y + h * 0.35, 'start'], [x - dotR * 1.4, y + h * 0.35, 'end'],
@@ -962,7 +979,8 @@
         label = `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${anchor}" font-size="${fs.toFixed(1)}">${esc(name)}</text>`;
         break;
       }
-      return `<g class="nm-grave${r.path ? ' approx' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(r.p.label)}">
+      const aria = mk.group && mk.group.length > 1 ? `${mk.group.length} graves on ${r.path}` : r.p.label;
+      return `<g class="nm-grave${r.path ? ' approx' : ''}" data-i="${i}"${mk.group && mk.group.length > 1 ? ` data-path="${esc(r.path)}"` : ''} tabindex="0" role="button" aria-label="${esc(aria)}">
         <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}"/>${label}
       </g>`;
     }).join('');
@@ -976,7 +994,17 @@
         <text class="nm-scale" x="${(-R + R / 20).toFixed(1)}" y="${(R - R / 20).toFixed(1)}" font-size="${(R / 17).toFixed(1)}">${Math.round(R)} m to the edge · north is up</text>
       </svg>`;
     for (const el of wrap.querySelectorAll('.nm-grave')) {
-      const open = () => { const r = rows[Number(el.dataset.i)]; S.stone = null; S.result = null; S.ocr = null; renderRecord({ kind: 'picked', person: r.p, distance: r.d }); };
+      const open = () => {
+        if (el.dataset.path) {
+          // Several graves on this path: show them in the list below.
+          const items = [...document.querySelectorAll('#nearby-list li')].filter((li) => li.querySelector('.np-path') && li.querySelector('.np-path').textContent === `on ${el.dataset.path}`);
+          for (const li of document.querySelectorAll('#nearby-list li.flash')) li.classList.remove('flash');
+          items.forEach((li) => li.classList.add('flash'));
+          if (items[0]) items[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        const r = rows[Number(el.dataset.i)]; S.stone = null; S.result = null; S.ocr = null; renderRecord({ kind: 'picked', person: r.p, distance: r.d });
+      };
       el.addEventListener('click', open);
       el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     }
