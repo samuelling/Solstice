@@ -527,6 +527,18 @@ def main():
                     from_roll += 1
                 if v.get('lot') and not p.get('lot') and (not way or way == p.get('path')):
                     p['lot'] = v['lot']
+            # Dearborn's Guide headers: "ROBERT G. SHAW. LOT 85. PINE AVENUE."
+            # Also writes data/guides.json, the guidebook passages.
+            import parse_guides
+            from_guide = 0
+            for q, (glot, gpath) in parse_guides.main(list(people.values()), known)['places'].items():
+                p = people[q]
+                if gpath and not p.get('path'):
+                    p['path'], p['pathSource'] = gpath, "Dearborn's Guide (1848–1857)"
+                    from_guide += 1
+                if glot and not p.get('lot') and (not gpath or gpath == p.get('path')):
+                    p['lot'] = glot
+            print("dearborn's guide:", from_guide, 'paths')
             for p in people.values():
                 if p.get('lot') and not p.get('path') and lots.get(p['lot']):
                     p['path'], p['pathSource'] = lots[p['lot']], 'Lot catalogue (1857/1860)'

@@ -113,6 +113,13 @@
     return (await textChunks.get(n))[qid] || null;
   }
 
+  // What the 19th-century guidebooks said about the grave (scripts/parse_guides.py).
+  let guides = null;
+  async function guidesOf(qid) {
+    if (!guides) guides = fetch('data/guides.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    return (await guides)[qid] || [];
+  }
+
   // ---------------------------------------------------------------------------
   // Family within Mount Auburn
   // ---------------------------------------------------------------------------
@@ -401,6 +408,6 @@
 
   root.SolsticeSources = {
     loadKnownBurials, wikidataDetails, wikipediaSummary, newspaperMentions,
-    deepLinks, titleCase, store, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []), paths: () => (bakedMeta ? bakedMeta.paths : {}),
+    deepLinks, titleCase, store, guidesOf, richSamples, familyOf, sameSurname, imagesOf, hasImages, textsOf, landmarks: () => (bakedMeta ? bakedMeta.landmarks : []), paths: () => (bakedMeta ? bakedMeta.paths : {}),
   };
 })(window);

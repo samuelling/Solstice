@@ -444,6 +444,7 @@
     'Wikidata': 'from Wikidata',
     'Roll of Distinction (1952)': 'from Mount Auburn’s 1952 Roll of Distinction',
     'Lot catalogue (1857/1860)': 'from Mount Auburn’s lot catalogues of 1857–60',
+    "Dearborn's Guide (1848–1857)": 'from Dearborn’s Guide through Mount Auburn, 1848–57',
     Wikipedia: 'from Wikipedia',
   };
 
@@ -569,6 +570,7 @@
       <div id="family-slot"></div>
       <div id="papers-wrap"><h3>In the newspapers</h3><div id="papers-slot"><p class="loading">Looking for newspaper pages…</p></div></div>
       <div id="grave-slot"></div>
+      <div id="guides-slot"></div>
       <div id="facts-slot"></div>
       <div id="period-slot"></div>
       ${known ? '' : `<div class="unknown-note"><h3>Nothing more on record here</h3><p>Solstice holds the ${S.known.length.toLocaleString()} people at Mount Auburn who have entries on Wikidata, out of roughly 100,000 buried here. Mount Auburn’s own archive can confirm a burial and its lot for free, and Find a Grave volunteers have photographed many more stones.</p></div>`}
@@ -591,6 +593,11 @@
         if (img.grave) {
           $('#grave-slot').innerHTML = `<h3>Their grave</h3><figure class="grave-photo wide"><img src="${img.grave.data}" alt="The grave of ${esc(person.label)}"><figcaption>${credit(img.grave)}</figcaption></figure>`;
         }
+      });
+    }
+    if (known) {
+      Src.guidesOf(person.qid).then((g) => {
+        if (g.length && S.recordToken === token) renderGuides(g);
       });
     }
     $('#again-btn').onclick = () => go('capture');
@@ -715,6 +722,16 @@
     </details>`;
   }
 
+
+  function renderGuides(passages) {
+    $('#guides-slot').innerHTML = `<h3>In the old guidebooks</h3>
+      <p class="hint">From the 1830s visitors walked Mount Auburn with pocket guides that stopped at notable graves. Quoted as the pages were scanned, so expect the odd garbled word.</p>
+      ${passages.map((x) => `<figure class="guide">
+        ${x.header ? `<p class="guide-head">${esc(x.header)}</p>` : ''}
+        <blockquote>${esc(x.text)}</blockquote>
+        <figcaption><span class="tag period">Period guide</span><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}, ${x.year}</a></figcaption>
+      </figure>`).join('')}`;
+  }
 
   function renderOtherBios(texts) {
     const bios = [

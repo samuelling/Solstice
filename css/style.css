@@ -452,3 +452,9 @@ li.tl-end .tl-text { font-family: var(--body); font-weight: 600; padding-top: 2p
 .lot-src { font-size: 0.8rem; }
 .roll-line { margin: 0 0 8px; font-size: 0.88rem; color: var(--muted); font-family: 'Source Serif 4', Georgia, serif; font-style: italic; }
 .nearby-list li.flash { animation: flash 2s ease-out; }
+
+/* Guidebook passages */
+figure.guide { margin: 0 0 18px; padding: 0 0 0 14px; border-left: 3px solid var(--line); }
+figure.guide .guide-head { margin: 0 0 4px; font-size: 0.78rem; letter-spacing: 0.06em; color: var(--muted); }
+figure.guide blockquote { margin: 0 0 6px; font-family: 'Source Serif 4', Georgia, serif; line-height: 1.6; }
+figure.guide figcaption { font-size: 0.85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }

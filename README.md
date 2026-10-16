@@ -34,6 +34,9 @@ No AI writes anything on the life page. Everything shown is either quoted from a
 - **In their own time** — the opening of a 19th- or early 20th-century encyclopedia entry (Wikisource).
 - **A life in dates** — sentences quoted from Wikipedia and the period entries that carry a year within their lifetime, one per year, spread across the life, each labelled with its source and section.
 - **Family at Mount Auburn**, **newspaper excerpts** (Library of Congress, only pages that contain their actual name), **their grave** (Commons photo), and **facts** grouped as work, honours and societies, service, life and death.
+- **In the old guidebooks** — what the visitors' guides of 1839–1865 (Dearborn's Guide, Mount Auburn Illustrated, the Cambridge railroad hand-books) said at their monument, quoted from Internet Archive scans (`scripts/parse_guides.py`).
+- **Archival biography** — from SNAC, written by archivists for the collections that hold their papers.
+- **Where they lie** — lot and path, with where that came from: Wikidata, Mount Auburn's 1952 Roll of Distinction, its 1857/1860 lot catalogues, or the headers in Dearborn's Guide ("ROBERT G. SHAW. LOT 85. PINE AVENUE.").
 
 When a stone isn't in the records, the page says so and points to Mount Auburn's archive, which confirms burials and lots for free.
 
@@ -61,6 +64,7 @@ node --test tests/core.test.js tests/life.test.js
 - `js/sources.js` — Wikidata, Wikipedia, Library of Congress, link-outs.
 - `js/life.js` — the life page: sentence splitting, the dated timeline, the at-a-glance line, the period pull quote, grouped facts. No DOM; tested in node.
 - `js/app.js` — the interface.
+- `scripts/` — data jobs run by GitHub Actions: `fetch_records.py` (Wikidata, Commons, OpenStreetMap, and the parsers for Mount Auburn's own books: `parse_roll.py`, `parse_catalogues.py`, `parse_guides.py`), `fetch_texts.py` (Wikipedia, Wikisource, SNAC, Chronicling America), `fetch_ia.py` (Internet Archive downloads).
 
 ## Next
 

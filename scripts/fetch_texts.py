@@ -203,13 +203,6 @@ def snac_bio(ark):
     return {'url': f'https://snaccooperative.org/ark:/99166/{ark.rsplit("/", 1)[-1]}', 'text': text[:5000]} if len(text) > 120 else None
 
 
-def bioguide(bid):
-    """Biographical Directory of the United States Congress (public domain)."""
-    d = get(f'https://bioguide.congress.gov/search/bio/{bid}.json')
-    data = d.get('data', d)
-    text = plain(data.get('profileText') or data.get('profile_text') or '')
-    return {'url': f'https://bioguide.congress.gov/search/bio/{bid}', 'text': text[:4000]} if len(text) > 60 else None
-
 # ---------------------------------------------------------------------------
 # Chronicling America: newspaper pages naming the person near their death
 # ---------------------------------------------------------------------------
@@ -388,8 +381,9 @@ def main():
     print('people with period entries:', n, 'of', len(links), 'linked')
     save_chunks(chunks)
 
-    # SNAC archival biographies and Congress biographies, by Wikidata link.
-    for prop, key, fetch in (('P3430', 'snac', snac_bio), ('P1157', 'congress', bioguide)):
+    # SNAC archival biographies, by Wikidata link. (The Congress directory sits
+    # behind a bot challenge, so it is linked from the page rather than fetched.)
+    for prop, key, fetch in (('P3430', 'snac', snac_bio),):
         try:
             ids = linked_ids(data['cemetery'], prop)
         except Exception as ex:
