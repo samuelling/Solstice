@@ -2,17 +2,25 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Jared+Sparks+Moore%22&dates=1951: The read operation timed out
-newspapers checked: 10 577 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+B.+Potter%22&dates=1949%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Chipman+Gray%22&dates=1881%: The read operation timed out
-newspapers checked: 20 1143 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Lowell+Gardner%22&dates=188: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Gardner%22&dates=1884%2F188: The read operation timed out
-newspapers checked: 30 1824 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+Rayner+Edmands%22&dates=191: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22John+Rayner+Edmands%22&dates=191: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22John+T.+Hassam%22&dates=1903%2F1: The read operation timed out
-newspapers checked: 40 2521 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Joseph+Putnam+Bradlee%22&dates=1: The read operation timed out
-newspapers checked this run: 46 | still to check: 254
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Joseph+Richards%22&dates=1900%2F: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Joshua+Wolcott%22&dates=1891%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Julia+Thayer%22&dates=1940%2F194: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Julia+Thayer%22&dates=1940%2F194: The read operation timed out
+newspapers checked: 10 1103 s
+newspapers checked: 20 1423 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucia+G.+Swett%22&dates=1934%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+Tuckerman+Weir%22&dates: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+Tuckerman+Weir%22&dates: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+T.+Weir%22&dates=1797%2: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+T.+Weir%22&dates=1797%2: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+Weir%22&dates=1797%2F17: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucy+H.+Everett%22&dates=1824%2F: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Lucy+H.+Everett%22&dates=1824%2F: HTTP Error 503: Service Unavailable
+newspapers checked: 30 2533 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mabel+Elwes%22&dates=1950%2F1951: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Mabel+Elwes%22&dates=1950%2F1951: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mabel+Lowell+Burnett%22&dates=18: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Marcus+M.+Kimball%22&dates=1939%: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Marcus+M.+Kimball%22&dates=1939%: The read operation timed out
+ERR loc search failed Marcus M. Kimball The read operation timed out
+newspapers checked this run: 34 | still to check: 220
