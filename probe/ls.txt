@@ -1,0 +1,8 @@
+total 3204
+drwxr-xr-x  2 runner runner    4096 Oct 16 22:26 .
+drwxr-xr-x 10 runner runner    4096 Oct 16 22:26 ..
+-rw-r--r--  1 runner runner  955294 Oct 16 22:26 collection.json
+-rw-r--r--  1 runner runner       0 Oct 16 22:26 ls.txt
+-rw-r--r--  1 runner runner 1464544 Oct 16 22:26 register1834.txt
+-rw-r--r--  1 runner runner  842199 Oct 16 22:26 register1834_manifest.json
+-rw-r--r--  1 runner runner    2848 Oct 16 22:26 robots.txt
