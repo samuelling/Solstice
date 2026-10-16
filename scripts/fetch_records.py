@@ -438,7 +438,7 @@ def main():
                 pm = pick_path(desc)
                 if pm and not p.get('path'):
                     p['path'] = norm_path(pm)
-                if lat is None or not (42.365 < lat < 42.378 and -71.155 < lon < -71.135):
+                if lat is None or not (42.3672 < lat < 42.3762 and -71.1520 < lon < -71.1380):  # the cemetery itself, not nearby houses
                     continue
                 if p.get('coordSource') in (None, 'grave photo'):
                     p['lat'], p['lon'], p['coordSource'] = round(lat, 6), round(lon, 6), 'Commons photo'
