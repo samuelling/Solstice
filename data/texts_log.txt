@@ -1,24 +1,24 @@
 wikipedia articles: 0
 people with period entries: 0 of 193 linked
+ERR retry 1: https://query.wikidata.org/sparql: The read operation timed out
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22R.+Waterston%22&dates=1893%2F189: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Richard+Fuller%22&dates=1910%2F1: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Richard+Fuller%22&dates=1910%2F1: The read operation timed out
-newspapers checked: 10 797 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+G.+Shaw%22&dates=1853%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+S.+Bradley%22&dates=1945%: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+Bradley%22&dates=1945%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+Treat+Paine%22&dates=1961: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+Treat+Paine%22&dates=1961: The read operation timed out
-ERR loc search failed Robert Treat Paine The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Rodman+Rotch%22&dates=1854%2F185: The read operation timed out
-newspapers checked: 20 1757 s
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Eliot+Guild%22&dates=1862: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Eliot+Guild%22&dates=1862: The read operation timed out
-ERR loc search failed Samuel Eliot Guild The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Webber%22&dates=1926%2F19: The read operation timed out
-newspapers checked: 30 2416 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Storrow+Higginson%22&date: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Storrow+Higginson%22&date: The read operation timed out
-newspapers checked this run: 38 | still to check: 104
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+Cabot+Parkman+Atkinson%22&: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+Dana+Thorndike%22&dates=18: The read operation timed out
+newspapers checked: 10 913 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+G.+Richards%22&dates=1914%: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+G.+Richards%22&dates=1914%: The read operation timed out
+newspapers checked: 20 1450 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sophia+Ritchie%22&dates=1874%2F1: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Sophia+Ritchie%22&dates=1874%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Stella+S.+Gilman%22&dates=1928%2: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Stella+S.+Gilman%22&dates=1928%2: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Burrill+Greene+Beals%22&da: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Burrill+Greene+Beals%22&da: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Copley+Cabot%22&dates=1861: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Copley+Cabot%22&dates=1861: The read operation timed out
+newspapers checked: 30 2651 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22T.+Jefferson+Coolidge%22&dates=1: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22T.+Jefferson+Coolidge%22&dates=1: The read operation timed out
+newspapers checked this run: 34 | still to check: 70
