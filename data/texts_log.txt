@@ -2,16 +2,23 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+Hamilton+Hill%22&dates=1952: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+Neilson%22&dates=1924%2F192: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+Jane+Derby%22&dates=1892%2F: IncompleteRead(1385184 bytes read, 419077 more expected)
-newspapers checked: 10 876 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+Louisa+Gardiner%22&dates=18: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+L.+Fowler%22&dates=1955%2F1: IncompleteRead(1544443 bytes read, 299509 more expected)
-newspapers checked: 20 1702 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mathilda+E.+Davis%22&dates=1960%: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mercy+S.+Hatch%22&dates=1852%2F1: The read operation timed out
-newspapers checked: 30 2380 s
-newspapers checked: 40 2707 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Philip+Howes+Sears%22&dates=1898: The read operation timed out
-newspapers checked this run: 44 | still to check: 142
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22R.+Waterston%22&dates=1893%2F189: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Richard+Fuller%22&dates=1910%2F1: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Richard+Fuller%22&dates=1910%2F1: The read operation timed out
+newspapers checked: 10 797 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+G.+Shaw%22&dates=1853%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+S.+Bradley%22&dates=1945%: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+Bradley%22&dates=1945%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+Treat+Paine%22&dates=1961: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Robert+Treat+Paine%22&dates=1961: The read operation timed out
+ERR loc search failed Robert Treat Paine The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Rodman+Rotch%22&dates=1854%2F185: The read operation timed out
+newspapers checked: 20 1757 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Eliot+Guild%22&dates=1862: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Eliot+Guild%22&dates=1862: The read operation timed out
+ERR loc search failed Samuel Eliot Guild The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Webber%22&dates=1926%2F19: The read operation timed out
+newspapers checked: 30 2416 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Storrow+Higginson%22&date: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Storrow+Higginson%22&date: The read operation timed out
+newspapers checked this run: 38 | still to check: 104
