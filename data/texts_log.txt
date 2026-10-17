@@ -2,25 +2,18 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Joseph+Richards%22&dates=1900%2F: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Joshua+Wolcott%22&dates=1891%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Julia+Thayer%22&dates=1940%2F194: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Julia+Thayer%22&dates=1940%2F194: The read operation timed out
-newspapers checked: 10 1103 s
-newspapers checked: 20 1423 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucia+G.+Swett%22&dates=1934%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+Tuckerman+Weir%22&dates: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+Tuckerman+Weir%22&dates: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+T.+Weir%22&dates=1797%2: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+T.+Weir%22&dates=1797%2: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucretia+Weir%22&dates=1797%2F17: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Lucy+H.+Everett%22&dates=1824%2F: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Lucy+H.+Everett%22&dates=1824%2F: HTTP Error 503: Service Unavailable
-newspapers checked: 30 2533 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mabel+Elwes%22&dates=1950%2F1951: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Mabel+Elwes%22&dates=1950%2F1951: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mabel+Lowell+Burnett%22&dates=18: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Marcus+M.+Kimball%22&dates=1939%: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Marcus+M.+Kimball%22&dates=1939%: The read operation timed out
-ERR loc search failed Marcus M. Kimball The read operation timed out
-newspapers checked this run: 34 | still to check: 220
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Margaret+Welch%22&dates=1830%2F1: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Margaret+Welch%22&dates=1830%2F1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Marianna+Slater%22&dates=1873%2F: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Marianna+Slater%22&dates=1873%2F: The read operation timed out
+ERR loc search failed Marianna Slater The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Marie+Mattingly%22&dates=1916%2F: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Marie+Garland%22&dates=1949%2F19: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Marie+Garland%22&dates=1949%2F19: The read operation timed out
+ERR loc search failed Marie Garland The read operation timed out
+newspapers checked: 10 1430 s
+newspapers checked: 20 1941 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+Hicks%22&dates=1826%2F1827&: IncompleteRead(61839 bytes read, 1778709 more expected)
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Mary+C.+Norcross%22&dates=1869%2: The read operation timed out
+newspapers checked: 30 2694 s
+newspapers checked this run: 34 | still to check: 186
