@@ -2,6 +2,4 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22William+Sumner+Appleton%22&dates: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22William+Sumner+Appleton%22&dates: The read operation timed out
-newspapers checked this run: 2 | still to check: 0
+newspapers checked this run: 0 | still to check: 0
