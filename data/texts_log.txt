@@ -1,24 +1,24 @@
 wikipedia articles: 0
 people with period entries: 0 of 193 linked
-ERR retry 1: https://query.wikidata.org/sparql: The read operation timed out
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Eliot+Guild%22&dates=1862: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+Cabot+Parkman+Atkinson%22&: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+Dana+Thorndike%22&dates=18: The read operation timed out
-newspapers checked: 10 913 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+G.+Richards%22&dates=1914%: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Sarah+G.+Richards%22&dates=1914%: The read operation timed out
-newspapers checked: 20 1450 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Sophia+Ritchie%22&dates=1874%2F1: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Sophia+Ritchie%22&dates=1874%2F1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Stella+S.+Gilman%22&dates=1928%2: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Stella+S.+Gilman%22&dates=1928%2: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Burrill+Greene+Beals%22&da: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Burrill+Greene+Beals%22&da: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Copley+Cabot%22&dates=1861: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Susan+Copley+Cabot%22&dates=1861: The read operation timed out
-newspapers checked: 30 2651 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22T.+Jefferson+Coolidge%22&dates=1: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22T.+Jefferson+Coolidge%22&dates=1: The read operation timed out
-newspapers checked this run: 34 | still to check: 70
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Appleton%22&dates=1872%2F: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Appleton%22&dates=1872%2F: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+B.+Winchester%22&dates=19: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Dickerson+Bergen%22&dates: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Dickerson+Bergen%22&dates: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Bergen%22&dates=1908%2F19: The read operation timed out
+newspapers checked: 10 876 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Lamb%22&dates=1887%2F1888: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Lamb%22&dates=1887%2F1888: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Russell+Sullivan%22&dates: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Russell+Sullivan%22&dates: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Wren+Ward%22&dates=1940%2: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Wren+Ward%22&dates=1940%2: The read operation timed out
+newspapers checked: 20 1990 s
+newspapers checked: 30 2450 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+Lincoln+Burrage%22&dates=: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+T.+Littlefield%22&dates=1: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+Littlefield%22&dates=1951: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+Littlefield%22&dates=1951: The read operation timed out
+newspapers checked this run: 34 | still to check: 36
