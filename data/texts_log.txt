@@ -2,23 +2,20 @@ wikipedia articles: 0
 people with period entries: 0 of 193 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 548 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Appleton%22&dates=1872%2F: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Appleton%22&dates=1872%2F: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+B.+Winchester%22&dates=19: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Dickerson+Bergen%22&dates: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Dickerson+Bergen%22&dates: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Bergen%22&dates=1908%2F19: The read operation timed out
-newspapers checked: 10 876 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Lamb%22&dates=1887%2F1888: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Lamb%22&dates=1887%2F1888: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Russell+Sullivan%22&dates: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Russell+Sullivan%22&dates: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Wren+Ward%22&dates=1940%2: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Thomas+Wren+Ward%22&dates=1940%2: The read operation timed out
-newspapers checked: 20 1990 s
-newspapers checked: 30 2450 s
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+Lincoln+Burrage%22&dates=: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+T.+Littlefield%22&dates=1: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+Littlefield%22&dates=1951: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Walter+Littlefield%22&dates=1951: The read operation timed out
-newspapers checked this run: 34 | still to check: 36
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Ward+Thoron%22&dates=1938%2F1939: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22William+D.+Brackett%22&dates=193: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22William+D.+Brackett%22&dates=193: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22William+Henry+Smith%22&dates=187: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22William+Henry+Smith%22&dates=187: The read operation timed out
+ERR loc search failed William Henry Smith IncompleteRead(20016 bytes read, 1809108 more expected)
+newspapers checked: 10 934 s
+newspapers checked: 20 1453 s
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22William+Sumner+Appleton%22&dates: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22William+Sumner+Appleton%22&dates: The read operation timed out
+ERR loc search failed William Sumner Appleton The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22William+Turell+Andrews%22&dates=: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22William+Turell+Andrews%22&dates=: The read operation timed out
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Winthrop+Ward+Chenery%22&dates=1: The read operation timed out
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Winthrop+Ward+Chenery%22&dates=1: The read operation timed out
+newspapers checked: 30 2475 s
+newspapers checked this run: 34 | still to check: 2
