@@ -435,6 +435,7 @@
     if (person.death) { fs.set('q.deathLikeDate.from', person.death - 1); fs.set('q.deathLikeDate.to', person.death + 1); }
     links.push({ label: 'FamilySearch records', url: `https://www.familysearch.org/search/record/results?${fs}`, note: 'Census, vital records, city directories — free account' });
 
+    links.push({ label: 'Mount Auburn’s grave locator', url: 'https://mountauburn.org/locate-a-grave/', note: `Their full burial records: search ${[given, family].filter(Boolean).join(' ') || 'the name'} to see the lot on a map` });
     links.push({ label: 'Ask Mount Auburn’s archive', url: 'https://mountauburn.org/genealogical-research-services/', note: 'Free burial verification with lot and path; lot cards and correspondence for a fee' });
     return links;
   }
