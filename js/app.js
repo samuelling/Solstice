@@ -6,6 +6,7 @@
   const OCR = window.SolsticeOCR;
   const Life = window.SolsticeLife;
   const NOTES_KEY = 'solstice.notes.v1';
+  const PINS_KEY = 'solstice.pins.v1';   // { key: { lat, lon, acc, at, how, label } }
   const NEAR_CEMETERY_M = 1500;
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -18,6 +19,7 @@
     sample: null, canSeeImages: false,   // set inside a claude.ai artifact
     known: [],             // Wikidata burials
     notes: Src.store.get(NOTES_KEY) || [],
+    pins: Src.store.get(PINS_KEY) || {},
     ocr: null, parsed: null,
     yearSource: { birth: 'ocr', death: 'ocr' },
     stone: null, result: null,
@@ -146,8 +148,8 @@
   }
 
   function updateRecordsChip() {
-    const n = S.known.length, m = S.notes.length;
-    setChip('#records-chip', `${n.toLocaleString()} known burials${m ? ` · ${m} of yours` : ''}`, n ? 'on' : '');
+    const n = S.known.length, m = S.notes.length, k = Object.keys(S.pins || {}).length;
+    setChip('#records-chip', `${n.toLocaleString()} known burials${m ? ` · ${m} of yours` : ''}${k ? ` · ${k} pinned` : ''}`, n ? 'on' : '');
   }
 
   /** Wikidata people, enriched with field-note locations, plus field-note-only stones. */
@@ -168,8 +170,15 @@
         });
       }
     }
+    // Graves you pinned by hand: the most direct evidence there is.
+    for (const p of byQid.values()) {
+      const pin = S.pins[pinKeyOf(p)];
+      if (pin) Object.assign(p, { lat: pin.lat, lon: pin.lon, coordError: Math.max(pin.acc || 5, 3), coordSource: 'your pins', locatedByYou: true, pinned: pin });
+    }
     return [...byQid.values(), ...extra];
   }
+
+  const pinKeyOf = (p) => p.qid || p.pinKey || null;
 
   // ---------------------------------------------------------------------------
   // Capture
@@ -569,6 +578,7 @@
         <p class="glance" id="glance">${esc(Life.glance(person, []))}</p>
         ${(person.path || person.lot) && !person.gone ? `<p class="lot-line">Buried ${person.lot ? `in Lot ${esc(person.lot)}${person.grave ? `, grave ${esc(person.grave)}` : ''}, ` : 'on '}${esc(person.path || 'Mount Auburn')}${person.pathSource ? ` <span class="lot-src">· ${esc(SOURCE_NOTE[person.pathSource] || person.pathSource)}</span>` : ''}</p>` : ''}
         ${person.roll1952 && person.roll1952.occupation ? `<p class="roll-line">Mount Auburn’s 1952 Roll of Distinction: “${esc(person.roll1952.occupation.replace(/\.$/, ''))}${person.roll1952.born_in ? `, born in ${esc(person.roll1952.born_in.replace(/\.$/, '.'))}` : ''}”</p>` : ''}
+        ${pinKeyOf(person) && (known || fromRegister) ? '<div id="pin-slot"></div>' : ''}
         ${fromStone ? `<p class="stone-line"><span class="tag you">On the stone</span>${esc(fromStone)}</p>` : ''}
         <p class="verdict-line">${verdict}</p>
       </div>
@@ -611,6 +621,7 @@
         if (g.length && S.recordToken === token) renderGuides(g);
       });
     }
+    if (pinKeyOf(person) && (known || fromRegister)) renderPin(person);
     $('#again-btn').onclick = () => go('capture');
     $('#save-btn').onclick = () => saveNote(person, choice);
     $('#save-hint').textContent = gpsForMatching()
@@ -733,6 +744,93 @@
     </details>`;
   }
 
+
+  // ---------------------------------------------------------------------------
+  // Pinning a grave by hand: stand at it and take a fix, or paste coordinates.
+  // Pins stay on this device; they place the grave in "Who's buried near me"
+  // and count as location evidence when matching a stone.
+  // ---------------------------------------------------------------------------
+
+  const CEM_BOX = { s: 42.3655, n: 42.3780, w: -71.1545, e: -71.1360 };
+  const inCemetery = (lat, lon) => lat >= CEM_BOX.s && lat <= CEM_BOX.n && lon >= CEM_BOX.w && lon <= CEM_BOX.e;
+
+  function savePin(person, pin) {
+    const key = pinKeyOf(person);
+    if (pin) S.pins[key] = { ...pin, label: person.label, at: new Date().toISOString() };
+    else delete S.pins[key];
+    Src.store.set(PINS_KEY, S.pins);
+    renderPin(person);
+    updateRecordsChip();
+  }
+
+  function renderPin(person) {
+    const slot = $('#pin-slot');
+    if (!slot) return;
+    const pin = S.pins[pinKeyOf(person)];
+    if (pin) {
+      slot.innerHTML = `<p class="pin-line"><span class="tag you">Pinned by you</span> ${pin.lat.toFixed(6)}, ${pin.lon.toFixed(6)} · ±${Math.round(pin.acc || 5)} m · ${new Date(pin.at).toLocaleDateString()}
+        <span class="pin-actions"><button class="link-btn" type="button" id="pin-redo">Re-pin</button> · <button class="link-btn" type="button" id="pin-del">Remove</button></span></p>`;
+      $('#pin-redo').onclick = () => openPinPanel(person);
+      $('#pin-del').onclick = () => savePin(person, null);
+      return;
+    }
+    slot.innerHTML = `<p class="pin-line"><button class="link-btn" type="button" id="pin-open">📍 Pin this grave’s location</button>${person.lat != null ? ' <span class="muted">to correct the recorded spot</span>' : ''}</p>`;
+    $('#pin-open').onclick = () => openPinPanel(person);
+  }
+
+  function openPinPanel(person) {
+    const slot = $('#pin-slot');
+    slot.innerHTML = `<div class="pin-panel">
+      <p class="pin-title">Where is ${esc(person.label)}’s grave?</p>
+      <button class="btn primary" type="button" id="pin-here">I’m standing at it</button>
+      <p class="hint" id="pin-status">Stand at the stone. Solstice listens to your GPS for up to 20 seconds and keeps the steadiest fix.</p>
+      <details class="pin-manual"><summary>Or type coordinates</summary>
+        <input id="pin-coords" inputmode="decimal" placeholder="42.37120, -71.14600" aria-label="Latitude, longitude">
+        <p class="hint">Paste from a maps app (long-press the spot, copy the numbers).</p>
+        <button class="btn small" type="button" id="pin-save-coords">Save these</button>
+      </details>
+      <p class="hint">Saved on this phone only. Pinned graves show up in “Who’s buried near me” and help match stones you photograph here.</p>
+      <button class="link-btn" type="button" id="pin-cancel">Cancel</button>
+    </div>`;
+    let watch = null, best = null, timer = null;
+    const stop = () => { if (watch != null) navigator.geolocation.clearWatch(watch); watch = null; clearTimeout(timer); };
+    $('#pin-cancel').onclick = () => { stop(); renderPin(person); };
+    $('#pin-save-coords').onclick = () => {
+      const m = /(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)/.exec($('#pin-coords').value);
+      if (!m) { toast('Couldn’t read those numbers'); return; }
+      const lat = Number(m[1]), lon = Number(m[2]);
+      if (!inCemetery(lat, lon)) { toast('That point isn’t inside Mount Auburn'); return; }
+      stop(); savePin(person, { lat, lon, acc: 5, how: 'typed' });
+      toast('Grave pinned');
+    };
+    $('#pin-here').onclick = () => {
+      if (!navigator.geolocation) { $('#pin-status').textContent = 'This browser can’t share location.'; return; }
+      const status = $('#pin-status'), btn = $('#pin-here');
+      btn.disabled = true; best = null;
+      status.textContent = 'Listening to GPS…';
+      const finish = () => {
+        stop(); btn.disabled = false;
+        if (!best) { status.textContent = 'No GPS fix came in. Check that location is allowed, then try again.'; return; }
+        if (!inCemetery(best.lat, best.lon)) { status.textContent = `That fix (±${Math.round(best.acc)} m) is outside Mount Auburn, so it wasn’t saved.`; return; }
+        if (best.acc > 30) { status.textContent = `The best fix was only ±${Math.round(best.acc)} m. Step away from trees or buildings and try again, or type coordinates.`; return; }
+        savePin(person, { lat: best.lat, lon: best.lon, acc: best.acc, how: 'gps' });
+        toast(`Grave pinned (±${Math.round(best.acc)} m)`);
+      };
+      let done = false;
+      const take = (pos) => {
+        if (done) return;
+        const f = { lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy };
+        if (!best || f.acc < best.acc) best = f;
+        status.textContent = `Best so far ±${Math.round(best.acc)} m…`;
+        if (best.acc <= 4) { done = true; finish(); }
+      };
+      const opts = { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 };
+      // Some browsers only report to the first watcher; ask directly too.
+      navigator.geolocation.getCurrentPosition(take, () => {}, { ...opts, maximumAge: 3000 });
+      watch = navigator.geolocation.watchPosition(take, () => {}, opts);
+      timer = setTimeout(() => { if (!done) { done = true; finish(); } }, 20000);
+    };
+  }
 
   const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const fmtDay = (y, m, d) => [d, m ? MONTH_NAMES[m] : '', y].filter(Boolean).join(' ');
@@ -1021,7 +1119,7 @@
       Src.imagesOf(qid).then((img) => { if (img && img.portrait) slot.innerHTML = `<img src="${img.portrait.data}" alt="">`; });
     }
     const bySource = {};
-    for (const p of located) { const k = p.source === 'notes' || p.locatedByYou ? 'your saved stones' : (p.coordSource || 'Wikidata'); bySource[k] = (bySource[k] || 0) + 1; }
+    for (const p of located) { const k = p.pinned ? 'your pins' : p.source === 'notes' || p.locatedByYou ? 'your saved stones' : (p.coordSource || 'Wikidata'); bySource[k] = (bySource[k] || 0) + 1; }
     note.textContent = `Solstice knows where ${located.length} of Mount Auburn’s graves are to within a few metres (${Object.entries(bySource).map(([k, v]) => `${v} from ${k}`).join(', ')})${onPaths.length ? `, and the avenue or path for ${onPaths.length} more, measured to the nearest point of the path` : ''}. `
       + (g.accuracy > 30 ? `Your position is only good to about ${Math.round(g.accuracy)} m, so distances are rough. ` : '')
       + 'Save the stones you photograph and they’ll show up here next time.';
@@ -1160,7 +1258,7 @@
   }
 
   async function exportNotes() {
-    const json = JSON.stringify(S.notes, null, 2);
+    const json = JSON.stringify({ notes: S.notes, pins: S.pins }, null, 2);
     if (window.claude) {
       // Inside Claude, downloads from the page are blocked: copy instead.
       try { await navigator.clipboard.writeText(json); toast('Field notes copied as JSON'); } catch (e) { toast('Couldn’t copy on this browser'); }

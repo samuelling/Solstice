@@ -45,6 +45,10 @@ When a stone isn't in the records, the page says so and points to Mount Auburn's
 
 With location on (or "I'm near…" a landmark), Solstice lists every grave with a known position within 50, 150 or 400 m, nearest first. Positions come from Wikidata, OpenStreetMap, the GPS in grave photos on Wikimedia Commons, and stones you save.
 
+## Pinning a grave
+
+Any life page has "Pin this grave's location": stand at the stone and Solstice listens to GPS for up to 20 seconds and keeps the steadiest fix (refusing anything worse than ±30 m or outside the cemetery), or paste coordinates from a maps app. Pins live on the device, place the grave in "Who's buried near me", count as location evidence when matching, and are included in the JSON export.
+
 ## Field notes
 
 Saving a stone stores it with your location on the phone. Next time you're nearby it becomes a known grave, so matching sharpens the more you walk. Export as JSON from the bottom of the page.

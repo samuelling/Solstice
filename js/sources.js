@@ -106,6 +106,8 @@
       const sp = C.splitName(e.n);
       out.push({
         id: 'R' + i, source: 'register', register: [entry],
+        // Stable across monthly re-bakes (the index isn't): page, name, year.
+        pinKey: `reg:${e.p}:${C.normName(e.n).replace(/\s+/g, '-')}:${e.y}`,
         label: e.n.replace(/\s+/g, ' ').replace(/\b([A-Z])\s/g, '$1. '),
         description: `Buried ${e.y}${e.a != null ? `, aged ${e.a}` : ''} · ${e.s || 'public-lot register'}`,
         birth: null, death: e.y, deathAlt: e.m && e.m <= 3 ? e.y - 1 : null, age: e.a ?? null,
