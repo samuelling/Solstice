@@ -1,5 +1,5 @@
 wikipedia articles: 0
-people with period entries: 1 of 194 linked
+people with period entries: 0 of 194 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
-snac : 550 linked, 1 biographies this run
+snac : 550 linked, 0 biographies this run
 newspapers checked this run: 0 | still to check: 0
