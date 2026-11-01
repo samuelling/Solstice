@@ -1,11 +1,10 @@
 wikipedia articles: 0
 people with period entries: 0 of 194 linked
-ERR retry 1: https://query.wikidata.org/sparql: HTTP Error 502: Bad Gateway
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 551 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Benedict%22&dates=1957%2: HTTP Error 429: Too Many Requests
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Benedict%22&dates=1957%2: HTTP Error 429: Too Many Requests
-ERR loc search failed Francis Benedict HTTP Error 429: Too Many Requests
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+G.+Benedict%22&dates=195: HTTP Error 429: Too Many Requests
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+G.+Benedict%22&dates=195: HTTP Error 429: Too Many Requests
+ERR loc search failed Francis G. Benedict HTTP Error 429: Too Many Requests
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22J.+Harleston+Parker%22&dates=193: HTTP Error 429: Too Many Requests
 ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22J.+Harleston+Parker%22&dates=193: HTTP Error 429: Too Many Requests
 ERR loc search failed J. Harleston Parker HTTP Error 429: Too Many Requests
