@@ -2,11 +2,13 @@ wikipedia articles: 0
 people with period entries: 0 of 194 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 551 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Benedict%22&dates=1957%2: The read operation timed out
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Francis+Benedict%22&dates=1957%2: The read operation timed out
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22J.+Harleston+Parker%22&dates=193: HTTP Error 429: Too Many Requests
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22J.+Harleston+Parker%22&dates=193: HTTP Error 429: Too Many Requests
-ERR loc search failed J. Harleston Parker HTTP Error 429: Too Many Requests
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22J.+Harleston+Parker%22&dates=193: The read operation timed out
+ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
+ERR full text failed HTTP Error 429: Too Many Requests
+ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22J.+H.+Parker%22&dates=1930%2F193: HTTP Error 429: Too Many Requests
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22J.+H.+Parker%22&dates=1930%2F193: HTTP Error 429: Too Many Requests
+ERR loc search failed J. H. Parker HTTP Error 429: Too Many Requests
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Philip+Henry+Savage%22&dates=189: HTTP Error 429: Too Many Requests
 ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Philip+Henry+Savage%22&dates=189: HTTP Error 429: Too Many Requests
 ERR loc search failed Philip Henry Savage HTTP Error 429: Too Many Requests
@@ -34,4 +36,4 @@ ERR loc search failed Howard Gardner Nichols HTTP Error 429: Too Many Requests
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Francis+Batchelder%22&dat: HTTP Error 429: Too Many Requests
 ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Francis+Batchelder%22&dat: HTTP Error 429: Too Many Requests
 ERR loc search failed Samuel Francis Batchelder HTTP Error 429: Too Many Requests
-newspapers checked this run: 1 | still to check: 10
+newspapers checked this run: 0 | still to check: 10
