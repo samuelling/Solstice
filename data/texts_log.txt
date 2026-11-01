@@ -8,12 +8,6 @@ ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=
 ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
 ERR full text failed HTTP Error 429: Too Many Requests
 ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
-ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
-ERR full text failed HTTP Error 429: Too Many Requests
-ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Batchelder%22&dates=1879%: HTTP Error 429: Too Many Requests
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Batchelder%22&dates=1879%: HTTP Error 429: Too Many Requests
-ERR loc search failed Samuel Batchelder HTTP Error 429: Too Many Requests
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22William+H.+Furber%22&dates=1912%: HTTP Error 429: Too Many Requests
 ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22William+H.+Furber%22&dates=1912%: HTTP Error 429: Too Many Requests
 ERR loc search failed William H. Furber HTTP Error 429: Too Many Requests
@@ -35,4 +29,4 @@ ERR loc search failed Howard Gardner Nichols HTTP Error 429: Too Many Requests
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Francis+Batchelder%22&dat: HTTP Error 429: Too Many Requests
 ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Samuel+Francis+Batchelder%22&dat: HTTP Error 429: Too Many Requests
 ERR loc search failed Samuel Francis Batchelder HTTP Error 429: Too Many Requests
-newspapers checked this run: 1 | still to check: 8
+newspapers checked this run: 1 | still to check: 7
