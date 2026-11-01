@@ -2,7 +2,6 @@ wikipedia articles: 0
 people with period entries: 0 of 194 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 551 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22J.+Harleston+Parker%22&dates=193: The read operation timed out
 ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
 ERR full text failed HTTP Error 429: Too Many Requests
 ERR retry 1: https://tile.loc.gov/text-services/word-coordinates-service?format=alto_xml&segment=%2Fser: HTTP Error 429: Too Many Requests
