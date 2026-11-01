@@ -2,9 +2,9 @@ wikipedia articles: 0
 people with period entries: 0 of 194 linked
 ERR snac failed for Q64111554 SNAC HTTP Error 404: Not Found
 snac : 551 linked, 0 biographies this run
-ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Alexander+Cochrane%22&dates=1928: HTTP Error 429: Too Many Requests
-ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Alexander+Cochrane%22&dates=1928: HTTP Error 429: Too Many Requests
-ERR loc search failed Alexander Cochrane HTTP Error 429: Too Many Requests
+ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Alexander+L.+Cochrane%22&dates=1: HTTP Error 429: Too Many Requests
+ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Alexander+L.+Cochrane%22&dates=1: HTTP Error 429: Too Many Requests
+ERR loc search failed Alexander L. Cochrane HTTP Error 429: Too Many Requests
 ERR retry 1: https://www.loc.gov/collections/chronicling-america/?q=%22Charles+Merriam%22&dates=1906%2F: HTTP Error 429: Too Many Requests
 ERR retry 2: https://www.loc.gov/collections/chronicling-america/?q=%22Charles+Merriam%22&dates=1906%2F: HTTP Error 429: Too Many Requests
 ERR loc search failed Charles Merriam HTTP Error 429: Too Many Requests
